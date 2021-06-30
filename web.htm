@@ -1,0 +1,42 @@
+<!doctype html>
+<html style="height:100%;">
+<head>
+<meta charset="UTF-8">
+<title>Listen and Talk</title>
+<script type="text/javascript">
+  if (screen.width <= 699) {
+    document.location = "index.html?v=17";
+  }
+
+  function getQueryVariable(variable){
+         var query = window.location.search.substring(1);
+         var vars = query.split("&");
+         for (var i=0;i<vars.length;i++) {
+                 var pair = vars[i].split("=");
+                 if(pair[0] == variable){
+                     var str=decodeURIComponent(pair[1]);
+                     return str;
+                 }
+         }
+         return(false);
+  }
+
+  var language="mangarrayi"; if(getQueryVariable("lang")){language=getQueryVariable("lang");}
+
+  var languageCap = language.toLowerCase().replace(/\b[a-z]/g, function(letter) { return letter.toUpperCase();}); //capitalises first letter
+  document.title="Listen and Talk - "+languageCap;
+  if (language==="mangarrayi"){document.title="Warrma Mangarrayi";}
+
+  var id=0; if(getQueryVariable("id")){id=getQueryVariable("id");}
+  var urlString="index.html?lang="+language+"&id="+id+"&v=17";
+
+</script>
+</head>
+
+<body style="text-align: center; height:100%;">
+  <script type="text/javascript">
+    document.write('<iframe width="480px" height="853px" src="'+urlString+'" style="margin:auto;"></iframe>');
+  </script>
+
+</body>
+</html>

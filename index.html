@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html><head>
+	<meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src * data: gap: https://ssl.gstatic.com 'unsafe-eval';
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' *;
+        connect-src 'self' 'unsafe-inline' 'unsafe-eval' blob: ws: *;
+        ">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+       <meta name="viewport" content="height=device-height,width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,minimal-ui"/>
+
+			 <link rel="stylesheet" type="text/css" href="css/index.css?23">
+				<style id="modifiedStyles"></style>
+        <title></title>
+    </head>
+    <body>
+
+			<div id="appHolder" class="nonbounce">
+
+        <div id="deviceready" class="screen"><div class="event listening">Connecting!</div>
+			  <div class="event received">Launching<br><br></div></div>
+
+				<!-- LAUNCH-->
+       	<div id="launch" class="screen bluegradient"><img src="images/logo.png" class="launchlogo" alt="Logo"></div>
+
+				<!-- WARN SCREEN-->
+				<div id="warning" class="screen bluegradient invisible">
+            <div class="warningHeader paddedContent"><h1 class="appTitle"></h1></div>
+            <div class="warningBody blue paddedContent">
+							<h2>Warning</h2>
+							<p>Aboriginal and/or Torres Strait Islander peoples should be aware that this app may contain the voices of people who have passed away.</p>
+            <div class="button warningButton">OK</div>
+            </div>
+        </div>
+
+				<!-- TOKENS-->
+				<div id="token" class="screen bluegradient invisible">
+					<div class="tokenHeader paddedContent"><h1>Token</h1></div>
+					<div class="tokenSubHeader paddedContent"><h2>Enter your token</h2></div>
+					<div class="tokenBody paddedContent">
+						<input type="text" placeholder="Enter your token here*">
+						<p>*Ask JCAC to set up a token for you if you don't have one</p>
+						<div class="button tokenButton">OK</div>
+					</div>
+				</div>
+
+
+
+				<!-- DASHBOARD-->
+				<div id="dashboard" class="screen bluegradient invisible">
+					<div class="screenHeader">
+						<div class="screenHeaderTop">
+							<div class="headerLeft menuButton"><img src="images/icon_menu.png" class="menuButtonIcon" title="Menu" alt="3 lines"></div>
+							<div class="headerCentre"><div class="headerSearchBox"><input type="text" placeholder="Search" class="searchInput"></div><img src="images/icon_close.png" title="Close" alt="Close" onclick="hideSearch();"></div>
+						</div>
+						<div class="screenHeaderBottom">
+							<div class="navTile"><div class="headerSubmenu headerPictureSearch"><img src="images/icon_body.png" title="Picture search" alt=""></div></div>
+							<div class="navTile"><div class="headerSubmenu headerListSearch"><img src="images/icon_list.png?v=1" title="List all" alt=""></div></div>
+							<div class="navTile"><div class="headerSubmenu headerCategorySearch"><img src="images/icon_tag.png" title="Category search" alt=""></div></div>
+							<div class="navTile"><div class="headerSubmenu headerFavourites"><img src="images/icon_faves.png" title="Favourites" alt=""></div></div>
+							<div class="navTile"><div class="headerSubmenu headerActivity"><img src="images/icon_brain.png" title="Have a go" alt=""></div></div>
+						</div>
+					</div>
+
+				<div class="screenBody">
+				<div>
+					<div id="topicsContainer"></div>
+				</div>
+
+				<div id="subtopicsContainer">
+				<div class="topicHeader">
+					<div class="topicHeaderLeft">
+						<div class="topicHeaderImage" onclick="showTopics();"><img src="images/icon_left_white.png" alt="Back"></div>
+						<div class="topicHeaderTitle"></div>
+					</div>
+					<div class="topicHeaderIcon"><img src="images/icon_topic1.png" alt="" class="iconWhite"></div>
+				</div>
+
+				<div class="subtopics" id="subtopics"></div>
+				</div>
+
+				<div id="subtopicsExpandedContainer">
+				<div class="subtopicHeader">
+					<div class="topicHeaderLeft">
+						<div class="subtopicHeaderImage" onclick="showSubTopics(selectedTopic);"><img src="images/icon_left_white.png" alt="Back"></div>
+						<div class="topicHeaderTitle"></div>
+						<div class="subtopicHeaderTitle"></div>
+					</div>
+				<div class="subtopicHeaderIcon"><img src="images/icon_topic1.png" alt="" class="iconWhite"></div>
+				</div>
+
+				<div class="subtopicsexpanded"> </div>
+				</div>
+
+				</div>
+				</div>
+
+
+
+
+
+
+
+
+
+
+			  <div id="fulllist" class="screen bluegradient invisible">
+					<div class="screenHeader">
+						<div class="screenHeaderTop">
+							<div class="headerLeft menuButton"><img src="images/icon_menu.png" class="menuButtonIcon" title="Menu" alt="3 lines"></div>
+							<div class="headerCentre"><div class="headerSearchBox"><input type="text" placeholder="Search" class="searchInput"></div><img src="images/icon_close.png" title="Close" alt="Close" onclick="hideSearch();"></div>
+						</div>
+						<div class="screenHeaderBottom">
+							<div class="navTile"><div class="headerSubmenu headerPictureSearch"><img src="images/icon_body.png" title="Picture search" alt=""></div></div>
+							<div class="navTile"><div class="headerSubmenu headerListSearch"><img src="images/icon_list.png" title="List all" alt=""></div></div>
+							<div class="navTile"><div class="headerSubmenu headerCategorySearch"><img src="images/icon_tag.png" title="Category search" alt=""></div></div>
+							<div class="navTile"><div class="headerSubmenu headerFavourites"><img src="images/icon_faves.png" title="Favourites" alt=""></div></div>
+							<div class="navTile"><div class="headerSubmenu headerActivity"><img src="images/icon_brain.png" title="Have a go" alt=""></div></div>
+						</div>
+					</div>
+                <div class="screenBody">
+                   <div class="entries"></div>
+                </div>
+            </div>
+
+
+
+			  <div id="categorylist" class="screen bluegradient invisible">
+					<div class="screenHeader">
+						<div class="screenHeaderTop">
+							<div class="headerLeft menuButton"><img src="images/icon_menu.png" class="menuButtonIcon" title="Menu" alt="3 lines"></div>
+							<div class="headerCentre"><div class="headerSearchBox"><input type="text" placeholder="Search" class="searchInput"></div><img src="images/icon_close.png" title="Close" alt="Close" onclick="hideSearch();"></div>
+						</div>
+						<div class="screenHeaderBottom">
+							<div class="navTile"><div class="headerSubmenu headerPictureSearch"><img src="images/icon_body.png" title="Picture search" alt=""></div></div>
+							<div class="navTile"><div class="headerSubmenu headerListSearch"><img src="images/icon_list.png" title="List all" alt=""></div></div>
+							<div class="navTile"><div class="headerSubmenu headerCategorySearch"><img src="images/icon_tag.png" title="Category search" alt=""></div></div>
+							<div class="navTile"><div class="headerSubmenu headerFavourites"><img src="images/icon_faves.png" title="Favourites" alt=""></div></div>
+							<div class="navTile"><div class="headerSubmenu headerActivity"><img src="images/icon_brain.png" title="Have a go" alt=""></div></div>
+						</div>
+					</div>
+                <div class="screenBody" id="categoryentriesbody">
+                    <div id="categoryentries">
+                        <h2>Filter by:
+                        <select id="filterEntries" onchange="setFilter();"></select>
+                        </h2>
+                        <div class="categoryresults"></div>
+                    </div>
+                </div>
+            </div>
+
+
+
+           <div id="favourites" class="screen bluegradient invisible">
+						 <div class="screenHeader">
+			 				<div class="screenHeaderTop">
+			 					<div class="headerLeft menuButton"><img src="images/icon_menu.png" class="menuButtonIcon" title="Menu" alt="3 lines"></div>
+			 					<div class="headerCentre"><div class="headerSearchBox"><input type="text" placeholder="Search" class="searchInput"></div><img src="images/icon_close.png" title="Close" alt="Close" onclick="hideSearch();"></div>
+			 				</div>
+			 				<div class="screenHeaderBottom">
+			 					<div class="navTile"><div class="headerSubmenu headerPictureSearch"><img src="images/icon_body.png" title="Picture search" alt=""></div></div>
+			 					<div class="navTile"><div class="headerSubmenu headerListSearch"><img src="images/icon_list.png" title="List all" alt=""></div></div>
+			 					<div class="navTile"><div class="headerSubmenu headerCategorySearch"><img src="images/icon_tag.png" title="Category search" alt=""></div></div>
+			 					<div class="navTile"><div class="headerSubmenu headerFavourites"><img src="images/icon_faves.png" title="Favourites" alt=""></div></div>
+			 					<div class="navTile"><div class="headerSubmenu headerActivity"><img src="images/icon_brain.png" title="Have a go" alt=""></div></div>
+			 				</div>
+			 			</div>
+			<div class="screenBody">
+				<div class="entries">
+                    <div id="favouritesresults"></div>
+                </div>
+
+
+			</div>
+          </div>
+
+
+
+    <div id="activity" class="screen bluegradient invisible">
+			<div class="screenHeader">
+				<div class="screenHeaderTop">
+					<div class="headerLeft menuButton"><img src="images/icon_menu.png" class="menuButtonIcon" title="Menu" alt="3 lines"></div>
+					<div class="headerCentre"><div class="headerSearchBox"><input type="text" placeholder="Search" class="searchInput"></div><img src="images/icon_close.png" title="Close" alt="Close" onclick="hideSearch();"></div>
+				</div>
+				<div class="screenHeaderBottom">
+					<div class="navTile"><div class="headerSubmenu headerPictureSearch"><img src="images/icon_body.png" title="Picture search" alt=""></div></div>
+					<div class="navTile"><div class="headerSubmenu headerListSearch"><img src="images/icon_list.png" title="List all" alt=""></div></div>
+					<div class="navTile"><div class="headerSubmenu headerCategorySearch"><img src="images/icon_tag.png" title="Category search" alt=""></div></div>
+					<div class="navTile"><div class="headerSubmenu headerFavourites"><img src="images/icon_faves.png" title="Favourites" alt=""></div></div>
+					<div class="navTile"><div class="headerSubmenu headerActivity"><img src="images/icon_brain.png" title="Have a go" alt=""></div></div>
+				</div>
+			</div>
+			<div class="screenBody">
+
+			<!--Activity start-->
+			<div id="activityStart" class="activityStartBody blue paddedContent">
+				<h2>Have a go?</h2>
+				<p class="activityNote">Tap the star on any words you want to learn and you can practice them here. </p>
+				<div class="button activityStartButton" onclick="setUpActivity();">OK</div>
+			</div>
+			<div class="activityReset" onclick="resetActivity();">Reset</div>
+
+			<!--Activity body-->
+			<div id="activityBody" class="invisible" data-type="s">
+
+				<!--Activity Question-->
+				<div class="activityEntryQuestion">
+					<div class="activityEntryQuestionPrompt"></div>
+					<div class="activityEntryQuestionHolder">
+						<div class="activityEntryQuestionText">
+							<div class="entryProgress" style="background-size: 0px;">
+								<img src="" alt="">
+								<span class="activityEntryQuestionTextContent"></span>
+							</div>
+						</div>
+
+						<div class="activityEntryGlossingText invisible">
+							<div class="entryProgress" style="background-size: 0px;">
+								<span class="activityEntryGlossingTextContent"></span>
+							</div>
+						</div>
+
+						<!--Activity Question Audio Slow (activity 1 only)-->
+						<div class="activityEntryPlayOption" id="activityEntryPlayOption1" onclick="toggleActivitySlow();">
+							<img src="images/icon_turtle.png" alt="turtle" title="Slow down audio" class="slowIcon colourOff">
+						</div>
+
+						<!--Activity Question Audio Play-->
+						<div class="activityEntryPlayOption" id="activityEntryPlayOption2" onclick="toggleActivityAudio();">
+							<img src="images/icon_play.png" alt="play" title="Play/Pause" class="playIcon colourOff">
+						</div>
+					</div>
+
+					<div id="activityProgress">
+						<div id="activity1Progress" class="activityProgressBlock">
+							<div id="activity1Egg1" class="activityProgressEgg disabled"></div>
+							<div id="activity1Egg2" class="activityProgressEgg disabled"></div>
+							<div id="activity1Egg3" class="activityProgressEgg disabled"></div>
+						</div>
+						<div id="activity2Progress" class="activityProgressBlock">
+							<div id="activity2Egg1" class="activityProgressEgg disabled"></div>
+							<div id="activity2Egg2" class="activityProgressEgg disabled"></div>
+							<div id="activity2Egg3" class="activityProgressEgg disabled"></div>
+						</div>
+						<div id="activity3Progress" class="activityProgressBlock">
+							<div id="activity3Egg1" class="activityProgressEgg disabled"></div>
+							<div id="activity3Egg2" class="activityProgressEgg disabled"></div>
+							<div id="activity3Egg3" class="activityProgressEgg disabled"></div>
+						</div>
+						<div class="reloadIconDiv" onclick="setUpActivity('previousLevel');">
+							<img src="images/icon_reload.png" alt="go back" title="Go back one level" class="reloadIcon">
+						</div>
+					</div>
+
+				</div>
+
+				<!--Activity Answers-->
+				<div class="activityAnswers">
+
+					<!--Microphone activity 3 only-->
+					<div class="activity3 invisible">
+						<div class="mikeentry">
+								<!--Play answer-->
+								<div class="mikeOption mikeOption2 invisible" id="answerAudio0" onclick="toggleActivityAnswerAudio('0');">
+									<img src="images/icon_ear.png" alt="Play" title="Play/Pause" class="playIcon colourOff">
+								</div>
+
+								<!--Record answer-->
+								<div class="mikeOption mikeOption3" onclick="recordAudio();">
+									<img src="images/icon_record.png?v=1" alt="Record yourself" title="Record yourself" class="iconRecord colourOff">
+								</div>
+								<!--Play own answer-->
+								<div class="mikeOption mikeOption4 invisible" onclick="togglePlayback();">
+									<img src="images/icon_headphones.png?v=1" data-mp3="" alt="Headphones" title="Headphones" class="iconHeadphones colourOff">
+								</div>
+						</div>
+						<!--Show answer text-->
+						<div class="mikePrompt" onclick="recordActivityFromLabel();"></div>
+						<!--Self assessment-->
+						<div class="checkActivity invisible">
+							<!--Yes or no holder-->
+							<div class="activityAnswerHorizontalHolder">
+								<!--Self assessment - No -->
+								<div class="activityAnswerHolder">
+									<div class="activityAnswer" id="activityAnswerN" onclick="toggleActivityAnswer('N');">
+										 <div class="activityAnswerText"><img src="images/icon_no.png" alt="No" title="No"> <span class="translateNo"></span></div>
+									</div>
+								</div>
+								<!--Self assessment - Yes -->
+								<div class="activityAnswerHolder">
+									<div class="activityAnswer" id="activityAnswerY" onclick="toggleActivityAnswer('Y');">
+										 <div class="activityAnswerText"><img src="images/icon_yes.png" alt="Yes" title="Yes"> <span class="translateYes"></span></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div><!--end microphone-->
+
+					<!--Activity answers Activity 1 and 2 -->
+					<!--Answer 1 -->
+					<div class="activityAnswerHolder activity1or2 marginTop" id="activityAnswerHolder1" data-phrase="">
+						<div class="activityAnswer" id="activityAnswer1" onclick="toggleActivityAnswer('1');">
+							 <div class="activityAnswerText">
+								 <img id="activityAnswerImage1" src="" alt="">
+								 <span id="activityAnswerText1"></span>
+							 </div>
+						</div>
+						<!--Answer 1 Audio-->
+						<div class="activityAnswerTextPlayOption" id="answerAudio1" onclick="toggleActivityAnswerAudio('1');">
+							<img src="images/icon_play.png" alt="play" title="Play/Pause" class="playIcon colourOff">
+						</div>
+					</div>
+
+					<!--Answer 2 -->
+					<div class="activityAnswerHolder activity1or2" id="activityAnswerHolder2" data-phrase="">
+							<div class="activityAnswer" id="activityAnswer2" onclick="toggleActivityAnswer('2');">
+									<div class="activityAnswerText">
+										<img id="activityAnswerImage2" src="" alt="">
+										<span id="activityAnswerText2"></span>
+									</div>
+							</div>
+							<!--Answer 2 Audio -->
+							<div class="activityAnswerTextPlayOption" id="answerAudio2" onclick="toggleActivityAnswerAudio('2');">
+								<img src="images/icon_play.png" alt="play" title="Play/Pause" class="playIcon colourOff">
+							</div>
+						</div>
+
+						<!--Answer 3 -->
+						<div class="activityAnswerHolder activity1or2" id="activityAnswerHolder3"
+							data-phrase="">
+							<div class="activityAnswer" id="activityAnswer3" onclick="toggleActivityAnswer('3');">
+									<div class="activityAnswerText">
+										<img id="activityAnswerImage3" src="" alt="">
+										<span id="activityAnswerText3"></span>
+									</div>
+							</div>
+							<!--Answer 3 Audio -->
+							<div class="activityAnswerTextPlayOption" id="answerAudio3" onclick="toggleActivityAnswerAudio('3');">
+								<img src="images/icon_play.png" alt="play" title="Play/Pause" class="playIcon colourOff">
+							</div>
+						</div>
+
+					</div><!--end activity answers-->
+
+
+
+					<!--Activity bottom nav -->
+					<div class="activityNav">
+						<!--Hide icon -->
+						<div class="activityNavOption" id="hideIcon" onclick="toggleHide();">
+							<img src="images/icon_hide.png" alt="hide" title="Don't show this" class="colourOff">
+						</div>
+						<!--Mute icon -->
+						<div class="activityNavOption" id="muteIcon" onclick="toggleMute();">
+							<img src="images/icon_mute.png" alt="mute" title="Don't play feedback" class="colourOff">
+						</div>
+						<!--Feedback -->
+						<div class="activityFeedbackHolder">
+							<div class="activityFeedback">&nbsp;</div>
+						</div>
+						<!--Glossing -->
+						<div class="activityNavOption invisible" id="infoIcon" onclick="toggleGlossing();">
+							<img src="images/icon_info.png" alt="info" title="Info" class="colourOff">
+						</div>
+						<!--Next -->
+						<div class="activityNext" onclick="setUpActivity();">
+							<div class="activityNextButton">
+								<img src="images/icon_next.png" alt="Next" title="Next">
+							</div>
+						</div>
+					</div>
+
+				</div><!--end activity body-->
+
+
+          </div>
+				</div><!--end activity screen-->
+
+
+			 <!-- DICTIONARY ENTRY-->
+           <div id="entry" class="screen bluegradient invisible">
+						 <div class="screenHeader">
+			 				<div class="screenHeaderTop">
+			 					<div class="headerLeft menuButton"><img src="images/icon_menu.png" class="menuButtonIcon" title="Menu" alt="3 lines"></div>
+			 					<div class="headerCentre"><div class="headerSearchBox"><input type="text" placeholder="Search" class="searchInput"></div><img src="images/icon_close.png" title="Close" alt="Close" onclick="hideSearch();"></div>
+			 				</div>
+			 				<div class="screenHeaderBottom">
+			 					<div class="navTile"><div class="headerSubmenu headerPictureSearch"><img src="images/icon_body.png" title="Picture search" alt=""></div></div>
+			 					<div class="navTile"><div class="headerSubmenu headerListSearch"><img src="images/icon_list.png" title="List all" alt=""></div></div>
+			 					<div class="navTile"><div class="headerSubmenu headerCategorySearch"><img src="images/icon_tag.png" title="Category search" alt=""></div></div>
+			 					<div class="navTile"><div class="headerSubmenu headerFavourites"><img src="images/icon_faves.png" title="Favourites" alt=""></div></div>
+			 					<div class="navTile"><div class="headerSubmenu headerActivity"><img src="images/icon_brain.png" title="Have a go" alt=""></div></div>
+			 				</div>
+			 			</div>
+			<div class="screenBody ">
+				<div id="dictionaryentry"></div>
+                <div id="conversationentry">
+                    <div class="conventry">
+                        <h2 class="coventryHeader">In conversation</h2>
+						<div id="conversation"></div>
+                    </div>
+                </div>
+                <div class="mikeentry">
+                    <!--<div class="mikeOption mikeOption1" onclick="emailPlayback();"><img src="images/icon_email.png" alt="Email" title="Share via email" class="colourOff" onclick="togglePlayback();"></div>-->
+                    <div class="mikeOption mikeOption2" onclick="sharePlayback();">
+											<img src="images/icon_messenger.png?v=1" alt="Messenger" title="Share" class="colourOff">
+										</div>
+										<div class="mikeOption mikeOption3" onclick="recordAudio();">
+											<img src="images/icon_record.png?v=1" alt="Record yourself" title="Record yourself" class="iconRecord colourOff">
+										</div>
+                    <div class="mikeOption mikeOption4" onclick="togglePlayback();">
+											<img src="images/icon_headphones.png?v=1" alt="Play" title="Play" class="iconHeadphones colourOff">
+										</div>
+                    <!--<div class="mikeOption mikeOption5" onclick="deletePlayback();"><img src="images/icon_delete.png" alt="Delete" title="Delete" class="colourOff"></div>-->
+                </div>
+								<div class="mikeentry mikeentry2"><div class="mikePrompt"></div></div>
+
+								<div id="imageentry"></div>
+			</div>
+          </div>
+
+
+
+
+
+
+
+            <div id="about" class="screen bluegradient invisible">
+							<div class="screenHeader">
+								<div class="screenHeaderTop">
+									<div class="headerLeft menuButton"><img src="images/icon_menu.png" class="menuButtonIcon" title="Menu" alt="3 lines"></div>
+									<div class="headerCentre"><div class="headerSearchBox"><input type="text" placeholder="Search" class="searchInput"></div><img src="images/icon_close.png" title="Close" alt="Close" onclick="hideSearch();"></div>
+								</div>
+								<div class="screenHeaderBottom">
+									<div class="navTile"><div class="headerSubmenu headerPictureSearch"><img src="images/icon_body.png" title="Picture search" alt=""></div></div>
+									<div class="navTile"><div class="headerSubmenu headerListSearch"><img src="images/icon_list.png" title="List all" alt=""></div></div>
+									<div class="navTile"><div class="headerSubmenu headerCategorySearch"><img src="images/icon_tag.png" title="Category search" alt=""></div></div>
+									<div class="navTile"><div class="headerSubmenu headerFavourites"><img src="images/icon_faves.png" title="Favourites" alt=""></div></div>
+									<div class="navTile"><div class="headerSubmenu headerActivity"><img src="images/icon_brain.png" title="Have a go" alt=""></div></div>
+								</div>
+							</div>
+                <div class="screenBody white">
+                    <div class="paddedContent">
+	                    <h2 class="appTitleExpanded centred"></h2>
+											<p class="versionInfo"></p>
+											<div class="aboutInfo"></div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+            <div id="terms" class="screen bluegradient invisible">
+							<div class="screenHeader">
+								<div class="screenHeaderTop">
+									<div class="headerLeft menuButton"><img src="images/icon_menu.png" class="menuButtonIcon" title="Menu" alt="3 lines"></div>
+									<div class="headerCentre"><div class="headerSearchBox"><input type="text" placeholder="Search" class="searchInput"></div><img src="images/icon_close.png" title="Close" alt="Close" onclick="hideSearch();"></div>
+								</div>
+								<div class="screenHeaderBottom">
+									<div class="navTile"><div class="headerSubmenu headerPictureSearch"><img src="images/icon_body.png" title="Picture search" alt=""></div></div>
+									<div class="navTile"><div class="headerSubmenu headerListSearch"><img src="images/icon_list.png" title="List all" alt=""></div></div>
+									<div class="navTile"><div class="headerSubmenu headerCategorySearch"><img src="images/icon_tag.png" title="Category search" alt=""></div></div>
+									<div class="navTile"><div class="headerSubmenu headerFavourites"><img src="images/icon_faves.png" title="Favourites" alt=""></div></div>
+									<div class="navTile"><div class="headerSubmenu headerActivity"><img src="images/icon_brain.png" title="Have a go" alt=""></div></div>
+								</div>
+							</div>
+                <div class="screenBody white textLeft">
+                    <div class="paddedContent">
+                        <h2>Terms of use</h2>
+                        <p>Terms of use</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="feedback" class="screen bluegradient invisible">
+							<div class="screenHeader">
+								<div class="screenHeaderTop">
+									<div class="headerLeft menuButton"><img src="images/icon_menu.png" class="menuButtonIcon" title="Menu" alt="3 lines"></div>
+									<div class="headerCentre"><div class="headerSearchBox"><input type="text" placeholder="Search" class="searchInput"></div><img src="images/icon_close.png" title="Close" alt="Close" onclick="hideSearch();"></div>
+								</div>
+								<div class="screenHeaderBottom">
+									<div class="navTile"><div class="headerSubmenu headerPictureSearch"><img src="images/icon_body.png" title="Picture search" alt=""></div></div>
+									<div class="navTile"><div class="headerSubmenu headerListSearch"><img src="images/icon_list.png" title="List all" alt=""></div></div>
+									<div class="navTile"><div class="headerSubmenu headerCategorySearch"><img src="images/icon_tag.png" title="Category search" alt=""></div></div>
+									<div class="navTile"><div class="headerSubmenu headerFavourites"><img src="images/icon_faves.png" title="Favourites" alt=""></div></div>
+									<div class="navTile"><div class="headerSubmenu headerActivity"><img src="images/icon_brain.png" title="Have a go" alt=""></div></div>
+								</div>
+							</div>
+                <div class="screenBody white textLeft">
+                    <div class="paddedContent">
+                        <h2><br>Feedback</h2>
+                        <p>Please <a href="mailto:admin@jcac.com.au?cc=M.Richards@westernsydney.edu.au&subject=Feedback about Mangarrayi app">contact us</a> if you have feedback or suggestions.</p>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+		<div id="headerSearchResult" style="display: none;">
+			<div id="searchresults"></div>
+		</div>
+
+
+           <div id="menu" class="popup invisible">
+			<div class="popupBody">
+			<div class="popupBodyText">
+				<div class="menuHeader">
+				<div class="menuHeaderName">Menu</div>
+				</div>
+				<div class="menuBody">
+				<div class="menuBodyItem" id="aboutButton">
+				<div class="menuBodyItemLeft"><img src="images/icon_info2.png" class="menuBodyItemIcon" title="Info" alt="information"></div>
+				<div class="menuBodyItemRight">About</div>
+				<div class="clearBoth"></div>
+				</div>
+				<div class="menuBodyItem" id="disclaimerButton">
+				<div class="menuBodyItemLeft"><img src="images/icon_contract.png" class="menuBodyItemIcon" title="Terms and conditions" alt="contract"></div>
+				<div class="menuBodyItemRight">Terms of use</div>
+				<div class="clearBoth"></div>
+				</div>
+				<div class="menuBodyItem" id="feedbackButton">
+				<div class="menuBodyItemLeft"><img src="images/icon_lightbulb.png" class="menuBodyItemIcon" title="Feedback" alt="lightbulb"></div>
+				<div class="menuBodyItemRight">Feedback and suggestions</div>
+				<div class="clearBoth"></div>
+				</div>
+					<!--<div class="menuSpace"></div>
+				<div class="menuHeader2">
+				<div class="menuHeaderName">Header 2</div>
+				</div>-->
+
+				<div class="menuSpace"></div>
+			</div>
+			</div></div>
+          </div>
+
+
+
+
+
+
+
+
+
+
+
+
+		<div id="success" class="popup invisible"><div class="popupBody successBody">
+		</div></div>
+
+
+
+
+		<div id="error" class="popup invisible"><div class="popupBody successBody">
+		</div></div>
+
+
+		 <div id="alert" class="popupAlert invisible"><div class="popupBody">
+			<div id="alertTextHolder">
+				<span id="alertText">Text</span>
+				<div id="alertOK" class="button greenButton buttonCentre">OK</div>
+			</div>
+			<div class="clearBoth"></div>
+			</div></div>
+
+
+		 <div id="loading" class="popup invisible">
+			 <div class="popupBody">Loading...</div>
+		</div>
+
+
+
+
+
+        </div><!--end appHolder-->
+
+
+
+			<script type="text/javascript" src="js/jquery.js"></script>
+			<script type="text/javascript" src="js/jquery.rwdImageMaps.min.js"></script>
+			<!--<script type="text/javascript" src="cordova.js"></script>-->
+			<script type="text/javascript" src="js/index.js?118"></script>
+			<!-- <script type="text/javascript" src="js/hammer.min.js"></script> For swipe detetcion-->
+			<script type="text/javascript" src="js/fastclick.js"></script>
+			<script type="text/javascript" src="js/dictionary.js?5"></script>
+
+
+
+       <audio preload="none" controls id="audioPlayer" onloadeddata="checkLoadedAudio();"><source src="" id="mp3Source" type="audio/mpeg"></audio>
+      <div class="preloadContainer"><img src="images/audio_on.png" alt=""><img src="images/audio_off.png" alt=""></div>
+
+    </body>
+</html>
