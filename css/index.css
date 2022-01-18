@@ -369,14 +369,6 @@ margin: .5vw;
 #activity2Progress .activityProgressEgg{background-color: #ffcab4;}
 #activity3Progress .activityProgressEgg{background-color: #FF4B00;}
 
-#activityProgress .reloadIconDiv{margin: 2px;
-    display: flex;
-    padding: 1vw; cursor: pointer;}
-#activityProgress .reloadIcon{width: 4vw;
-    height: 4vw;
-    margin: .5vw;}
-
-
 .activityNav{    position: absolute;
     display: flex;
     align-items: center;
