@@ -2,12 +2,14 @@
 
 //GENERAL
 
-var language="mangarrayi"; if(getQueryVariable("lang")){language=getQueryVariable("lang");}
+var language="hungarian"; if(getQueryVariable("lang")){language=getQueryVariable("lang");}
 //var language="hungarian";
 var translation="english"; if(getQueryVariable("translation")){translation=getQueryVariable("translation");}
 var versionNo="1.0.0";
 
 var languageCap = language.toLowerCase().replace(/\b[a-z]/g, function(letter) { return letter.toUpperCase();}); //capitalises first letter of each word in string
+var languageHeader = "Language";
+if (language==="hungarian" ||language==="german" ||language==="ktunaxa" ||language==="chinese" ||language==="mangarrayi"){ languageHeader=languageCap; }
 var translationCap = translation.toLowerCase().replace(/\b[a-z]/g, function(letter) { return letter.toUpperCase();}); //capitalises first letter of each word in string
 
 
@@ -69,6 +71,8 @@ if (language==="mangarrayi"){
     appTitleLong="Warrma Mangarrayi (Listen to Mangarrayi)";
     projectInfo='<p class="leftText">Are you interested in learning Mangarrayi? This app is to help community members learn some phrases in your own language.</p><p class="leftText">We acknowledge the Mangarrayi speakers whose voices appear in this app: <strong>Sheila Yanybarrak Conway, Jesse Garalnganyjak Roberts, Amy Dirn.gayg.</strong></p><p class="leftText">This app has been co-designed by the Jilkminggan Community with Western Sydney University and Elearn Australia.</p><a href="http://www.jcac.com.au/" target="_blank"><img src="images/logo_jcac.png" alt="Jilkminggan Community Aboriginal Corporation logo" class="aboutLogo"></a><p class="leftText">Funding from: Australian Research Council Centre of Excellence for the Dynamics of Language</p><a href="https://www.westernsydney.edu.au/" target="_blank"><img src="images/logo_wsu.png" alt="Western Sydney University logo" class="aboutLogo rectLogo"></a><a href="https://www.dynamicsoflanguage.edu.au/" target="_blank"><img src="images/logo_arc.png" alt="ARC Centre of Excellence for the Dynamics of Language" class="aboutLogo rectLogo"></a><a href="https://www.elearnaustralia.com.au" target="_blank"><img src="images/logo_ela.png" alt="Elearn Australia" class="aboutLogo rectLogo"></a><p>&nbsp;</p>';
 }
+
+
 
 //=========================================================================================================================== SHOW STUFF
 
@@ -257,7 +261,7 @@ function getData(){
     //create filter list (english key word as default)
         var filterSelectStr='';
         filterSelectStr+='<option value="keyword'+translationCol+'">Keywords ('+translationCap+')</option>';
-        filterSelectStr+='<option value="keyword">Keywords ('+languageCap+')</option>';
+        filterSelectStr+='<option value="keyword">Keywords ('+languageHeader+')</option>';
         filterSelectStr+='<option value="class">Words or phrases</option>';
         filterSelectStr+='<option value="function">Language function</option>';
         filterSelectStr+='<option value="keywordling">Linguistic keyword</option>';
@@ -338,14 +342,18 @@ function setEntry(x){
     conversations.forEach((item, i) => {
         if (needle===item.entry1||needle===item.entry2||needle===item.entry3|| needle===item.entry4||needle===item.entry5||needle===item.entry6){ match=i+1; }
     });
+
     if (match!==0){
         for (var c=0; c<6; c++){//number of conversation parts
             var entryid=conversations[match-1]["entry"+(c+1)];
+
             if (entryid!=="0"&&entryid!=="0"){
                 var cid = chunkbank.findIndex(chunk=>chunk.id===entryid);//get the phrase's index in the chunkbank array
                 //console.log("conversation x "+x+" c "+cid+" chunkbank[n].id "+chunkbank[n].id+" chunkbank[cid].id "+chunkbank[cid].id);
-                var boldClass=""; if(chunkbank[n].id===chunkbank[cid].id){boldClass=' boldClass';}
-                cstr+='<div class="entry"><div class="entryEnglish'+boldClass+'" onclick="referrer=\'convolist\'; setEntry(\''+chunkbank[cid].id+'\'); showPage(\'entry\');">'+chunkbank[cid][translationCol]+'</div><div class="entryMangarrayi audioButtonDiv active" id="conversaaudio_'+chunkbank[cid].id+'" onclick="toggleAudio(\'conversaaudio_'+chunkbank[cid].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon">'+chunkbank[cid][languageCol]+'</div><div class="entryGo active" onclick="referrer=\'convolist\'; setEntry(\''+chunkbank[cid].id+'\'); showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"></div></div>';
+                if (cid!==-1){
+                  var boldClass=""; if(chunkbank[n].id===chunkbank[cid].id){boldClass=' boldClass';}
+                  cstr+='<div class="entry"><div class="entryEnglish'+boldClass+'" onclick="referrer=\'convolist\'; setEntry(\''+chunkbank[cid].id+'\'); showPage(\'entry\');">'+chunkbank[cid][translationCol]+'</div><div class="entryMangarrayi audioButtonDiv active" id="conversaaudio_'+chunkbank[cid].id+'" onclick="toggleAudio(\'conversaaudio_'+chunkbank[cid].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon">'+chunkbank[cid][languageCol]+'</div><div class="entryGo active" onclick="referrer=\'convolist\'; setEntry(\''+chunkbank[cid].id+'\'); showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"></div></div>';
+                }
             }
         }
     }
@@ -1239,7 +1247,7 @@ async function setUpActivity(mode){
             break;
 
         case 3: //english/kriol/image to audio
-            $(".activityEntryQuestionPrompt").html('Say this in '+languageCap);
+            $(".activityEntryQuestionPrompt").html('Say this in '+languageHeader);
             //set question image
             if(chunkbank[qI].image){
                 $(".activityEntryQuestionText img").attr("src",imagepath+chunkbank[qI].image).css("display", "inline");
@@ -1261,7 +1269,7 @@ async function setUpActivity(mode){
             $(".reloadIconDiv").css("display","flex");
             $(".activity3").css("display","block");
             if (language==="mangarrayi"){
-                $.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+chunkbank[qI].id+"&interaction=9", function() { });
+                $.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+chunkbank[qI].id+"&interaction=10", function() { });
             }
             break;
 
