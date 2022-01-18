@@ -47,8 +47,9 @@ var audiopathServer=web_dir+language+"/mp3/"; //server folder if no local mp3 fi
 var audioError=0;
 var playbackspeed=1;
 var imagepath=web_dir+language+"/img/";
-var speakers=[]; var topics=[]; var conversations=[]; var favourites=[]; var chunkbank=[]; var chunkbankSorted=[]; var chunkbankSortedLength=[]; var chunkbankFlags=[];
+var speakers=[]; var topics=[]; var conversations=[]; var favourites=[]; var chunkbank=[]; var chunkbankSorted=[]; var chunkbankSortedLength=[]; var chunkbankFlags=[]; var entryConversation=[];
 var initialActivityWordLength=20;//maximum length of words for intial set up of Have a go activity
+var maxMemoryWordLength=200;//maximum length of words memory activity
 
 //backwards compatibility for mangarrayi app
 if (language==="mangarrayi"){
@@ -66,10 +67,11 @@ if (language==="mangarrayi"){
     startpage="warning";//go to warning and token screens on startup
     translateNoText="dayi"; //text for yes and no buttons in language
     translateYesText="yowo";
-    versionNo="2.3.1";
+    versionNo="2.3.4";
     appTitleShort="Warrma Mangarrayi";
     appTitleLong="Warrma Mangarrayi (Listen to Mangarrayi)";
     projectInfo='<p class="leftText">Are you interested in learning Mangarrayi? This app is to help community members learn some phrases in your own language.</p><p class="leftText">We acknowledge the Mangarrayi speakers whose voices appear in this app: <strong>Sheila Yanybarrak Conway, Jesse Garalnganyjak Roberts, Amy Dirn.gayg.</strong></p><p class="leftText">This app has been co-designed by the Jilkminggan Community with Western Sydney University and Elearn Australia.</p><a href="http://www.jcac.com.au/" target="_blank"><img src="images/logo_jcac.png" alt="Jilkminggan Community Aboriginal Corporation logo" class="aboutLogo"></a><p class="leftText">Funding from: Australian Research Council Centre of Excellence for the Dynamics of Language</p><a href="https://www.westernsydney.edu.au/" target="_blank"><img src="images/logo_wsu.png" alt="Western Sydney University logo" class="aboutLogo rectLogo"></a><a href="https://www.dynamicsoflanguage.edu.au/" target="_blank"><img src="images/logo_arc.png" alt="ARC Centre of Excellence for the Dynamics of Language" class="aboutLogo rectLogo"></a><a href="https://www.elearnaustralia.com.au" target="_blank"><img src="images/logo_ela.png" alt="Elearn Australia" class="aboutLogo rectLogo"></a><p>&nbsp;</p>';
+    maxMemoryWordLength=50;
 }
 
 
@@ -78,7 +80,7 @@ if (language==="mangarrayi"){
 
 function showPage(page){
     "use strict";
-  console.log("============SHOW PAGE "+page+". Referred by: "+referrer);
+    console.log("============SHOW PAGE "+page+". Referred by: "+referrer);
     currentpage=page;
     $(".screen, .popup, #camera, #alert").css("display","none");
     if (page==="launch"){
@@ -92,13 +94,16 @@ function showPage(page){
         $("#"+page).css("display", "block");
     }
   if(page==="entry"){//language entry screen
-        //write to log
+    //write to log
     if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedEntry+"&interaction=6", function() { });}
-        //show back button
-        $(".menuButton img").attr("src","images/icon_left.png");
+    //show back button
+    $(".menuButton img").attr("src","images/icon_left.png");
+    audioOff(); $(".playAllAudioIcon").attr("src","images/icon_play_white.png");
+  } else if(page==="activity" && $("#activityStart").css("display")==="none"){//activity screen active
+    $(".menuButton img").attr("src","images/icon_left.png");
   } else {
-        $(".menuButton img").attr("src","images/icon_menu.png");//show menu button again
-    }
+    $(".menuButton img").attr("src","images/icon_menu.png");//show menu button again
+  }
 }
 
 function showPopup(page){"use strict"; $("#"+page).css("display","flex"); }
@@ -338,16 +343,15 @@ function setEntry(x){
     $("#dictionaryentry").html(st);
 
     //set up conversations screen
-    var cstr=""; var match=0; var needle=selectedEntry.toString();
+    var cstr=""; var match=0; var needle=selectedEntry.toString(); entryConversation=[];
     conversations.forEach((item, i) => {
         if (needle===item.entry1||needle===item.entry2||needle===item.entry3|| needle===item.entry4||needle===item.entry5||needle===item.entry6){ match=i+1; }
     });
-
     if (match!==0){
         for (var c=0; c<6; c++){//number of conversation parts
             var entryid=conversations[match-1]["entry"+(c+1)];
-
             if (entryid!=="0"&&entryid!=="0"){
+                entryConversation.push(entryid);
                 var cid = chunkbank.findIndex(chunk=>chunk.id===entryid);//get the phrase's index in the chunkbank array
                 //console.log("conversation x "+x+" c "+cid+" chunkbank[n].id "+chunkbank[n].id+" chunkbank[cid].id "+chunkbank[cid].id);
                 if (cid!==-1){
@@ -358,16 +362,34 @@ function setEntry(x){
         }
     }
     if(language==="mangarrayi"){$(".coventryHeader").html("Having a yarn");}
-    if (cstr===""){cstr="<p class='textLeft paddedContent note'>Nothing set for this</p><p>&nbsp;</p>";}
+    if (cstr===""){
+      cstr="<p class='textLeft paddedContent note'>Nothing set for this</p><p>&nbsp;</p>";
+      $("#conversationentry .playAllButtonHolder").css("display","none");
+    } else {
+      $("#conversationentry .playAllButtonHolder").css("display","flex");
+    }
     $("#conversation").html(cstr);
 
     //show image if available
     var istr='';
-    if (chunkbank[n].image!==""){istr='<img src="'+imagepath+chunkbank[n].image+'" alt="">';}
-    if (language==="mangarrayi" && istr===""){
-        istr='<p class="textLeft note paddedContent">No photo! You can send a photo to <a href="mailto:jakinaniwa@gmail.com?Subject=Photo for Mangarrayi app - '+chunkbank[n][languageCol]+'">jakinaniwa@gmail.com</a>.';
+    if (chunkbank[n].image!==""){
+      if (chunkbank[n].notes!=="" && chunkbank[n].notes!==null){
+        istr+='<div id="creditsentry">'+chunkbank[n].notes+'</div>';
+      }
+      istr+='<img src="'+imagepath+chunkbank[n].image+'" alt="">';
     }
+    if (language==="mangarrayi" && istr===""){
+        istr='<p class="textLeft note paddedContent">No photo! You can <a href="https://forms.gle/HQuPKzKEvY4mHEzC8" target="_blank">send in a photo</a> if you have a good one.';
+    }
+
     $("#imageentry").html(istr);
+
+    var istr="";
+    if (chunkbank[n].info!=="" && chunkbank[n].info!==null){
+      istr=chunkbank[n].info;
+    }
+    $("#infoentry").html(istr);
+
 }
 
 
@@ -476,7 +498,9 @@ function toggleInfo(){
     "use strict";
     if($("#entryOption4 img").hasClass("colourOff")){
         //show glossing
-         $(".entryNormal").css("display", "none"); $(".entryGlossing").fadeIn();
+         $(".entryNormal").css("display", "none");
+         $(".entryGlossing, #creditsentry").fadeIn();
+         if ($("#infoentry").html()!==""){$("#infoentry").fadeIn();}
         //hide convo if showing
          //if($("#entryOption5 img").hasClass("colourOn")){ $(".conventry").css("display","none");  $("#entryOption5 img").removeClass("colourOn").addClass("colourOff");}
         $("#entryOption4 img").removeClass("colourOff").addClass("colourOn");
@@ -485,7 +509,7 @@ function toggleInfo(){
                 }
     } else{
         //hide glossing
-        $(".entryGlossing").css("display", "none"); $(".entryNormal").fadeIn();
+        $(".entryGlossing, #infoentry, #creditsentry").css("display", "none"); $(".entryNormal").fadeIn();
         $("#entryOption4 img").removeClass("colourOn").addClass("colourOff");
     }
 }
@@ -672,6 +696,9 @@ function setupTopics(){
                 str+='<div class="topicDiv">'+topics[t].title+'</div></div></div>';
     }
     $("#topicsContainer").html('<div class="topicsFlexContainer">'+str+'</div>');
+    if (language==="mangarrayi"){
+      $("#topicsContainer").append('<a class="storiesContainer" href="https://www.jcac.com.au/library" target="_blank"><img src="images/icon_stories.png" alt="">Stories</a>');
+    }
 }
 
 function showTopics(){
@@ -751,8 +778,9 @@ function showFull(){
 //=========================================================================================================================== ACTIVITY
 async function showActivity(){
     "use strict";
+    console.log("currentpage "+currentpage);
     referrer='activity';
-    //loadFavourites();
+    if (currentpage==="activity"){return;}
     showPage("activity");
     $(".headerSubmenu").css("background","none");
     $(".headerActivity").css("background-color","#FF4C00");
@@ -760,11 +788,21 @@ async function showActivity(){
     setUpQuestionSet();
 }
 
+function showActivityHome(){
+  $("#memoryBody, #activityBody").css("display", "none");
+  $(".activityReset").css("display", "block");
+  $("#activityStart").css("display", "flex");
+  $(".menuButton img").attr("src","images/icon_menu.png");
+  referrer="activity";
+}
+
 //type of activity
 var currentActivityType=0;
 //set of phrases for activity
 var questionSet=[];
 var questionSetLength=10;//number of questions in set
+var memorySet=[];
+var memorySetLength=12;//number of memory tiles
 var answerSetLength=3;//number of possible answers
 var previousQuestionsLength=5;//how long before phrases can be repeated in the activity?
 var previousQuestions=new Array(previousQuestionsLength);//container for previous questions
@@ -777,9 +815,12 @@ function setUpFlags(){
     console.log("=======SET UP FLAGS");
     chunkbankFlags=[];//reset flags array
     getFlags();//get any flags from storage
+
     for (var a=0; a<chunkbank.length; a++){
         //if a chunk doesn't exist in the flags array then add it (e.g. if new phrase added to dictionary)
-        if (!chunkbankFlags.some(el => el.id === chunkbank[a].id)){chunkbankFlags.push({    id: chunkbank[a].id, fave:0,    flag:"none", count:0    });}
+        if (!chunkbankFlags.some(el => el.id === chunkbank[a].id)){
+          chunkbankFlags.push({    id: chunkbank[a].id, fave:0,    flag:"none", count:0    });
+        }
         //add indexes to entire flag array
         chunkbankFlags[a].index=a;
         //set updated favourites to flag array
@@ -874,20 +915,27 @@ function setUpQuestionSet(){
     chunkbank.forEach((item, i) => {
         if(item[languageCol].length<initialActivityWordLength){possibleShortPhraseCount++;}
     });
-    console.log("possibleShortPhraseCount "+possibleShortPhraseCount);
+
     //if there are limited questions then reduce the length of the questionSet and previousQuestion set
     if(possiblePhraseCount<questionSetLength){
         questionSetLength=possiblePhraseCount;
         previousQuestionsLength=Math.floor(questionSetLength/2);
     }
     //remove word length requirement if there are not enough short phrases for initial set up
-    if(possibleShortPhraseCount<questionSetLength){initialActivityWordLength=100;}
+    if(possibleShortPhraseCount<questionSetLength){initialActivityWordLength=10;}
+
+console.log("chunkbankFlags");
+console.log(chunkbankFlags)
+    console.log("possibleShortPhraseCount "+possibleShortPhraseCount);
+    console.log("possiblePhraseCount "+possiblePhraseCount);
+    console.log("questionSetLength "+questionSetLength);
+
 
     //check number of questions needed to be added to existing set (if any)
     var numQuestionsNeeded=questionSetLength-questionSet.length;
 
-
     if (numQuestionsNeeded>0){ //more questions needed - add to set
+        console.log(questionSet);
         console.log("set not complete. Qns still needed: "+numQuestionsNeeded);
         console.log("ADD FAVES");
         console.log(chunkbankFlags);
@@ -908,7 +956,7 @@ function setUpQuestionSet(){
                 }
             }
         }
-
+        console.log(questionSet.length);
         console.log("ADD RANDOMS");
         //second Fill a ⅓ of empty remaining cells with randoms not in set
         var numberRandomsNeeded=Math.round(numQuestionsNeeded/3);
@@ -928,9 +976,10 @@ function setUpQuestionSet(){
             }
         }
 
-
+//remove convos for now
         //if question set still not complete fill remaining cells with any related conversation phrases not in set
-        if (numQuestionsNeeded>0){
+      /*  if (numQuestionsNeeded>0){
+          console.log(questionSet.length);
             console.log("ADD CONVOS");
             for (var s=0; s<questionSet.length; s++){ //get ids from questions set
                 for (var c=0; c<conversations.length; c++){ //loop through conversations
@@ -943,15 +992,17 @@ function setUpQuestionSet(){
                                     if(!questionSet.some(el => el.id === conversations[c]["entry"+oc])){ //check phrase not already in the question set array
                                         //console.log("Add "+conversations[c]["entry"+oc]+" - has a related conversation");
                                         var n = chunkbankFlags.findIndex(question=>question.id===conversations[c]["entry"+oc]);//get the phrase's index in the flag array
-                                        if (chunkbankFlags[n].flag!=="green"||chunkbankFlags[n].flag!=="red"){//check phrase has not already been mastered or hidden
-                                            if(!initialSetUp||chunkbank[n][languageCol].length<initialActivityWordLength){//choose short words the first time round
-                                                questionSet.push({id:chunkbankFlags[n].id,index:chunkbankFlags[n].index}); //add to set
-                                                chunkbankFlags[n].flag="blue";//set flag in main flag array to blue
-                                                chunkbankFlags[n].count=0;//set count in main flag array to 0
-                                                numQuestionsNeeded--;
-                                                console.log("added "+chunkbank[n].id+" - "+chunkbank[n][translationCol]+" - "+chunkbank[n][languageCol]+". Qns still needed: "+numQuestionsNeeded);
-                                            }
-                                        }//end check flags
+                                        if (n!==-1){
+                                          if (chunkbankFlags[n].flag!=="green"||chunkbankFlags[n].flag!=="red"){//check phrase has not already been mastered or hidden
+                                              if(!initialSetUp||chunkbank[n][languageCol].length<initialActivityWordLength){//choose short words the first time round
+                                                  questionSet.push({id:chunkbankFlags[n].id,index:chunkbankFlags[n].index}); //add to set
+                                                  chunkbankFlags[n].flag="blue";//set flag in main flag array to blue
+                                                  chunkbankFlags[n].count=0;//set count in main flag array to 0
+                                                  numQuestionsNeeded--;
+                                                  console.log("added "+chunkbank[n].id+" - "+chunkbank[n][translationCol]+" - "+chunkbank[n][languageCol]+". Qns still needed: "+numQuestionsNeeded);
+                                              }
+                                          }//end check flags
+                                        }
                                     }//end check phrase not in set
                                 }//end go through other conversation parts
                             }//end conv part loop
@@ -960,7 +1011,7 @@ function setUpQuestionSet(){
                 }//end conv loop
             }//end set loop
         }//end num qu needed
-
+*/
         //if question set still not complete Fill remaining cells with any related topic phrases not in set
         if (numQuestionsNeeded>0){
             console.log("ADD TOPICS");
@@ -989,17 +1040,18 @@ function setUpQuestionSet(){
         if (numQuestionsNeeded>0){
             console.log("ADD FINAL RANDOMS");
             while (numQuestionsNeeded>0) {
+              //console.log("numQuestionsNeeded! "+numQuestionsNeeded+" "+initialActivityWordLength);
                 randomNo=Math.floor((Math.random() * (chunkbankFlags.length-1)));//randomly choose from chunkbank array
                 //check phrase not already in the question set array, mastered or hidden
                 if(!questionSet.some(el => el.id === chunkbankFlags[randomNo].id)&&chunkbankFlags[randomNo].id!=="0" &&(chunkbankFlags[randomNo].flag!=="green"||chunkbankFlags[randomNo].flag!=="red")){
-                    if(!initialSetUp||chunkbank[chunkbankFlags[randomNo].index][languageCol].length<initialActivityWordLength){//choose short words the first time round
-                        questionSet.push({id:chunkbankFlags[randomNo].id,index:chunkbankFlags[randomNo].index}); //add to set
+
+                    questionSet.push({id:chunkbankFlags[randomNo].id,index:chunkbankFlags[randomNo].index}); //add to set
                         chunkbankFlags[randomNo].flag="blue";//set flag in main flag array to blue
                         chunkbankFlags[randomNo].count=0;//set count in main flag array to 0
                         numQuestionsNeeded--;
                         console.log("added "+chunkbankFlags[randomNo].id+" - "+chunkbank[chunkbankFlags[randomNo].index][translationCol]+" - "+chunkbank[chunkbankFlags[randomNo].index][languageCol]+". Qns still needed: "+numQuestionsNeeded);
                         //console.log("added "+chunkbankFlags[randomNo].id+" as random to set. Qns still needed: "+numQuestionsNeeded);
-                    }
+
                 }
             }
         }
@@ -1037,6 +1089,7 @@ function setUpQuestionSet(){
     //questionSet=[{id:"1204",index:"2"}];//testing for hungarian
 }
 
+
 function shuffle(array) {
   var currentIndex = array.length, temporaryValue, randomIndex;
   while (0 !== currentIndex) {
@@ -1051,11 +1104,148 @@ function shuffle(array) {
   return array;
 }
 
+function setUpMemorySet(){
+    console.log("=======SET UP MEMORY SET");
+    memorySet=[];
+    var numMemoryNeeded=memorySetLength-memorySet.length;
+    if (numMemoryNeeded>0){ //more questions needed - add to set
+        //console.log("memory set not complete. Memory still needed: "+numMemoryNeeded);
+        var attempts=0;
+        var i=0; while (i < numMemoryNeeded) {
+            attempts++; if (attempts >100) { break; }
+            var randomNo=Math.floor((Math.random() * (chunkbankFlags.length-1)));//randomly choose from chunkbank array
+            //check phrase id not already in the memory set array and is long enough
+            if(!memorySet.some(el => el.id === chunkbankFlags[randomNo].id) && chunkbankFlags[randomNo].id!=="0"){
+                //choose phrases with images and check image is not a duplicate
+                if(chunkbank[chunkbankFlags[randomNo].index].image!=="" && !memorySet.some(el => el.image === chunkbank[chunkbankFlags[randomNo].index].image)){
+                  if(chunkbank[chunkbankFlags[randomNo].index][languageCol].length<maxMemoryWordLength){//choose short phrases
+                    memorySet.push({
+                      id:chunkbankFlags[randomNo].id,
+                      index:chunkbankFlags[randomNo].index,
+                      image:chunkbank[chunkbankFlags[randomNo].index].image,
+                      sound:chunkbank[chunkbankFlags[randomNo].index].soundfilename,
+                      found:false
+                    }); //add to set
+                    numMemoryNeeded--;
+                    memorySet.push({
+                      id:chunkbankFlags[randomNo].id,
+                      index:chunkbankFlags[randomNo].index,
+                      image:chunkbank[chunkbankFlags[randomNo].index].image,
+                      sound:chunkbank[chunkbankFlags[randomNo].index].soundfilename,
+                      found:false
+                    }); //add to set
+                    numMemoryNeeded--;
+                    //console.log("added "+chunkbankFlags[randomNo].id+" - "+chunkbank[chunkbankFlags[randomNo].index][translationCol]+" - "+chunkbank[chunkbankFlags[randomNo].index][languageCol]+". Memory still needed: "+numMemoryNeeded);
+                  }
+                }
+            }
+        }
+    } else if (memorySet.length>memorySetLength){
+        //set is too big - remove extras from set
+        memorySet.splice(memorySetLength);
+    }
+
+    /*memorySet.forEach((item, i) => {
+        console.log(i+" "+item.id+" "+chunkbank[item.index][translationCol]);
+    });*/
+}
 
 
+
+
+var selectedMemoryItemA=null;
+var selectedMemoryItemB=null;
+async function setUpMemory(){
+  $("#activityStart, .activityReset, #activityBody").css("display", "none");
+  $("#memoryBody").removeClass("pyro").css("display", "flex");
+  $(".menuButton img").attr("src","images/icon_left.png");
+  referrer="memory";
+
+  await setUpMemorySet();
+  shuffle(memorySet);
+  console.log(memorySet);
+  selectedMemoryItemA=null; selectedMemoryItemB=null;
+
+  var mstr="<div class='before'></div>";
+  mstr+="<p class='memoryInstructions'>Tap or click on a card and listen, look and match</p>";
+  memorySet.forEach((item, i) => {
+    mstr+='<div class="memoryCardHolder">';
+    //mstr+='<div class="memoryCardOff" onclick="checkMemoryCard(\''+item.index'\')"></div>';
+    mstr+='<div id="memoryCard'+i+'" class="memoryCardOn" onclick="checkMemoryCard('+i+',\''+item.index+'\',\''+item.id+'\')"></div>';
+    mstr+='</div>';
+  });
+  mstr+='<div class="memoryReset" onclick="audioOff(); setUpMemory();">Play again</div>';
+  mstr+="<div class='after'></div>";
+  $("#memoryBody").html(mstr);
+}
+
+function hideMemoryCard(i){
+  //$("#memoryCard"+i).animate({ opacity: 0 }, { duration: 500 });
+  $("#memoryCard"+i).css("background-image", "url('images/memory_square.jpg')");
+  audioOff();
+}
+
+
+
+function checkMemoryCard(i, index, id){
+  if ($("#memoryCard"+i).css("background-image").indexOf("memory_square.jpg")==-1) {return;}
+  //see which items have been selected so far
+  console.log(i+" "+memorySet[i].image+" "+memorySet[i].sound);
+  //only do anything if less than two items selected
+  if (selectedMemoryItemB===null) {
+    //if item hasn't already been selected then do something
+    if (selectedMemoryItemA===null){
+      selectedMemoryItemA=i;
+    } else {
+      selectedMemoryItemB=i;
+    }
+      var imageURL=memorySet[i].image.replace(/'/g, "%27");
+      $("#memoryCard"+i).css("background-image", "url('"+imagepath+imageURL+"')");
+      playAudio(memorySet[i].sound);
+      //check match if this is the second item to be selected
+      console.log(selectedMemoryItemA+" "+selectedMemoryItemB);
+      if (selectedMemoryItemA!==null && selectedMemoryItemB!==null) {
+        //two cards selected
+        if (memorySet[selectedMemoryItemA].id===memorySet[selectedMemoryItemB].id){
+          //matched
+          memorySet[selectedMemoryItemA].found=true;
+          memorySet[selectedMemoryItemB].found=true;
+          selectedMemoryItemA=null; selectedMemoryItemB=null;
+          //check if game ended
+          var stillToFind=memorySet.findIndex(item=>item.found===false);
+          console.log("still to find: "+stillToFind);
+          if (stillToFind===-1){
+            //celebrate
+            $("#memoryBody").addClass("pyro");
+            playAudio("memory_cheer.mp3");
+            $(".memoryReset").css("display", "block");
+          }
+        } else {
+          //not a match
+          console.log("hiding: "+selectedMemoryItemA+" "+selectedMemoryItemB);
+          var a=selectedMemoryItemA; var b=selectedMemoryItemB;
+          selectedMemoryItemA=null; selectedMemoryItemB=null;
+          setTimeout(
+            function(){
+              hideMemoryCard(a);
+              hideMemoryCard(b);
+            },2000
+          );
+
+        }
+        //console.log(memorySet);
+      }
+
+  }
+
+  console.log(memorySet);
+  //console.log(selectedMemoryItems);
+
+
+
+}
 
 async function setUpActivity(mode){
-
 
     var previousLevel = false; if(mode==="previousLevel"){previousLevel=true;}
     var index; //holder to store phrase index
@@ -1075,7 +1265,9 @@ async function setUpActivity(mode){
 
     //work out how many phrases have NOT been mastered or hidden
     var possiblePhraseCount=0;
-    chunkbankFlags.forEach((item, i) => {    if(item.flag!=="green"&&item.flag!=="red"&&item.id!=="0"){possiblePhraseCount++;}});
+    chunkbankFlags.forEach((item, i) => {
+      if(item.flag!=="green"&&item.flag!=="red"&&item.id!=="0"){  possiblePhraseCount++; }
+    });
 
 
     //console.log(chunkbankFlags);
@@ -1116,10 +1308,12 @@ async function setUpActivity(mode){
       //determine answers
       answerSet = [];
       answerSet.push({id:questionSet[rn].id, index:questionSet[rn].index});//(must include question phrase index)
-      //console.log("answerSet "+JSON.stringify(answerSet));
-      //console.log(answerSetLength-1);
+      console.log("answerSet "+JSON.stringify(answerSet));
+      console.log(answerSetLength-1);
       //console.log("answer set "+JSON.stringify(answerSet));
+      var attempts=0;
       while(answerSet.length <= (answerSetLength-1)){ //other random answers from the question set - default = 2 other answers
+        attempts++; if (attempts >10) { break; }
           var r = Math.floor((Math.random() * (questionSet.length-1)));//randomly number (between 0 and length of question set)
               if(!answerSet.some(el => el.id === questionSet[r].id)){ //add to answers if not already there
                   if(chunkbank[qI][translationCol]!==chunkbank[questionSet[r].index][translationCol]){//check if answer is the same as the question translation
@@ -1173,6 +1367,7 @@ async function setUpActivity(mode){
     $(".activityAnswerTextPlayOption, #activityEntryPlayOption2").addClass("disabled");
     $("#infoIcon img").removeClass("colourOn").addClass("colourOff");
     $(".activityEntryGlossingText, #activityBody .mikeOption2, #activityBody .mikeOption4, #activityBody .checkActivity").addClass("invisible");
+    $(".menuButton img").attr("src","images/icon_menu.png");
     $(".activityAnswer").removeClass("correct incorrect");
     $(".activityEntryQuestionText").removeClass("invisible");
     $(".activityFeedback, .mikePrompt").html("");
@@ -1279,6 +1474,8 @@ async function setUpActivity(mode){
     if (qI!==0){ //initialise activity page
         $("#activityStart, .activityReset").css("display", "none");
         $("#activityBody").css("display", "flex");
+        $(".menuButton img").attr("src","images/icon_left.png");
+        referrer="quiz";
     }
 
 
@@ -1289,7 +1486,7 @@ function toggleActivityAudio(){
     "use strict";
         if ($("#activityEntryPlayOption2").hasClass("disabled")) {return;} //don't play if no audio available
         console.log("TOGGLE ACTIVITY AUDIO ="+qI);
-    selectedAudio=qI;
+        selectedAudio=qI;
         var type=currentActivityType; //type of activity
         var mainAudioThumbnail="activityEntryPlayOption2";
         var playImage="icon_play.png"; //if (type===2){playImage="icon_play2.png";} //main audio is kriol
@@ -1557,12 +1754,19 @@ function showFaves(){
     showPage("favourites");
     $(".headerSubmenu").css("background","none");
     $(".headerFavourites").css("background-color","#FF4C00");
+    audioOff(); $(".playAllAudioIcon").attr("src","images/icon_play_white.png");
 }
 
 function loadFavourites(){
     "use strict";
         console.log("============LOAD FAVOURITES "+favourites);
     var str="";
+    if (favourites.length>1){
+      //add play all button
+      str+='<div class="playAllHolder">';
+      str+='<div class="playAllButtonHolder" onclick="playAll(\'favourites\');"><img src="images/icon_play_white.png" alt="play" title="Play all" class="playAllAudioIcon" id=""> Play all</div>';
+      str+='</div>';
+    }
     for (var f=0; f<favourites.length; f++){//go through what they have saved
         var n=0; for (var a=0; a<chunkbank.length; a++){if(chunkbank[a].id === favourites[f].toString()){n = a;}} //get the relevant element
         str+='<div class="starRemove active" onclick="toggleStar(\''+chunkbank[n].id+'\');">X</div>';
@@ -1679,7 +1883,7 @@ function onBackKeyDown() {
         }
     }else if(currentpage==="entry"){
          //hide glossing
-        $(".entryGlossing").css("display", "none"); $(".entryNormal").fadeIn();
+        $(".entryGlossing, #infoentry, #creditsentry").css("display", "none"); $(".entryNormal").fadeIn();
         $("#entryOption4 img").removeClass("colourOn").addClass("colourOff");
          //hide conversation
         $(".conventry").css("display","none");
@@ -1718,6 +1922,7 @@ function toggleAudio(id){
     } else {
         $(".audioIcon").attr("src","images/audio_on.png");
         audioOff();
+        $(".playAllAudioIcon").attr("src","images/icon_play_white.png");
     }
 }
 function toggleKriolAudio(id){
@@ -1771,6 +1976,43 @@ function playAudio(filename) {
     $.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedAudio+"&interaction=1", function() { });
     }
  }
+
+var playAllFCounter=0;
+var playAllCCounter=0;
+function playAll(scr){
+  if (scr==="favourites"){
+    if ($("#favouritesresults .playAllAudioIcon").attr("src")==="images/icon_play_white.png") {
+      //play first favourite
+      playAllFCounter=0;
+      var n = chunkbank.findIndex(chunk=>chunk.id===favourites[playAllFCounter].toString());
+      var filename=chunkbank[n].soundfilename;
+      $(".audioIcon").attr("src","images/audio_on.png");
+      $("#favouritesresults .playAllAudioIcon").attr("src","images/icon_pause_white.png");
+      $("#favoriteentry_"+favourites[playAllFCounter]+" .audioIcon").attr("src","images/audio_off.png");
+      playAudio(filename);
+    } else {
+      $("#favouritesresults .playAllAudioIcon").attr("src","images/icon_play_white.png");
+      $(".audioIcon").attr("src","images/audio_on.png");
+      audioOff();
+    }
+  } else if (scr==="conversation"){
+    if ($("#entry .playAllAudioIcon").attr("src")==="images/icon_play_white.png") {
+      //play first conversation
+      playAllCCounter=0;
+      //get the phrase's index in the chunkbank array
+      var m = chunkbank.findIndex(chunk=>chunk.id===entryConversation[playAllCCounter]);
+      var filename=chunkbank[m].soundfilename;
+      $(".audioIcon").attr("src","images/audio_on.png");
+      $("#entry .playAllAudioIcon").attr("src","images/icon_pause_white.png");
+      $("#conversaaudio_"+entryConversation[playAllCCounter]+" .audioIcon").attr("src","images/audio_off.png");
+      playAudio(filename);
+    } else {
+      $("#entry .playAllAudioIcon").attr("src","images/icon_play_white.png");
+      $(".audioIcon").attr("src","images/audio_on.png");
+      audioOff();
+    }
+  }
+}
 
 
 function audioOff(){
@@ -1885,7 +2127,20 @@ $(document).ready(function(){
             showPopup("menu");
         } else {
             //hide entry screen if menu button is actually a back button
-            if(referrer!==""){showPage(referrer);}else{showPage("dashboard");}
+            console.log("GO BACK - referrer "+referrer+" current page "+currentpage);
+            if (referrer==="quiz" || referrer ==="memory" || referrer ==="activity"){
+              //hide entry and go back to activity screen
+              if (currentpage==="entry"){
+                showPage("activity");
+              } else {
+                //go back to main activity screen
+                showActivityHome();
+              }
+            } else if(referrer!==""){
+              showPage(referrer);
+            } else{
+              showPage("dashboard");
+            }
         }
     });
 
@@ -1947,10 +2202,40 @@ $(document).ready(function(){
     document.getElementById('audioPlayer').addEventListener("ended",function() {
         hideAudioPlayButtons(); //reset play button in entry screen
         $(".audioIcon").attr("src","images/audio_on.png"); //reset other play buttons
-                $(".activityAnswerTextPlayOption img, .activityAnswerPlayOption img, #answerAudio0 img").attr("src","images/icon_play.png");
-                $("#activity .mikeOption2 img").attr("src","images/icon_ear.png");//activity 3 audio icon
-                $(".iconHeadphones").attr("src", "images/icon_headphones.png");
+        $(".activityAnswerTextPlayOption img, .activityAnswerPlayOption img, #answerAudio0 img").attr("src","images/icon_play.png");
+        $("#activity .mikeOption2 img").attr("src","images/icon_ear.png");//activity 3 audio icon
+        $(".iconHeadphones").attr("src", "images/icon_headphones.png");
+
+        //check play ALL
+        if (currentpage==="favourites"&&$("#favouritesresults .playAllAudioIcon").attr("src")==="images/icon_pause_white.png") {
+          playAllFCounter++;
+          if (playAllFCounter<favourites.length){
+            var n = chunkbank.findIndex(chunk=>chunk.id===favourites[playAllFCounter].toString());
+            var filename=chunkbank[n].soundfilename;
+            //allow a half second break between playback
+            setTimeout(function(){
+              $("#favoriteentry_"+favourites[playAllFCounter]+" .audioIcon").attr("src","images/audio_off.png");
+              playAudio(filename);
+            }, 500);
+          } else {
+            $("#favouritesresults .playAllAudioIcon").attr("src","images/icon_play_white.png");
+          }
+        } else if (currentpage==="entry" && $("#entry .playAllAudioIcon").attr("src")==="images/icon_pause_white.png") {
+          playAllCCounter++;
+          if (playAllCCounter<entryConversation.length){
+            var m = chunkbank.findIndex(chunk=>chunk.id===entryConversation[playAllCCounter]);
+            var filename=chunkbank[m].soundfilename;
+            //allow a half second break between playback
+            setTimeout(function(){
+              $("#conversaaudio_"+entryConversation[playAllCCounter]+" .audioIcon").attr("src","images/audio_off.png");
+              playAudio(filename);
+            }, 500);
+          } else {
+            $("#entry .playAllAudioIcon").attr("src","images/icon_play_white.png");
+          }
+        }
     });
+
 
      $("#audioPlayer").bind('timeupdate', function(){
          if ($("#entryOption3 img").attr("src")==="images/icon_pause.png") {

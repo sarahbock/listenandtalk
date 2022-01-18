@@ -11,7 +11,8 @@
         <meta name="msapplication-tap-highlight" content="no">
        <meta name="viewport" content="height=device-height,width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,minimal-ui"/>
 
-			 <link rel="stylesheet" type="text/css" href="css/index.css?23">
+			 <link rel="stylesheet" type="text/css" href="css/index.css?28">
+			 <link rel="stylesheet" type="text/css" href="css/pyro.css">
 				<style id="modifiedStyles"></style>
         <title></title>
     </head>
@@ -41,7 +42,7 @@
 					<div class="tokenSubHeader paddedContent"><h2>Enter your token</h2></div>
 					<div class="tokenBody paddedContent">
 						<input type="text" placeholder="Enter your token here*">
-						<p>*Ask JCAC to set up a token for you if you don't have one</p>
+						<p>*<a href="https://forms.gle/Mp36U4kGuf3MEv7P7" target="_blank">Ask JCAC</a> to set up a token for you if you don't have one</p>
 						<div class="button tokenButton">OK</div>
 					</div>
 				</div>
@@ -169,8 +170,8 @@
 			 			</div>
 			<div class="screenBody">
 				<div class="entries">
-                    <div id="favouritesresults"></div>
-                </div>
+					<div id="favouritesresults"></div>
+        </div>
 
 
 			</div>
@@ -194,13 +195,27 @@
 			</div>
 			<div class="screenBody">
 
+
+
+
 			<!--Activity start-->
-			<div id="activityStart" class="activityStartBody blue paddedContent">
-				<h2>Have a go?</h2>
-				<p class="activityNote">Tap the star on any words you want to learn and you can practice them here. </p>
-				<div class="button activityStartButton" onclick="setUpActivity();">OK</div>
+			<div id="activityStart">
+				<div class="activityStartBody blue paddedContent">
+					<h2>Have a go?</h2>
+					<p class="activityNote">Tap the star on any words you want to learn and you can practice them here. </p>
+					<div class="button activityStartButton" onclick="setUpActivity();">OK</div>
+				</div>
+				<div class="activityStartBody blue paddedContent">
+					<h2>Memory</h2>
+					<p class="activityNote">Practice matching pictures to phrases </p>
+					<div class="button activityStartButton" onclick="setUpMemory();">OK</div>
+				</div>
+					<div class="activityReset" onclick="resetActivity();">Reset</div>
 			</div>
-			<div class="activityReset" onclick="resetActivity();">Reset</div>
+
+			<!--Memory body-->
+			<div id="memoryBody" class="invisible">
+			</div>
 
 			<!--Activity body-->
 			<div id="activityBody" class="invisible" data-type="s">
@@ -398,8 +413,11 @@
 				<div id="dictionaryentry"></div>
                 <div id="conversationentry">
                     <div class="conventry">
-                        <h2 class="coventryHeader">In conversation</h2>
-						<div id="conversation"></div>
+											<div class="conversationHeading">
+												<h2 class="coventryHeader">In conversation</h2>
+												<div class="playAllButtonHolder playAllConversationHolder" onclick="playAll('conversation');"><img src="images/icon_play_white.png" alt="play" title="Play all" class="playAllAudioIcon" id=""> Play all</div>
+											</div>
+											<div id="conversation"></div>
                     </div>
                 </div>
                 <div class="mikeentry">
@@ -416,7 +434,7 @@
                     <!--<div class="mikeOption mikeOption5" onclick="deletePlayback();"><img src="images/icon_delete.png" alt="Delete" title="Delete" class="colourOff"></div>-->
                 </div>
 								<div class="mikeentry mikeentry2"><div class="mikePrompt"></div></div>
-
+								<div id="infoentry"></div>
 								<div id="imageentry"></div>
 			</div>
           </div>
@@ -496,7 +514,7 @@
                 <div class="screenBody white textLeft">
                     <div class="paddedContent">
                         <h2><br>Feedback</h2>
-                        <p>Please <a href="mailto:admin@jcac.com.au?cc=M.Richards@westernsydney.edu.au&subject=Feedback about Mangarrayi app">contact us</a> if you have feedback or suggestions.</p>
+                        <p>Please <a href="https://forms.gle/6hoS5Vrb3oHBPeWU6" target="_blank">contact us</a> if you have feedback or suggestions.</p>
                     </div>
                 </div>
             </div>
@@ -587,8 +605,8 @@
 
 			<script type="text/javascript" src="js/jquery.js"></script>
 			<script type="text/javascript" src="js/jquery.rwdImageMaps.min.js"></script>
-			<!--<script type="text/javascript" src="cordova.js"></script>-->
-			<script type="text/javascript" src="js/index.js?119"></script>
+			<script type="text/javascript" src="cordova.js"></script>
+			<script type="text/javascript" src="js/index.js?126"></script>
 			<!-- <script type="text/javascript" src="js/hammer.min.js"></script> For swipe detetcion-->
 			<script type="text/javascript" src="js/fastclick.js"></script>
 			<script type="text/javascript" src="js/dictionary.js?6"></script>

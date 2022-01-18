@@ -104,6 +104,7 @@ hr{ display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:0
 .tokenBody{min-height:62%;}
 .tokenButton{margin-top: 5%;}
 #token p{text-align: center; color: #FFF;}
+#token a{color: #FFF;}
 
 /*warning*/
 .warningHeader{height:32%;     overflow: hidden;}
@@ -115,15 +116,26 @@ hr{ display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:0
 
 /*TOPICS AND SUBTOPICS*/
 .topicsFlexContainer{display:flex; flex-wrap:wrap; justify-content: center; padding-top: 10px;}
+.storiesContainer{    width: calc(100% - 30px);
+    background-color: #FFF;
+    margin: 20px 10px 10px 10px;
+    padding: 5px;
+    display: flex;
+    color: #000;
+    text-decoration: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;}
 .topicDivContainer{width:25%;   background-color: #FFF; box-shadow: 0px 2px 2px #0000003D;     margin: 10px; padding: 10px 5px;}
 .topicDivHolder{padding:1vw; cursor: pointer; }
 .topicDivHolder img{height: auto;  max-width: 100%;}
+.storiesContainer img{height: auto; max-width: 30%;}
 .topicDiv{ }
 .topicDiv, .subtopicDiv{    padding: 0 .5em;   overflow-wrap: break-word;   font-size: .8em;}
 
 #subtopicsContainer, #subtopicsExpandedContainer, .subtopics{display: none; margin-top: 50px;}
 #subtopicsExpandedContainer{margin-top: 60px;}
-.topicHeader, .subtopicHeader{background-color: #ff4b00; color: #FFF; padding: 10px 0 10px 5vw; text-align: left; position: absolute; top: 100px; width: 95%;     height: 30px;     display: flex;     justify-content: space-between;}
+.topicHeader, .subtopicHeader{background-color: #ff4b00; color: #FFF; padding: 10px 0 10px 5vw; text-align: left; position: absolute; top: 120px; width: 95%;     height: 30px;     display: flex;     justify-content: space-between;}
 .topicHeaderTitle, .subtopicHeaderTitle{ display: inline;   text-align: left; }
 .topicHeaderImage, .subtopicHeaderImage{display: inline;     margin-left: 10px; margin-right:10px; min-height: 2em; }
 .topicHeaderImage img, .subtopicHeaderImage img{  width: 20px;}
@@ -169,7 +181,7 @@ hr{ display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:0
 #imageClose{background-color: #ffb91a; position: absolute; top: 0; right: 0; cursor: pointer; padding: 10px 20px; width: 10vw; height: auto; max-width: 40px;}
 
 /*GENERAL SCREENS min-height: 145px; */
-.screenHeader{  text-align: center;   height: 100px;  }
+.screenHeader{  text-align: center;   height: 120px;  }
 .screenHeaderBack{position: absolute; top: 0; left: 0; cursor: pointer; padding: 3vh 20px; }
 .screenHeaderBackIcon{color: #FFF; font-size: 2em; }
 .screenHeader h2{text-align: center;}
@@ -190,7 +202,7 @@ hr{ display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:0
 .headerSearchBox input{border-radius:.3em; padding: 5px 2%; border: 0;}
 .headerBottom{ background-color:#E9E9E9;  }
 
-.screenBody{    height: calc(100% - 100px);  text-align: center; overflow:auto; overflow-y: auto;  -webkit-overflow-scrolling: touch;}
+.screenBody{    height: calc(100% - 120px);  text-align: center; overflow:auto; overflow-y: auto;  -webkit-overflow-scrolling: touch;}
 .screenBody::-webkit-scrollbar { /*width: 0 !important;     display: none;*/ } /*uncomment these two styles for app version*/
 .screenBody::-webkit-scrollbar-thumb { /*background: #FF0000;*/}
 .screenFooter{height: 5%;
@@ -273,6 +285,14 @@ hr{ display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:0
 #entryOption6{width:10vw;margin-left: 2vw; margin-top: 5vw;}
 
 #imageentry img{max-width: 100%;}
+#imageentry{    position: relative;}
+#creditsentry{ float: left; position: absolute; left: 0px; top: 0px; z-index: 1000;   background-color: #0000008a;   padding: 1em; color: #fff; display:none;}
+#infoentry{ padding: 1em; background-color: #021C40; color: #FFF; display: none; }
+
+/*PLAY ALL*/
+.playAllHolder { padding: .5em; display: flex; justify-content: flex-end; align-content: center; align-items: center;}
+.playAllButtonHolder {    cursor: pointer; border: 1px solid #FFF; color: #FFF;    padding: .5em;   border-radius: 20px;   background-color: #000;}
+.playAllAudioIcon {height:1.2em; width:auto; margin-right:0.3em; max-width:20%; vertical-align: middle;}
 
 /*Conversation*/
 #conversationentry entry{}
@@ -281,7 +301,10 @@ hr{ display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:0
 .conventry{ display: none; background-color: #021C40; }
 /*#entry .conventry .entry:nth-of-type(odd) {background-color:#000;}
 #entry .conventry .entry:nth-of-type(even) {background-color:#fff;}*/
-h2.coventryHeader{color: #FFF; background-color: #021C40; padding: .5em 0 .5em 5%; margin-bottom: .5em; }
+.conversationHeading{color: #FFF; background-color: #021C40; padding: .5em 0 .5em 5%;  display: flex; justify-content: space-between; align-items: center;}
+h2.coventryHeader{}
+.playAllConversationHolder{margin-right: 3%;}
+
 
 
 /*Mike*/
@@ -292,11 +315,11 @@ h2.coventryHeader{color: #FFF; background-color: #021C40; padding: .5em 0 .5em 5
 .mikePrompt{color: #FFF; padding: 0;     background-color: #000; width: 100%;}
 
 /*ACTIVITY*/
-
+#activityStart {    display: flex; flex-direction: column; justify-content: space-evenly; height: 95%;}
 .activityStartBody h2{text-align: center; padding: 1em 0 .5em 0; }
-.activityStartBody p{text-align:center;     margin: 2% 0 5% 0;}
-.activityStartBody p.activityNote{margin-bottom: 2em; padding: 1em;}
-.activityStartBody{ border-radius:10px;    padding-bottom: 5%; margin-top: 2em;}
+.activityStartBody p{text-align:center;     margin: 0;}
+.activityStartBody p.activityNote{margin-bottom: 1em; padding: 1em;}
+.activityStartBody{ border-radius:10px;    padding-bottom:10px; margin-top: 1em;}
 .activityStartButton{width: 90%;  margin-left: 5%;}
 
 #activityBody{height: calc(100% - 60px);flex-direction: column;}
@@ -333,7 +356,7 @@ h2.coventryHeader{color: #FFF; background-color: #021C40; padding: .5em 0 .5em 5
     align-items: center;
     margin-bottom: 1em;
 	flex:1;}
-.activityAnswer{   margin: 0 3% 0 3%;  flex: 7;  border-radius: 10px;  background-color: #D1DBE6;    box-shadow: 2px 2px 5px #33333382;}
+.activityAnswer{   margin: 0 3% 0 3%;  flex: 7;  border-radius: 10px;  background-color: #D1DBE6;    box-shadow: 2px 2px 5px #33333382; cursor: pointer;}
 .activityAnswerHorizontalHolder{display:flex; flex-direction: row; justify-content: space-between;}
 .activityAnswerHorizontalHolder .activityAnswerHolder{margin:1em;}
 
@@ -369,6 +392,14 @@ margin: .5vw;
 #activity2Progress .activityProgressEgg{background-color: #ffcab4;}
 #activity3Progress .activityProgressEgg{background-color: #FF4B00;}
 
+#activityProgress .reloadIconDiv{margin: 2px;
+    display: flex;
+    padding: 1vw; cursor: pointer;}
+#activityProgress .reloadIcon{width: 4vw;
+    height: 4vw;
+    margin: .5vw;}
+
+
 .activityNav{    position: absolute;
     display: flex;
     align-items: center;
@@ -378,11 +409,19 @@ margin: .5vw;
     width: 100%; background-color: #000;}
 .activityNavOption{flex: 0;  text-align: left;    margin: 10px;}
 .activityNavOption img{border-radius:50%; width: 30px;padding: 5px; cursor: pointer;}
-.activityNext{ flex:0;     margin: 10px;}
+.activityNext{ flex:0;     margin: 10px; cursor: pointer;}
 .activityFeedback{ flex:0; margin:10px;     min-width: 50px; color: #fff;}
 .activityNextButton{ background-color: #FF4B00; border-radius:50%; }
 .activityNextButton img{width: 30px;     padding: 5px 5px 2px 5px;}
 .activityReset{text-decoration: underline; color: #FFF; margin-top:1em; text-align: center;}
+
+
+/*MEMORY*/
+#memoryBody{    flex-wrap: wrap;    justify-content: center; align-content: space-evenly;     padding: 20px 0;}
+.memoryInstructions{    color: #FFF; width: 100vw;    margin: 0;}
+.memoryCardHolder{    width: 22vw;   height: 22vw; padding: 15px;}
+.memoryCardOn{background-color: #FFF; cursor: pointer; display: flex; align-items: center; justify-content: center; background-repeat: no-repeat; background-size: cover; width: 100%; height: 100%; background-image: url("../images/memory_square.jpg")}
+.memoryReset{text-decoration: underline; color: #FFF; margin-top:1em; text-align: center; display: none; cursor: pointer;}
 
 /*CATEGORIES (FILTER)*/
 .categoryresult {    background-color: #ffffff;  margin: 2px 0 0 0; text-align: left;}
@@ -395,7 +434,7 @@ margin: .5vw;
 #categoryentries select{width:50vw; height: auto; background-color: #FFF; background-image: url("../images/icon_down.png");     background-position: 97% 50%; background-repeat: no-repeat;    background-size: auto 40%; margin-left: 5vw; padding-right: 5vw;}
 
 /*SEARCH*/
-#headerSearchResult{    position: absolute; top: 44px; height: auto; width: 100vw; background-color: #FFF; }
+#headerSearchResult{    position: absolute; top: 50px; height: auto; width: 100vw; background-color: #FFF; }
 #headerSearchResult .searchresult{cursor: pointer; margin-bottom:0;  border-bottom:1px solid #021C40;     padding: 0.5em;}
 #headerSearchResult h2{color: #4e86c1; margin: 0 0 0 2%; padding: 5px 0 0 0; width: 96%;}
 #headerSearchResult p{padding: 1em;}
