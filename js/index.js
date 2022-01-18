@@ -94,8 +94,6 @@ function showPage(page){
         $("#"+page).css("display", "block");
     }
   if(page==="entry"){//language entry screen
-    //write to log
-    if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedEntry+"&interaction=6", function() { });}
     //show back button
     $(".menuButton img").attr("src","images/icon_left.png");
     audioOff(); $(".playAllAudioIcon").attr("src","images/icon_play_white.png");
@@ -399,9 +397,7 @@ function toggleHide(x){
             //hide phrase from activity
             showAlert("<p>We won't show this phrase again.</p> ");
             $("#hideIcon img").removeClass("colourOff").addClass("colourOn");
-      if (language==="mangarrayi"){
-                $.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedEntry+"&interaction=7", function() { });
-            }
+      
     } else{
       //remove hide
       $("#hideIcon img").removeClass("colourOn").addClass("colourOff");
@@ -429,9 +425,7 @@ function toggleStar(x){
         //chunkbank[n].star=1;
         if ($.inArray(x,favourites)===-1){favourites.push(x);}
         $("#entryOption1 img").removeClass("colourOff").addClass("colourOn");
-        if (language==="mangarrayi"){
-                    $.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedEntry+"&interaction=2", function() { });
-                }
+        
     } else{
         //remove starred entry
         for (var f=0; f<favourites.length; f++){if (favourites[f]===x){favourites.splice(f, 1); f--;}}
@@ -504,9 +498,7 @@ function toggleInfo(){
         //hide convo if showing
          //if($("#entryOption5 img").hasClass("colourOn")){ $(".conventry").css("display","none");  $("#entryOption5 img").removeClass("colourOn").addClass("colourOff");}
         $("#entryOption4 img").removeClass("colourOff").addClass("colourOn");
-        if (language==="mangarrayi"){
-                    $.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedEntry+"&interaction=4", function() { });
-                }
+       
     } else{
         //hide glossing
         $(".entryGlossing, #infoentry, #creditsentry").css("display", "none"); $(".entryNormal").fadeIn();
@@ -522,9 +514,7 @@ function toggleConversation(){
         //hide mike if showing
         if($("#entryOption6 img").hasClass("colourOn")){ $("#entry .mikeentry").css("display","none");  $("#entryOption6 img").removeClass("colourOn").addClass("colourOff");}
         $("#entryOption5 img").removeClass("colourOff").addClass("colourOn");
-       if (language==="mangarrayi"){
-                 $.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedEntry+"&interaction=5", function() { });
-             }
+       
     } else{
         //hide conversation
         $(".conventry").css("display","none");
@@ -539,7 +529,7 @@ function checkToken(){
     token=cleanUp($("#token input").val());
     if(token==="test"){
         showPage("dashboard");
-         $.get("https://www.elearnaustralia.com.au/mangarrayi/api/sessions.php?token="+token, function() { });
+         
         return false;
     }
     $.get("https://www.elearnaustralia.com.au/mangarrayi/api/check-token.php?token="+token, function(data) {
@@ -547,7 +537,7 @@ function checkToken(){
             audioOff();
             localStorage.setItem("mang-token", token);
             showPage("dashboard");
-            $.get("https://www.elearnaustralia.com.au/mangarrayi/api/sessions.php?token="+token, function() { });
+           
         } else {
             alert("Token is not right or has already been used");
         }
@@ -1406,9 +1396,7 @@ async function setUpActivity(mode){
             });
             //show activity-related content
             $(".activity1, .activity1or2").css("display","flex");
-            if (language==="mangarrayi"){
-                $.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+chunkbank[qI].id+"&interaction=8", function() { });
-            }
+            
             toggleActivityAudio(); //auto play
             break;
 
@@ -1436,9 +1424,7 @@ async function setUpActivity(mode){
             });
             //show activity-related content
             $(".activity1or2, .reloadIconDiv").css("display","flex");
-            if (language==="mangarrayi"){
-                $.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+chunkbank[qI].id+"&interaction=9", function() { });
-            }
+            
             break;
 
         case 3: //english/kriol/image to audio
@@ -1463,9 +1449,7 @@ async function setUpActivity(mode){
             //show activity-related content
             $(".reloadIconDiv").css("display","flex");
             $(".activity3").css("display","block");
-            if (language==="mangarrayi"){
-                $.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+chunkbank[qI].id+"&interaction=10", function() { });
-            }
+           
             break;
 
         default:
@@ -1952,9 +1936,7 @@ function checkLoadedAudio(){
         audio.playbackRate=playbackspeed;
         if (chunkbank[selectedN].speaker==="Amy Dirn.gayg" && playbackspeed!==1){audio.playbackRate=0.6;} //if set to slow then slow down Amy a lot more
         if(playbackspeed!==1){//write to log if they are playing it slowly
-            if (language==="mangarrayi"){
-                            $.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedEntry+"&interaction=3", function() { });
-                        }
+          
         }
     } else {
         audio.playbackRate=1;
@@ -1972,9 +1954,7 @@ function playAudio(filename) {
     var audio = document.getElementById('audioPlayer');
     audio.setAttribute("src", filename);
     audio.load();
-    if (language==="mangarrayi"){
-    $.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedAudio+"&interaction=1", function() { });
-    }
+    
  }
 
 var playAllFCounter=0;
@@ -2111,7 +2091,6 @@ $(document).ready(function(){
             gotoPage="token"; //need to get token
         } else {
             token=localStorage.getItem("mang-token");
-            $.get("https://www.elearnaustralia.com.au/mangarrayi/api/sessions.php?token="+token, function() { });
         }
         setTimeout(function(){audioOff();showPage(gotoPage);},500);
 
