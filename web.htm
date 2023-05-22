@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <title>Listen and Talk</title>
 <script type="text/javascript">
-  if (screen.width <= 699) {
-    document.location = "index.html?v=17";
-  }
+
 
   function getQueryVariable(variable){
          var query = window.location.search.substring(1);
@@ -26,9 +24,14 @@
   var languageCap = language.toLowerCase().replace(/\b[a-z]/g, function(letter) { return letter.toUpperCase();}); //capitalises first letter
   document.title="Listen and Talk - "+languageCap;
   if (language==="mangarrayi"){document.title="Warrma Mangarrayi";}
+  if (language==="umpila"){document.title="Ngampula Kuuku Pitaanchimana";}
 
   var id=0; if(getQueryVariable("id")){id=getQueryVariable("id");}
-  var urlString="index.html?lang="+language+"&id="+id+"&v=17";
+  var urlString="index.html?lang="+language+"&id="+id+"&v=151";
+
+  if (screen.width <= 799) {
+    document.location = urlString;
+  }
 
 </script>
 </head>

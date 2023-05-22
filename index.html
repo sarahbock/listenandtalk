@@ -11,7 +11,7 @@
         <meta name="msapplication-tap-highlight" content="no">
        <meta name="viewport" content="height=device-height,width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,minimal-ui"/>
 
-			 <link rel="stylesheet" type="text/css" href="css/index.css?28">
+			 <link rel="stylesheet" type="text/css" href="css/index.css?34">
 			 <link rel="stylesheet" type="text/css" href="css/pyro.css">
 				<style id="modifiedStyles"></style>
         <title></title>
@@ -42,7 +42,7 @@
 					<div class="tokenSubHeader paddedContent"><h2>Enter your token</h2></div>
 					<div class="tokenBody paddedContent">
 						<input type="text" placeholder="Enter your token here*">
-						<p>*<a href="https://forms.gle/Mp36U4kGuf3MEv7P7" target="_blank">Ask JCAC</a> to set up a token for you if you don't have one</p>
+						<p>*<span id="tokenRequest"></span> to set up a token for you if you don't have one</p>
 						<div class="button tokenButton">OK</div>
 					</div>
 				</div>
@@ -76,7 +76,7 @@
 						<div class="topicHeaderImage" onclick="showTopics();"><img src="images/icon_left_white.png" alt="Back"></div>
 						<div class="topicHeaderTitle"></div>
 					</div>
-					<div class="topicHeaderIcon"><img src="images/icon_topic1.png" alt="" class="iconWhite"></div>
+					<div class="topicHeaderIcon"><img src="images/icon_topic.png" alt="" class="iconWhite"></div>
 				</div>
 
 				<div class="subtopics" id="subtopics"></div>
@@ -89,7 +89,7 @@
 						<div class="topicHeaderTitle"></div>
 						<div class="subtopicHeaderTitle"></div>
 					</div>
-				<div class="subtopicHeaderIcon"><img src="images/icon_topic1.png" alt="" class="iconWhite"></div>
+				<div class="subtopicHeaderIcon"><img src="images/icon_topic.png" alt="" class="iconWhite"></div>
 				</div>
 
 				<div class="subtopicsexpanded"> </div>
@@ -491,7 +491,8 @@
                 <div class="screenBody white textLeft">
                     <div class="paddedContent">
                         <h2>Terms of use</h2>
-                        <p>Terms of use</p>
+	   
+
                     </div>
                 </div>
             </div>
@@ -514,7 +515,7 @@
                 <div class="screenBody white textLeft">
                     <div class="paddedContent">
                         <h2><br>Feedback</h2>
-                        <p>Please <a href="https://forms.gle/6hoS5Vrb3oHBPeWU6" target="_blank">contact us</a> if you have feedback or suggestions.</p>
+                        <p id="appFeedbackText"></p>
                     </div>
                 </div>
             </div>
@@ -605,11 +606,11 @@
 
 			<script type="text/javascript" src="js/jquery.js"></script>
 			<script type="text/javascript" src="js/jquery.rwdImageMaps.min.js"></script>
-			<script type="text/javascript" src="cordova.js"></script>
-			<script type="text/javascript" src="js/index.js?126"></script>
+			<!--<script type="text/javascript" src="cordova.js"></script>-->
+			<script type="text/javascript" src="js/index.js?151"></script>
 			<!-- <script type="text/javascript" src="js/hammer.min.js"></script> For swipe detetcion-->
 			<script type="text/javascript" src="js/fastclick.js"></script>
-			<script type="text/javascript" src="js/dictionary.js?6"></script>
+			<script type="text/javascript" src="js/dictionary.js?7"></script>
 
 
 

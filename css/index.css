@@ -77,7 +77,7 @@ input:disabled, textarea:disabled, select:disabled{border:0;}
 .buttonHalf{width:50%; float:right;} .buttonLeft{ float:left;}
 .buttonCentre{width:50%; margin-left:auto; margin-right:auto; float: none; padding-left: 2%; padding-right: 2%;}
 
-.greenButton{background-color: #021C40;font-weight: 400; color: #FFF;}
+.greenButton{background-color: #007d00;font-weight: 400; color: #FFF;}
 .redButton{background-color: #F16159;font-weight: 400; color: #FFF;}
 .greyButton{background-color: #C1C1C1;font-weight: 400; color: #FFF;}
 .brownButton{background-color: #b98f47;font-weight: 400; color: #FFF;}
@@ -232,6 +232,8 @@ hr{ display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:0
 .entryHeader{background: none; border: 0; width: 90%; margin-left:5%; margin-right:5%;    padding-top: 3%; }
 .entryEnglish{float:left; width:35%; padding: 0.5em 0 0.5em 5%;     hyphens: auto; word-break: break-word;}
 .entryMangarrayi{float:left; width:43%; padding: 0.5em 2% 0.5em 5%;   hyphens: auto; word-break: break-word;}
+.entryMeaning{padding: 0 2% 1em 5%;   hyphens: auto; word-break: break-word;    font-size: 1.5em;   color: rgb(255, 76, 0);
+    font-weight: bold;}
 .entryCol{}
 .langNotAvail .entryGo{background-color: #ccc;}
 
@@ -284,10 +286,10 @@ hr{ display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:0
 #entryOption5{width:10vw;margin-left: 16vw;  margin-top: 5vw;}
 #entryOption6{width:10vw;margin-left: 2vw; margin-top: 5vw;}
 
-#imageentry img{max-width: 100%;}
+#imageentry img{max-width: 100%; width:100%;}
 #imageentry{    position: relative;}
 #creditsentry{ float: left; position: absolute; left: 0px; top: 0px; z-index: 1000;   background-color: #0000008a;   padding: 1em; color: #fff; display:none;}
-#infoentry{ padding: 1em; background-color: #021C40; color: #FFF; display: none; }
+#infoentry{ padding: 1em 5vw; background-color: #021C40; color: #FFF; display: none; text-align: left;}
 
 /*PLAY ALL*/
 .playAllHolder { padding: .5em; display: flex; justify-content: flex-end; align-content: center; align-items: center;}
@@ -418,10 +420,10 @@ margin: .5vw;
 
 /*MEMORY*/
 #memoryBody{    flex-wrap: wrap;    justify-content: center; align-content: space-evenly;     padding: 20px 0;}
-.memoryInstructions{    color: #FFF; width: 100vw;    margin: 0;}
+.memoryInstructions{    color: #FFF; width: 100vw;    margin: 0; line-height: initial;  padding: 0 5px;}
 .memoryCardHolder{    width: 22vw;   height: 22vw; padding: 15px;}
 .memoryCardOn{background-color: #FFF; cursor: pointer; display: flex; align-items: center; justify-content: center; background-repeat: no-repeat; background-size: cover; width: 100%; height: 100%; background-image: url("../images/memory_square.jpg")}
-.memoryReset{text-decoration: underline; color: #FFF; margin-top:1em; text-align: center; display: none; cursor: pointer;}
+.memoryReset{text-decoration: underline; color: #FFF; margin-top:1em; text-align: center; display: none; cursor: pointer;     width: 100%;}
 
 /*CATEGORIES (FILTER)*/
 .categoryresult {    background-color: #ffffff;  margin: 2px 0 0 0; text-align: left;}
@@ -519,7 +521,7 @@ margin: .5vw;
 .colour8{color: #7CA317;}
 .colour9{color: #3d7b76;}
 .colour10{color: #237d75;}
-.colour11{font-style: italic;}/*focus - italics*/
+.colour11{}/*focus - italics*/
 .colour12{color: #EE7733;}
 .colour13{color: #009988;}
 .colour14{}

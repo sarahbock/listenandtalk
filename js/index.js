@@ -2,7 +2,9 @@
 
 //GENERAL
 
-var language="hungarian"; if(getQueryVariable("lang")){language=getQueryVariable("lang");}
+var language="mangarrayi"; if(getQueryVariable("lang")){language=getQueryVariable("lang");}
+var secondaryColor="#FF4C00"; if (language==="umpila") {secondaryColor="#198083"} //colour of buttons
+var recordLog = false; if (language==="umpila") {recordLog = true;}
 //var language="hungarian";
 var translation="english"; if(getQueryVariable("translation")){translation=getQueryVariable("translation");}
 var versionNo="1.0.0";
@@ -16,6 +18,7 @@ var translationCap = translation.toLowerCase().replace(/\b[a-z]/g, function(lett
 var startscreen="launch"; //var startscreen="launch"; //for testing web version
 var startpage="dashboard"; //which page to go to after launch?
 var web=true;
+var tokenEnabled=false; if (language==="umpila" || language==="mangarrayi") {tokenEnabled = true;}
 
 var web_dir="https://elearnaustralia.com.au/opal/";
 var apiPath=web_dir+"readandwrite/";
@@ -29,6 +32,7 @@ var translateYesText="Yes";
 var appTitleShort=languageCap+" Listen and Talk";
 var appTitleLong=languageCap+" Listen and Talk";
 var projectInfo="<p>Information about this project.</p>";
+
 
 
 var currentpage=""; var referrer="dashboard"; //which page to go back to?
@@ -46,15 +50,26 @@ var audiopathServer=web_dir+language+"/mp3/"; //server folder if no local mp3 fi
 
 var audioError=0;
 var playbackspeed=1;
-var imagepath=web_dir+language+"/img/";
+//get local images if offline
+var imagepath= (window.navigator.onLine) ? web_dir+language+"/img/" : "img/";
 var speakers=[]; var topics=[]; var conversations=[]; var favourites=[]; var chunkbank=[]; var chunkbankSorted=[]; var chunkbankSortedLength=[]; var chunkbankFlags=[]; var entryConversation=[];
 var initialActivityWordLength=20;//maximum length of words for intial set up of Have a go activity
 var maxMemoryWordLength=200;//maximum length of words memory activity
+var tokenRequest=""; //link and text to point people to right place to get token
+
+//umpila app
+if (language==="umpila"){
+  appTitleShort="Kuuku ngaachiku";
+  appTitleLong="Kuuku ngaachiku"; //Ngampula Kuuku Pitaanchimana
+  $("#launch .launchlogo").attr("src", "images/logo_lcasc.png");
+  projectInfo='<p class="leftText">Are you interested in learning Umpila / Kuuku Ya’u? This app is to help community members learn some phrases in your own language.</p><p class="leftText">We acknowledge the language speakers whose voices appear in this app: <strong>Maria Butcher, Lorraine Clarmont, Elizabeth Giblet, Lucy Hobson, Minnie Pascoe, Josiah Omeenyo, Lawrence Omeenyo, Dorothy Short</strong>.</p><p class="leftText">Illustrators: <strong>Phyllis Hobson and Krystal Dean</strong>.</p><a href="http://www.jcac.com.au/" target="_blank"><img src="images/logo_lcasc.png" alt="Lockhart River Aboriginal Shire Council logo" class="aboutLogo"></a><p class="leftText">Funding from: Australian Research Council Centre of Excellence for the Dynamics of Language, and Indigenous Languages and the Arts, Department of Infrastructure, Transport, regional Development, Communications and the Arts.</p><p class="leftText">In kind support from: The MARCS Institute for Brain, Behaviour and Development, Western Sydney University and School of Humanities and Languages, UNSW.</p><a href="https://www.dynamicsoflanguage.edu.au/" target="_blank"><img src="images/logo_arc.png" alt="Australian Research Council Centre of Excellence for the Dynamics of Language logo" class="aboutLogo rectLogo"></a><a href="https://www.arts.gov.au/funding-and-support/indigenous-languages-and-arts-program" target="_blank"><img src="images/logo_ausgov.png" alt="Indigenous Languages and the Arts, Department of Infrastructure, Transport, regional Development, Communications and the Arts logo" class="aboutLogo rectLogo"></a><a href="https://www.westernsydney.edu.au/" target="_blank"><img src="images/logo_wsu.png" alt="Western Sydney University logo" class="aboutLogo rectLogo"></a><a href="https://www.unsw.edu.au/arts-design-architecture/our-schools/humanities-languages" target="_blank"><img src="images/logo_unsw.png" alt="UNSW Sydney logo" class="aboutLogo rectLogo"></a><a href="https://www.elearnaustralia.com.au" target="_blank"><img src="images/logo_ela.png" alt="Elearn Australia" class="aboutLogo rectLogo"></a><p>&nbsp;</p>';
+  versionNo="1.0.2";
+  tokenRequest='<a href="https://forms.gle/qqmGhZWsaAcK1XAB6" target="_blank">Ask Lockhart River Aboriginal Shire Council</a>';
+}
 
 //backwards compatibility for mangarrayi app
 if (language==="mangarrayi"){
     $("#launch .launchlogo").attr("src", "images/logo_jcac.png");
-    audiopath="mp3/"; //mp3 and image folder is inside app folder
     imagepath="https://elearnaustralia.com.au/mangarrayi/img/";
     audiopathServer="https://elearnaustralia.com.au/mangarrayi/mp3/";
     translationColsoundfilename="kriolsoundfilename";//name of audio translation column in DB table
@@ -64,16 +79,22 @@ if (language==="mangarrayi"){
     topicCol="subtopic"; //name of topic column in DB
     apiPath="https://www.elearnaustralia.com.au/mangarrayi/api/"; //hardcoded path to API and web files
     web_dir="https://elearnaustralia.com.au/mangarrayi/";
-    startpage="warning";//go to warning and token screens on startup
+    
     translateNoText="dayi"; //text for yes and no buttons in language
     translateYesText="yowo";
-    versionNo="2.3.4";
+    versionNo="2.3.3";
     appTitleShort="Warrma Mangarrayi";
     appTitleLong="Warrma Mangarrayi (Listen to Mangarrayi)";
     projectInfo='<p class="leftText">Are you interested in learning Mangarrayi? This app is to help community members learn some phrases in your own language.</p><p class="leftText">We acknowledge the Mangarrayi speakers whose voices appear in this app: <strong>Sheila Yanybarrak Conway, Jesse Garalnganyjak Roberts, Amy Dirn.gayg.</strong></p><p class="leftText">This app has been co-designed by the Jilkminggan Community with Western Sydney University and Elearn Australia.</p><a href="http://www.jcac.com.au/" target="_blank"><img src="images/logo_jcac.png" alt="Jilkminggan Community Aboriginal Corporation logo" class="aboutLogo"></a><p class="leftText">Funding from: Australian Research Council Centre of Excellence for the Dynamics of Language</p><a href="https://www.westernsydney.edu.au/" target="_blank"><img src="images/logo_wsu.png" alt="Western Sydney University logo" class="aboutLogo rectLogo"></a><a href="https://www.dynamicsoflanguage.edu.au/" target="_blank"><img src="images/logo_arc.png" alt="ARC Centre of Excellence for the Dynamics of Language" class="aboutLogo rectLogo"></a><a href="https://www.elearnaustralia.com.au" target="_blank"><img src="images/logo_ela.png" alt="Elearn Australia" class="aboutLogo rectLogo"></a><p>&nbsp;</p>';
     maxMemoryWordLength=50;
+    tokenRequest='<a href="https://forms.gle/Mp36U4kGuf3MEv7P7" target="_blank">Ask JCAC</a>';
 }
 
+//show token / warning system
+if (language==="umpila" || language==="mangarrayi"){
+    audiopath="mp3/"; //mp3 and image folder is inside app folder
+    startpage="warning";//go to warning and token screens on startup
+}
 
 
 //=========================================================================================================================== SHOW STUFF
@@ -94,6 +115,9 @@ function showPage(page){
         $("#"+page).css("display", "block");
     }
   if(page==="entry"){//language entry screen
+    //write to log
+    if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedEntry+"&interaction=6", function() { });}
+    if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=6", function() { });}
     //show back button
     $(".menuButton img").attr("src","images/icon_left.png");
     audioOff(); $(".playAllAudioIcon").attr("src","images/icon_play_white.png");
@@ -120,7 +144,7 @@ function getDictionary(){
     "use strict";
 
     //$.getJSON(apiPath+"get-topics.php", function(data) {if (data!==0) {topics=data; setupTopics();}});
-    console.log(apiPath+"get-language.php?table="+language);
+    //console.log(apiPath+"get-language.php?table="+language);
      var getURL=apiPath+"get-language.php?table="+language; if (language==="mangarrayi"){getURL=apiPath+"get-mangarrayi.php";}
     $.getJSON(getURL, function(data) {if (data!==0) {chunkbank=data; }})
     .done(function() {
@@ -149,6 +173,10 @@ function initialiseDictionary(){
         if (chunkbank[a].image!==""&&chunkbank[a].image!==null){
             preloadHTML+="<img id=\"preloadImage"+a+"\" src=\""+imagepath+""+chunkbank[a].image+"\" alt=\"\" width=\"0\" height=\"0\">";
         }//preload images
+        if (chunkbank[a].soundfilename!==""&&chunkbank[a].soundfilename!==null){
+            //console.log('checking audio'+a+'-'+chunkbank[a].soundfilename);
+            //preloadHTML+="<audio preload=\"auto\" id=\"preloadAudio"+a+"\"><source src=\"mp3/"+chunkbank[a].soundfilename+"\" id=\"mp3Source\" type=\"audio/mpeg\"></audio>";
+        }//preload audio for testing
     if (chunkbank[a][translationCol]===null){chunkbank[a][translationCol]="";}
         if (chunkbank[a][languageCol]===null){chunkbank[a][languageCol]="";}
     //capitalise first letter of English
@@ -172,12 +200,29 @@ function initialiseDictionary(){
 
     if(parseInt(initialEntry)!==0){
         //if there is an id set in the URL then go straight to that id.
-        setTimeout(function(){setEntry(initialEntry); showPage('entry'); if(initialConv==="true"){toggleConversation();}},500);
+        if (tokenEnabled){
+            var tokenName = (language==="mangarrayi") ? "mang-token" : language+"-token";
+            //check tokens if enabled
+            if (localStorage.getItem(tokenName)===null){ //see if they have a stored token
+                showPage("token");//need to get token
+            } else {
+                //get token from storage
+                token=localStorage.getItem(tokenName);
+                //record interaction
+                if (language==="mangarrayi") { $.get("https://www.elearnaustralia.com.au/mangarrayi/api/sessions.php?token="+token, function() { });}
+                if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=0&interaction=12", function() { });}
+                //go straight to entry or conversation
+                setTimeout(function(){setEntry(initialEntry); showPage('entry'); if(initialConv==="true"){toggleConversation();}},500);
+            }
+        } else {
+            //tokens not enabled - go straight to entry or conversation
+            setTimeout(function(){setEntry(initialEntry); showPage('entry'); if(initialConv==="true"){toggleConversation();}},500);
+        }   
     } else {
-        //otherwise go to default start screen
+        //no intial entry id set - go straight to default start screen
         showPage(startscreen);
     }
-
+    //get any favourites from storage
     if (localStorage.getItem(language+"-favourites")){favourites=JSON.parse(localStorage.getItem(language+"-favourites"));}
 }
 
@@ -268,6 +313,7 @@ function getData(){
         filterSelectStr+='<option value="class">Words or phrases</option>';
         filterSelectStr+='<option value="function">Language function</option>';
         filterSelectStr+='<option value="keywordling">Linguistic keyword</option>';
+        filterSelectStr+='<option value="speaker">Speaker</option>';
         $("#filterEntries").html(filterSelectStr);
 
         selectedFilter="keyword"+translationCol;
@@ -297,48 +343,57 @@ function setEntry(x){
     console.log(JSON.stringify(chunkbank[n]));
 
     //set up page
-    var st='<div class="entry" id="entryaudio_'+chunkbank[n].id+'">';
-  st+='<div class="entryEnglish"><div class="entryEnglishText">'+chunkbank[n][translationCol];
-    st+='</div>';
+    var startingStr='<div class="entry" id="entryaudio_'+chunkbank[n].id+'">';
+
+    var entryEngStr ='<div class="entryEnglish">';
+    entryEngStr +='<div class="entryEnglishText">'+chunkbank[n][translationCol]+'</div>';
     //show translation audio if available
     if (chunkbank[n][translationColsoundfilename]!==""){
-        st+='<div class="entryKriol active" id="kriolAudio" onclick="toggleKriolAudio(\''+chunkbank[n][translationColsoundfilename]+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon"></div>';
+        entryEngStr+='<div class="entryKriol active" id="kriolAudio" onclick="toggleKriolAudio(\''+chunkbank[n][translationColsoundfilename]+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon"></div>';
     }
-    st+='</div>';//end entryEnglish
-  st+='<div class="entryMangarrayi">';
-  st+='<div class="entryOption" id="entryOption4" onclick="toggleInfo();">';
-  st+='<img src="images/icon_info.png" alt="info" title="Show glossing" class="infoIcon colourOff">';
-  st+='</div>';
-    st+='<div class="entryNormal"><div class="entryMangarrayiText"><div class="entryProgress">'+chunkbank[n][languageCol]+'</div></div></div>';
-    st+='<div class="entryGlossing">';
-    st+='<div class="entryMangarrayiText"><div class="entryProgress">'+chunkbank[n].glossing+'</div></div>';
-    st+='<div class="entryExplanationText">'+chunkbank[n].explanation+'</div>';
-    st+='</div>';
-    st+='<div class="entryOptions">';
-    st+='<div class="entryOption" id="entryOption1" onclick="toggleStar(\''+chunkbank[n].id+'\');">';
+    entryEngStr+='</div>';//end entryEnglish
+    if (chunkbank[n].meaning) entryEngStr+='<div class="entryMeaning">'+chunkbank[n].meaning+'</div>';
+
+    var entryLangStr='<div class="entryMangarrayi">';
+    entryLangStr+='<div class="entryOption" id="entryOption4" onclick="toggleInfo();">';
+    entryLangStr+='<img src="images/icon_info.png" alt="info" title="Show glossing" class="infoIcon colourOff">';
+    entryLangStr+='</div>';
+    entryLangStr+='<div class="entryNormal"><div class="entryMangarrayiText"><div class="entryProgress">'+chunkbank[n][languageCol]+'</div></div></div>';
+    entryLangStr+='<div class="entryGlossing">';
+    entryLangStr+='<div class="entryMangarrayiText"><div class="entryProgress">'+chunkbank[n].glossing+'</div></div>';
+    entryLangStr+='<div class="entryExplanationText">'+chunkbank[n].explanation+'</div>';
+    entryLangStr+='</div>';
+    entryLangStr+='<div class="entryOptions">';
+    entryLangStr+='<div class="entryOption" id="entryOption1" onclick="toggleStar(\''+chunkbank[n].id+'\');">';
     //has it been favourited?
     var favouriteClass="colourOff";  if ($.inArray(chunkbank[n].id,favourites)!==-1){favouriteClass="colourOn"; }
-    st+='<img src="images/icon_star.png" alt="star" title="Add to favourites" class="starIcon '+favouriteClass+'">';
-    st+='</div>';
-    st+='<div class="entryOption" id="entryOption2" onclick="toggleSlow(\''+chunkbank[n].id+'\');">';
+    entryLangStr+='<img src="images/icon_star.png" alt="star" title="Add to favourites" class="starIcon '+favouriteClass+'">';
+    entryLangStr+='</div>';
+    entryLangStr+='<div class="entryOption" id="entryOption2" onclick="toggleSlow(\''+chunkbank[n].id+'\');">';
     var slowClass="colourOff"; if (playbackspeed!==1){slowClass="colourOn";}
-    st+='<img src="images/icon_turtle.png" alt="turtle" title="Slow down audio" class="slowIcon '+slowClass+'">';
-    st+='</div>';
-    st+='<div class="entryOption" id="entryOption3" onclick="toggleEntryAudio(\''+chunkbank[n].id+'\');">';
-    st+='<img src="images/icon_play.png" alt="play" title="Play/Pause" class="playIcon colourOff">';
-    st+='</div>';
-    st+='<div class="entryOption" id="entryOption5" onclick="toggleConversation();">';
-    st+='<img src="images/icon_chat.png" alt="chat" title="Suggested conversation" class="chatIcon colourOff">';
-    st+='</div>';
-    st+='<div class="entryOption" id="entryOption6" onclick="toggleMike();">';
-    st+='<img src="images/icon_mike.png" alt="mike" title="Open microphone" class="slowIcon colourOff">';
-    st+='</div>';
-    st+='<div class="clearBoth"></div>';
-    st+='</div>';
-    st+='</div>';
-    st+='</div>';
-    st+='<div class="clearBoth"></div>';
-    $("#dictionaryentry").html(st);
+    entryLangStr+='<img src="images/icon_turtle.png" alt="turtle" title="Slow down audio" class="slowIcon '+slowClass+'">';
+    entryLangStr+='</div>';
+    entryLangStr+='<div class="entryOption" id="entryOption3" onclick="toggleEntryAudio(\''+chunkbank[n].id+'\');">';
+    entryLangStr+='<img src="images/icon_play.png" alt="play" title="Play/Pause" class="playIcon colourOff">';
+    entryLangStr+='</div>';
+    entryLangStr+='<div class="entryOption" id="entryOption5" onclick="toggleConversation();">';
+    entryLangStr+='<img src="images/icon_chat.png" alt="chat" title="Suggested conversation" class="chatIcon colourOff">';
+    entryLangStr+='</div>';
+    entryLangStr+='<div class="entryOption" id="entryOption6" onclick="toggleMike();">';
+    entryLangStr+='<img src="images/icon_mike.png" alt="mike" title="Open microphone" class="slowIcon colourOff">';
+    entryLangStr+='</div>';
+    entryLangStr+='<div class="clearBoth"></div>';
+    entryLangStr+='</div>';
+    entryLangStr+='</div>';
+
+    var closingStr='</div><div class="clearBoth"></div>';
+
+    //change order of display for umpila
+    if (language==="umpila"){
+      $("#dictionaryentry").html(startingStr+entryLangStr+entryEngStr+closingStr);
+    } else {
+      $("#dictionaryentry").html(startingStr+entryEngStr+entryLangStr+closingStr);
+    }
 
     //set up conversations screen
     var cstr=""; var match=0; var needle=selectedEntry.toString(); entryConversation=[];
@@ -371,7 +426,8 @@ function setEntry(x){
     //show image if available
     var istr='';
     if (chunkbank[n].image!==""){
-      if (chunkbank[n].notes!=="" && chunkbank[n].notes!==null){
+      //for mangarrayi show notes as image credit info
+      if (language==="mangarrayi" && chunkbank[n].notes!=="" && chunkbank[n].notes!==null){
         istr+='<div id="creditsentry">'+chunkbank[n].notes+'</div>';
       }
       istr+='<img src="'+imagepath+chunkbank[n].image+'" alt="">';
@@ -383,8 +439,11 @@ function setEntry(x){
     $("#imageentry").html(istr);
 
     var istr="";
-    if (chunkbank[n].info!=="" && chunkbank[n].info!==null){
+    if (chunkbank[n].info){
       istr=chunkbank[n].info;
+    }
+    if (language!=="mangarrayi" && chunkbank[n].notes){
+      istr+=chunkbank[n].notes;
     }
     $("#infoentry").html(istr);
 
@@ -397,7 +456,8 @@ function toggleHide(x){
             //hide phrase from activity
             showAlert("<p>We won't show this phrase again.</p> ");
             $("#hideIcon img").removeClass("colourOff").addClass("colourOn");
-      
+      if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedEntry+"&interaction=7", function() { });}
+      if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=7", function() { });}
     } else{
       //remove hide
       $("#hideIcon img").removeClass("colourOn").addClass("colourOff");
@@ -425,7 +485,8 @@ function toggleStar(x){
         //chunkbank[n].star=1;
         if ($.inArray(x,favourites)===-1){favourites.push(x);}
         $("#entryOption1 img").removeClass("colourOff").addClass("colourOn");
-        
+        if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedEntry+"&interaction=2", function() { });}
+        if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=2", function() { });}
     } else{
         //remove starred entry
         for (var f=0; f<favourites.length; f++){if (favourites[f]===x){favourites.splice(f, 1); f--;}}
@@ -498,7 +559,8 @@ function toggleInfo(){
         //hide convo if showing
          //if($("#entryOption5 img").hasClass("colourOn")){ $(".conventry").css("display","none");  $("#entryOption5 img").removeClass("colourOn").addClass("colourOff");}
         $("#entryOption4 img").removeClass("colourOff").addClass("colourOn");
-       
+        if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedEntry+"&interaction=4", function() { });}
+        if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=4", function() { });}
     } else{
         //hide glossing
         $(".entryGlossing, #infoentry, #creditsentry").css("display", "none"); $(".entryNormal").fadeIn();
@@ -514,7 +576,8 @@ function toggleConversation(){
         //hide mike if showing
         if($("#entryOption6 img").hasClass("colourOn")){ $("#entry .mikeentry").css("display","none");  $("#entryOption6 img").removeClass("colourOn").addClass("colourOff");}
         $("#entryOption5 img").removeClass("colourOff").addClass("colourOn");
-       
+       if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedEntry+"&interaction=5", function() { });}
+       if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=5", function() { });}
     } else{
         //hide conversation
         $(".conventry").css("display","none");
@@ -527,21 +590,40 @@ function toggleConversation(){
 function checkToken(){
     "use strict";
     token=cleanUp($("#token input").val());
-    if(token==="test"){
-        showPage("dashboard");
-         
-        return false;
-    }
-    $.get("https://www.elearnaustralia.com.au/mangarrayi/api/check-token.php?token="+token, function(data) {
-        if (data.indexOf(1)!==-1){
-            audioOff();
-            localStorage.setItem("mang-token", token);
+    if (language==="mangarrayi"){
+        if(token==="test"){
             showPage("dashboard");
-           
-        } else {
-            alert("Token is not right or has already been used");
+             $.get("https://www.elearnaustralia.com.au/mangarrayi/api/sessions.php?token="+token, function() { });
+            return false;
         }
-     });
+        $.get("https://www.elearnaustralia.com.au/mangarrayi/api/check-token.php?token="+token, function(data) {
+            if (data.indexOf(1)!==-1){
+                audioOff();
+                localStorage.setItem("mang-token", token);
+                showPage("dashboard");
+                $.get("https://www.elearnaustralia.com.au/mangarrayi/api/sessions.php?token="+token, function() { });
+            } else {
+                alert("Token is not right or has already been used");
+            }
+         });
+    } else {
+        if(token==="test"){
+            showPage("dashboard");
+            if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=0&interaction=11", function() { });}
+            return false;
+        }
+        $.get(apiPath+"check-token.php?table="+language+"&token="+token, function(data) {
+            if (data.indexOf(1)!==-1){
+                audioOff();
+                localStorage.setItem(language+"-token", token);
+                showPage("dashboard");
+                if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=0&interaction=11", function() { });}
+            } else {
+                alert("Token is not right or has already been used");
+            }
+         });
+    }
+    
 }
 
 
@@ -681,9 +763,14 @@ function setupTopics(){
     var str="";
     for (var t=0; t<topics.length; t++){
         str+='<div class="topicDivContainer" id="topicContainer'+(t+1)+'" onclick="showSubTopics(\''+(t+1)+'\');"><div class="topicDivHolder">';
-                var iconImage="icon_topic.png"; if (language==="mangarrayi"){ iconImage='icon_topic'+(t+1)+'.png?v=3';}
-                str+='<img src="images/'+iconImage+'" alt="">';
-                str+='<div class="topicDiv">'+topics[t].title+'</div></div></div>';
+        if (topics[t].image) {
+          str+='<img src="'+imagepath+topics[t].image+'?v=2" alt="">';
+        } else {
+          var iconImage="icon_topic.png";
+          if (language==="mangarrayi"){ iconImage='icon_topic'+(t+1)+'.png?v=3';}
+          str+='<img src="images/'+iconImage+'" alt="">';
+        }
+        str+='<div class="topicDiv">'+topics[t].title+'</div></div></div>';
     }
     $("#topicsContainer").html('<div class="topicsFlexContainer">'+str+'</div>');
     if (language==="mangarrayi"){
@@ -698,7 +785,7 @@ function showTopics(){
     referrer='dashboard';
     showPage("dashboard");
     $(".headerSubmenu").css("background","none");
-    $(".headerPictureSearch").css("background-color","#FF4C00");
+    $(".headerPictureSearch").css("background-color",secondaryColor);
     $("#topicsContainer").css("display", "block");
 }
 
@@ -707,13 +794,24 @@ function showSubTopics(x){
     selectedTopic=parseInt(x);
     console.log("showSubTopics"+x+" selectedTopic: "+selectedTopic+" selectedSubTopic: "+selectedSubTopic);
     $(".topicHeaderTitle").html(topics[(selectedTopic-1)].title);
-    $(".topicHeaderIcon img").attr("src","images/icon_topic"+x+".png?v=2");
-        var str="";
+    if (language==="mangarrayi"){ $(".topicHeaderIcon img").attr("src","images/icon_topic"+x+".png?v=2");}
+    if (topics[(selectedTopic-1)].image) {
+      $(".topicHeaderIcon img").attr("src",imagepath+topics[(selectedTopic-1)].image);
+    } else {
+      $(".topicHeaderIcon img").attr("src","images/icon_topic.png");
+    }
+    var str="";
     for (var t=0; t<topics[(selectedTopic-1)].subtopics.length; t++){
+        var subtopicTitle = topics[(selectedTopic-1)].subtopics[t].title ? topics[(selectedTopic-1)].subtopics[t].title : topics[(selectedTopic-1)].subtopics[t].topic;
         str+='<div class="subtopicDivContainer" id="subtopicContainer'+(t+1)+'"  onclick="showSubTopicsExpanded(\''+(t+1)+'\');"><div class="subtopicDivHolder">';
-                var iconImage="icon_topic.png"; if (language==="mangarrayi"){ iconImage='icon_topic'+selectedTopic+'_'+(t+1)+'.png';}
-                str+='<img src="images/'+iconImage+'" alt="">';
-                str+='<div class="subtopicDiv">'+topics[(selectedTopic-1)].subtopics[t].title+'</div></div></div>';
+        if (topics[(selectedTopic-1)].subtopics[t].image) {
+          str+='<img src="'+imagepath+topics[(selectedTopic-1)].subtopics[t].image+'?v=2" alt="">';
+        } else {
+          var iconImage="icon_topic.png";
+          if (language==="mangarrayi"){ iconImage='icon_topic'+selectedTopic+'_'+(t+1)+'.png';}
+          str+='<img src="images/'+iconImage+'" alt="">';
+        }
+        str+='<div class="subtopicDiv">'+subtopicTitle+'</div></div></div>';
     }
     $("#subtopicsContainer").slideDown();
     $("#subtopics").html('<div class="topicsFlexContainer">'+str+'</div>').css("display", "block");
@@ -723,31 +821,39 @@ function showSubTopicsExpanded(x){
     hideTopicsAndSubtopics();
     selectedSubTopic=parseInt(x);
     console.log("showSubTopicsExpanded"+x+" selectedTopic: "+selectedTopic+" selectedSubTopic: "+selectedSubTopic);
-
-        var topicid=selectedTopic.toString();
-        var subtopicid=topics[(selectedTopic-1)].subtopics[(selectedSubTopic-1)].title;
-    console.log("topicid: "+topicid+" subtopicid: "+subtopicid);
+    var topicid=selectedTopic.toString();
+    var subtopicid=topics[(selectedTopic-1)].subtopics[(selectedSubTopic-1)].id ? topics[(selectedTopic-1)].subtopics[(selectedSubTopic-1)].id : null;
+    var subtopicname=topics[(selectedTopic-1)].subtopics[(selectedSubTopic-1)].title ? topics[(selectedTopic-1)].subtopics[(selectedSubTopic-1)].title : topics[(selectedTopic-1)].subtopics[(selectedSubTopic-1)].topic;
+    console.log("topicid: "+topicid+" subtopicid: "+subtopicid+" subtopicname: "+subtopicname);
     $(".topicHeaderTitle").html('');
-    $(".subtopicHeaderTitle").html(subtopicid);
-    $(".subtopicHeaderIcon img").attr("src","images/icon_topic"+selectedTopic+"_"+selectedSubTopic+".png");
-        var str="";
-        for (var a=0; a<chunkbankSorted.length; a++){
-        var matchedEntry=false; //see if subtopic word is found in entry subtopics or related
-        if(
-            //chunkbankSorted[a].topic===topicid &&
-            (chunkbankSorted[a][topicCol]!==null && chunkbankSorted[a][topicCol].toLowerCase().indexOf(subtopicid.toLowerCase())!==-1) ||
-            (chunkbankSorted[a].related!==null && chunkbankSorted[a].related.toLowerCase().indexOf(subtopicid.toLowerCase())!==-1)
-        ){
-            matchedEntry=true;
+    $(".subtopicHeaderTitle").html(subtopicname);
+    if (language==="mangarrayi"){
+      $(".subtopicHeaderIcon img").attr("src","images/icon_topic"+selectedTopic+"_"+selectedSubTopic+".png");
+    }
+    if (topics[(selectedTopic-1)].subtopics[(selectedSubTopic-1)].image) {
+      $(".subtopicHeaderIcon img").attr("src",imagepath+topics[(selectedTopic-1)].subtopics[(selectedSubTopic-1)].image);
+    } else {
+      $(".subtopicHeaderIcon img").attr("src","images/icon_topic.png");
+    }
+    var str="";
+    for (var a=0; a<chunkbankSorted.length; a++){
+    var matchedEntry=false; //see if subtopic word is found in entry subtopics or related
+    if(
+        (subtopicid && chunkbankSorted[a][topicCol]===subtopicid) || //does selected topic match entry topic (new)
+        (chunkbankSorted[a].related && chunkbankSorted[a].related.split(',').find(item => item === subtopicid)) || //does selected topic match entry related (new)
+        (chunkbankSorted[a][topicCol]!==null && chunkbankSorted[a][topicCol].toLowerCase().indexOf(subtopicname.toLowerCase())!==-1) || //does selected topic match entry topic (old)
+        (chunkbankSorted[a].related!==null && chunkbankSorted[a].related.toLowerCase().indexOf(subtopicname.toLowerCase())!==-1) //does selected topic match entry related (old)
+    ){
+        matchedEntry=true;
+    }
+    if(matchedEntry===true){
+                str+='<div class="entry"><div class="entryEnglish" onclick="setEntry(\''+chunkbankSorted[a].id+'\'); showPage(\'entry\');">'+chunkbankSorted[a][translationCol]+'</div> <div class="entryMangarrayi audioButtonDiv active" id="subtopicsexpa_'+chunkbankSorted[a].id+'" onclick="toggleAudio(\'subtopicsexpa_'+chunkbankSorted[a].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon" id="">'+chunkbankSorted[a][languageCol]+'</div> <div class="entryGo active" onclick="setEntry(\''+chunkbankSorted[a].id+'\');showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"> </div> </div>';
         }
-        if(matchedEntry===true){
-                    str+='<div class="entry"><div class="entryEnglish" onclick="setEntry(\''+chunkbankSorted[a].id+'\'); showPage(\'entry\');">'+chunkbankSorted[a][translationCol]+'</div> <div class="entryMangarrayi audioButtonDiv active" id="subtopicsexpa_'+chunkbankSorted[a].id+'" onclick="toggleAudio(\'subtopicsexpa_'+chunkbankSorted[a].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon" id="">'+chunkbankSorted[a][languageCol]+'</div> <div class="entryGo active" onclick="setEntry(\''+chunkbankSorted[a].id+'\');showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"> </div> </div>';
-            }
-        }
-        if (str===""){str="<p class='textLeft paddedContent note'>Nothing under this topic yet.</p>";}
-        $(".subtopicsexpanded").html(str);
-        //$("#subtopicsExpandedContainer").css("display", "block");
-        $("#subtopicsExpandedContainer").fadeIn();
+    }
+    if (str===""){str="<p class='textLeft paddedContent note'>Nothing under this topic yet.</p>";}
+    $(".subtopicsexpanded").html(str);
+    //$("#subtopicsExpandedContainer").css("display", "block");
+    $("#subtopicsExpandedContainer").fadeIn();
 }
 
 function hideTopicsAndSubtopics(){
@@ -762,7 +868,7 @@ function showFull(){
     referrer='fulllist';
     showPage("fulllist");
     $(".headerSubmenu").css("background","none");
-    $(".headerListSearch").css("background-color","#FF4C00");
+    $(".headerListSearch").css("background-color",secondaryColor);
 }
 
 //=========================================================================================================================== ACTIVITY
@@ -773,7 +879,7 @@ async function showActivity(){
     if (currentpage==="activity"){return;}
     showPage("activity");
     $(".headerSubmenu").css("background","none");
-    $(".headerActivity").css("background-color","#FF4C00");
+    $(".headerActivity").css("background-color",secondaryColor);
     await setUpFlags(); //wait for flags to be set up before setting up question set
     setUpQuestionSet();
 }
@@ -781,7 +887,7 @@ async function showActivity(){
 function showActivityHome(){
   $("#memoryBody, #activityBody").css("display", "none");
   $(".activityReset").css("display", "block");
-  $("#activityStart").css("display", "flex");
+  $("#activityStart, ").css("display", "flex");
   $(".menuButton img").attr("src","images/icon_menu.png");
   referrer="activity";
 }
@@ -899,8 +1005,11 @@ function setUpQuestionSet(){
 
     //work out how many phrases are available
     var possiblePhraseCount=0; var possibleShortPhraseCount=0;
+    // if (chunkbank[a][translationCol]===null){chunkbank[a][translationCol]="";}
     chunkbankFlags.forEach((item, i) => {
-        if(item.flag!=="green"&&item.flag!=="red"&&item.id!=="0"&&item.id!=="1"){possiblePhraseCount++;}
+        if(item.flag!=="green"&&item.flag!=="red"&&item.id!=="0"&&item.id!=="1"&&chunkbank[item.index][languageCol]!==""&&chunkbank[item.index][translationCol]!==""){
+          possiblePhraseCount++;
+        }
     });
     chunkbank.forEach((item, i) => {
         if(item[languageCol].length<initialActivityWordLength){possibleShortPhraseCount++;}
@@ -912,7 +1021,7 @@ function setUpQuestionSet(){
         previousQuestionsLength=Math.floor(questionSetLength/2);
     }
     //remove word length requirement if there are not enough short phrases for initial set up
-    if(possibleShortPhraseCount<questionSetLength){initialActivityWordLength=10;}
+    if(possibleShortPhraseCount<questionSetLength){initialActivityWordLength=100;}
 
 console.log("chunkbankFlags");
 console.log(chunkbankFlags)
@@ -931,8 +1040,8 @@ console.log(chunkbankFlags)
         console.log(chunkbankFlags);
         //first get any new favourites
         for (var f=0; f<chunkbankFlags.length; f++){
-            //check phrase not already in the question set array
-            if(!questionSet.some(el => el.id === chunkbankFlags[f].id)&&chunkbankFlags[f].id!=="0"){
+            //check phrase not already in the question set array and has language and translation content
+            if(!questionSet.some(el => el.id === chunkbankFlags[f].id)&&chunkbankFlags[f].id!=="0"&&chunkbank[f][languageCol]!==""&&chunkbank[f][translationCol]!==""){
                 //check for favourite phrases that haven't already been mastered or hidden
                 if (chunkbankFlags[f].fave===1 &&(chunkbankFlags[f].flag!=="green"&&chunkbankFlags[f].flag!=="red")){
                     //add all these to set - fill up set but don't go over the number of questions needed
@@ -952,8 +1061,8 @@ console.log(chunkbankFlags)
         var numberRandomsNeeded=Math.round(numQuestionsNeeded/3);
         var i=0; while (i < numberRandomsNeeded) {
             var randomNo=Math.floor((Math.random() * (chunkbankFlags.length-1)));//randomly choose from chunkbank array
-            //check phrase not already in the question set array, has not already been mastered (green) or hidden (red)
-            if(!questionSet.some(el => el.id === chunkbankFlags[randomNo].id)&&chunkbankFlags[randomNo].id!=="0" &&(chunkbankFlags[randomNo].flag!=="green"||chunkbankFlags[randomNo].flag!=="red")){
+            //check phrase not already in the question set array, has not already been mastered (green) or hidden (red) and has language and translation content
+            if(!questionSet.some(el => el.id === chunkbankFlags[randomNo].id)&&chunkbankFlags[randomNo].id!=="0" &&(chunkbankFlags[randomNo].flag!=="green"||chunkbankFlags[randomNo].flag!=="red") &&chunkbank[randomNo][languageCol]!==""&&chunkbank[randomNo][translationCol]!==""){
                 if(!initialSetUp||chunkbank[chunkbankFlags[randomNo].index][languageCol].length<initialActivityWordLength){//choose short words the first time round
                     questionSet.push({id:chunkbankFlags[randomNo].id,index:chunkbankFlags[randomNo].index}); //add to set
                     chunkbankFlags[randomNo].flag="blue";//set flag in main flag array to blue
@@ -1010,7 +1119,7 @@ console.log(chunkbankFlags)
                 if(topic!=="null" && topic!==null && topic!==""){
                     for (var c=0; c<chunkbank.length; c++){ //loop through chunkbank
                         if(chunkbank[c][topicCol]===topic){//find similar topics
-                            if(!questionSet.some(el => el.id === chunkbank[c].id) && numQuestionsNeeded>0 &&chunkbank[c].id!=="0" &&(chunkbankFlags[c].flag!=="green"||chunkbankFlags[c].flag!=="red")){ //check phrase not already in the question set array, mastered or hidden
+                            if(!questionSet.some(el => el.id === chunkbank[c].id) && numQuestionsNeeded>0 &&chunkbank[c].id!=="0" &&(chunkbankFlags[c].flag!=="green"||chunkbankFlags[c].flag!=="red")&&chunkbank[c][languageCol]!==""&&chunkbank[c][translationCol]!==""){ //check phrase not already in the question set array, mastered or hidden and has language and translation content
                                 if(!initialSetUp||chunkbank[c][languageCol].length<initialActivityWordLength){//choose short words the first time round
                                     questionSet.push({id:chunkbank[c].id,index:c}); //add to set
                                     chunkbankFlags[c].flag="blue";//set flag in main flag array to blue
@@ -1032,8 +1141,8 @@ console.log(chunkbankFlags)
             while (numQuestionsNeeded>0) {
               //console.log("numQuestionsNeeded! "+numQuestionsNeeded+" "+initialActivityWordLength);
                 randomNo=Math.floor((Math.random() * (chunkbankFlags.length-1)));//randomly choose from chunkbank array
-                //check phrase not already in the question set array, mastered or hidden
-                if(!questionSet.some(el => el.id === chunkbankFlags[randomNo].id)&&chunkbankFlags[randomNo].id!=="0" &&(chunkbankFlags[randomNo].flag!=="green"||chunkbankFlags[randomNo].flag!=="red")){
+                //check phrase not already in the question set array, mastered or hidden and has language and translation content
+                if(!questionSet.some(el => el.id === chunkbankFlags[randomNo].id)&&chunkbankFlags[randomNo].id!=="0" &&(chunkbankFlags[randomNo].flag!=="green"||chunkbankFlags[randomNo].flag!=="red")&&chunkbank[randomNo][languageCol]!==""&&chunkbank[randomNo][translationCol]!==""){
 
                     questionSet.push({id:chunkbankFlags[randomNo].id,index:chunkbankFlags[randomNo].index}); //add to set
                         chunkbankFlags[randomNo].flag="blue";//set flag in main flag array to blue
@@ -1106,8 +1215,8 @@ function setUpMemorySet(){
             var randomNo=Math.floor((Math.random() * (chunkbankFlags.length-1)));//randomly choose from chunkbank array
             //check phrase id not already in the memory set array and is long enough
             if(!memorySet.some(el => el.id === chunkbankFlags[randomNo].id) && chunkbankFlags[randomNo].id!=="0"){
-                //choose phrases with images and check image is not a duplicate
-                if(chunkbank[chunkbankFlags[randomNo].index].image!=="" && !memorySet.some(el => el.image === chunkbank[chunkbankFlags[randomNo].index].image)){
+                //choose phrases with images and audio and check image is not a duplicate
+                if(chunkbank[chunkbankFlags[randomNo].index].soundfilename!=="" && chunkbank[chunkbankFlags[randomNo].index].image!=="" && !memorySet.some(el => el.image === chunkbank[chunkbankFlags[randomNo].index].image)){
                   if(chunkbank[chunkbankFlags[randomNo].index][languageCol].length<maxMemoryWordLength){//choose short phrases
                     memorySet.push({
                       id:chunkbankFlags[randomNo].id,
@@ -1256,7 +1365,9 @@ async function setUpActivity(mode){
     //work out how many phrases have NOT been mastered or hidden
     var possiblePhraseCount=0;
     chunkbankFlags.forEach((item, i) => {
-      if(item.flag!=="green"&&item.flag!=="red"&&item.id!=="0"){  possiblePhraseCount++; }
+      if(item.flag!=="green"&&item.flag!=="red"&&item.id!=="0" &&chunkbank[item.index].language!==""){
+        possiblePhraseCount++;
+      }
     });
 
 
@@ -1396,7 +1507,8 @@ async function setUpActivity(mode){
             });
             //show activity-related content
             $(".activity1, .activity1or2").css("display","flex");
-            
+            if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+chunkbank[qI].id+"&interaction=8", function() { });}
+            if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+chunkbank[qI].id+"&interaction=8", function() { });}
             toggleActivityAudio(); //auto play
             break;
 
@@ -1424,7 +1536,8 @@ async function setUpActivity(mode){
             });
             //show activity-related content
             $(".activity1or2, .reloadIconDiv").css("display","flex");
-            
+            if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+chunkbank[qI].id+"&interaction=9", function() { });}
+            if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+chunkbank[qI].id+"&interaction=9", function() { });}
             break;
 
         case 3: //english/kriol/image to audio
@@ -1449,7 +1562,8 @@ async function setUpActivity(mode){
             //show activity-related content
             $(".reloadIconDiv").css("display","flex");
             $(".activity3").css("display","block");
-           
+            if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+chunkbank[qI].id+"&interaction=10", function() { });}
+            if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+chunkbank[qI].id+"&interaction=10", function() { });}
             break;
 
         default:
@@ -1737,7 +1851,7 @@ function showFaves(){
     referrer='favourites';
     showPage("favourites");
     $(".headerSubmenu").css("background","none");
-    $(".headerFavourites").css("background-color","#FF4C00");
+    $(".headerFavourites").css("background-color",secondaryColor);
     audioOff(); $(".playAllAudioIcon").attr("src","images/icon_play_white.png");
 }
 
@@ -1767,7 +1881,7 @@ function showCategory(){
     showPage("categorylist");
     var catDiv = document.getElementById('categoryentriesbody'); catDiv.scrollTop = 0;
     $(".headerSubmenu").css("background","none");
-    $(".headerCategorySearch").css("background-color","#FF4C00");
+    $(".headerCategorySearch").css("background-color",secondaryColor);
 }
 function setFilter(){
     "use strict";
@@ -1776,8 +1890,6 @@ function setFilter(){
 }
 
 function loadFilterEntries(){
-    "use strict";
-    //var tempstr="";
    //console.log("selectedFilter: "+selectedFilter);
     $("#filterEntries").val(selectedFilter);
     var filterArray=[];
@@ -1800,9 +1912,13 @@ function loadFilterEntries(){
     //now create headings for all the filter items
     var filterListHTML="";
     for (var d=0; d<filterArray.length; d++){//loop through filter items
-      // tempstr+='{"title":"'+filterArray[d]+'","id":"'+(d+1)+'"},';
-        var firstLetterUpper=""; if (selectedFilter!=="keyword"){firstLetterUpper=" firstLetterUpper";}//add class to transform first letter to uppercase unless it's mang keyword
-        filterListHTML+='<a name="categoryresult_'+d+'_anchor" id="categoryresult_'+d+'_anchor"></a><div class="categoryresult active" id="categoryresult_'+d+'" onclick="showCategoryResult(\''+d+'\');"><div class="entryEnglish entryCol'+firstLetterUpper+'">'+filterArray[d]+'</div><div class="clearBoth"></div></div>';
+        let displayItem=filterArray[d]; 
+        //transform first letter to uppercase unless it's a language keyword
+        var firstLetterUpper=""; if (selectedFilter!=="keyword"){firstLetterUpper=" firstLetterUpper";}
+        //if the filter is speaker names then capitalise every letter
+        if (selectedFilter==="speaker"){displayItem=filterArray[d].toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ');}
+        //Display the filtered item e.g. keyword
+        filterListHTML+='<a name="categoryresult_'+d+'_anchor" id="categoryresult_'+d+'_anchor"></a><div class="categoryresult active" id="categoryresult_'+d+'" onclick="showCategoryResult(\''+d+'\');"><div class="entryEnglish entryCol'+firstLetterUpper+'">'+displayItem+'</div><div class="clearBoth"></div></div>';
         //start the html for the filter item result entries
         filterListHTML+='<div class="categoryresultentries" id="categoryresult_'+d+'_entries">';
 
@@ -1936,7 +2052,8 @@ function checkLoadedAudio(){
         audio.playbackRate=playbackspeed;
         if (chunkbank[selectedN].speaker==="Amy Dirn.gayg" && playbackspeed!==1){audio.playbackRate=0.6;} //if set to slow then slow down Amy a lot more
         if(playbackspeed!==1){//write to log if they are playing it slowly
-          
+            if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedEntry+"&interaction=3", function() { });}
+            if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=3", function() { });}
         }
     } else {
         audio.playbackRate=1;
@@ -1954,7 +2071,8 @@ function playAudio(filename) {
     var audio = document.getElementById('audioPlayer');
     audio.setAttribute("src", filename);
     audio.load();
-    
+    if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedAudio+"&interaction=1", function() { });}
+    if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedAudio+"&interaction=1", function() { });}
  }
 
 var playAllFCounter=0;
@@ -2039,7 +2157,7 @@ var app = {
     receivedEvent: function() {
         "use strict";
         $(".listening").css("display","none");
-        $(".received").css("display","block");
+        $(".received").css("display","none");
 
         /*Put all plugin related calls in here*/
         console.log("DEVICE READY");
@@ -2073,6 +2191,7 @@ $(document).ready(function(){
     $(".aboutInfo").html(projectInfo);
     $("title, .appTitle").html(appTitleShort);
     $(".appTitleExpanded").html(appTitleLong);
+    $("#tokenRequest").html(tokenRequest);
 
 
 
@@ -2087,10 +2206,13 @@ $(document).ready(function(){
     //WARNING
     $("#warning .warningButton").click(function(){
         var gotoPage="dashboard";
-        if (localStorage.getItem("mang-token")===null){ //see if they have a stored token
+        var tokenName = (language==="mangarrayi") ? "mang-token" : language+"-token";
+        if (localStorage.getItem(tokenName)===null){ //see if they have a stored token
             gotoPage="token"; //need to get token
         } else {
-            token=localStorage.getItem("mang-token");
+            token=localStorage.getItem(tokenName);
+            if (language==="mangarrayi") { $.get("https://www.elearnaustralia.com.au/mangarrayi/api/sessions.php?token="+token, function() { });}
+            if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=0&interaction=12", function() { });}
         }
         setTimeout(function(){audioOff();showPage(gotoPage);},500);
 
@@ -2136,6 +2258,10 @@ $(document).ready(function(){
     });
     $("#feedbackButton").click(function(){
         if (language==="mangarrayi"){
+            $("#appFeedbackText").html('Please <a href="https://forms.gle/6hoS5Vrb3oHBPeWU6" target="_blank">contact us</a> if you have feedback or suggestions.');
+            showPage("feedback");
+        } else if (language==="umpila"){
+            $("#appFeedbackText").html('Please <a href="https://forms.gle/DWuNVfoigvPpauaT6" target="_blank">contact us</a> if you have feedback or suggestions.');
             showPage("feedback");
         }
     }); //link to feedback
@@ -2234,6 +2360,7 @@ $(document).ready(function(){
         //try looking for the file online
         if (audioError===0){
             var filename=audiopathServer+missingaudio;
+            console.log("looking for "+filename);
             var audio = document.getElementById('audioPlayer');
             audio.setAttribute("src", filename);
             audioError++;
@@ -2263,29 +2390,53 @@ $(document).ready(function(){
 
     $("input[type=text], input[type=email], input[type=password], textarea").click(function(){ $(this).focus();}); //this fixes text inputs sometimes not selecting on short tap
 
-    if (language!=="mangarrayi"){
+    var extraCSS="";
+
+    if (language==="mangarrayi"){
+
+         //green 'OK' button is actually blue
+         extraCSS+=".greenButton{background-color: #021C40;}";
+         $("#modifiedStyles").html(extraCSS);
+         
+    } else {
+
+        //hide mute icon as only mangarrayi has audio associated with correct / incorrect answers
+        extraCSS+=".activityNav #muteIcon{display: none;} ";
+
         //get customised glossing colours from the DB
-        $.getJSON(apiPath+"get-glossing.php?table="+language, function(data) {
+        $.getJSON(apiPath+"get-glossing.php?table="+language)
+        .done(function(data){
+
             if (data!==0) {
-                var extraCSS="";
+                    
                 data.forEach((item, i) => {
                     if (item.title!==""){ //only group 2 has colours
                         switch (item.id) {
+                            
                             case "1": extraCSS+=".colour1{font-weight:bold;color:inherit;}"; break;
                             case "2": extraCSS+=".colour2{font-style:italic; color:inherit;}"; break;
                             default: extraCSS+=".colour"+item.id+"{color: #"+item.colour+";} ";
                         }
                     }
                 });
-                $("#modifiedStyles").html(extraCSS);
-                }
-        });
-    }
+            }
 
+            //umpila specific styles
+            if (language==='umpila'){
+                extraCSS+=".screen, body {background-color:#900001;} .activityProgressBlock{background-color:#000000;} .blue {background-color:#8dadae;} .entry, #activity .activityEntryQuestion, .activityAnswer {background-color:#c7c7c7;} .headerPictureSearch, .colourOn, .topicHeader, .subtopicHeader, .conversationHeading, .conventry, .greenButton, .activityNextButton, .activityAnswer.correct{background-color:#198083;}";
+            }
+
+            console.log(extraCSS)
+            $("#modifiedStyles").html(extraCSS);
+
+        });
+
+
+    }
 
     getDictionary();
     getConversations();
-  setupTopics();
+    setupTopics();
     //getSpeakers();
 });
 
