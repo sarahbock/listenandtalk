@@ -116,20 +116,30 @@ hr{ display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:0
 
 /*TOPICS AND SUBTOPICS*/
 .topicsFlexContainer{display:flex; flex-wrap:wrap; justify-content: center; padding-top: 10px;}
-.storiesContainer{    width: calc(100% - 30px);
-    background-color: #FFF;
-    margin: 20px 10px 10px 10px;
-    padding: 5px;
+.storiesContainer{    
+    margin: 10px;
     display: flex;
-    color: #000;
-    text-decoration: none;
     align-items: center;
     justify-content: center;
-    flex-direction: column;}
+    flex-direction: row;
+}
+.storiesContainer a{
+    flex:1;
+    margin:10px;
+    padding: 5px;
+    background-color: #FFF;
+    color: #000;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.storiesContainer img{height: auto; max-width: 30%;}
 .topicDivContainer{width:25%;   background-color: #FFF; box-shadow: 0px 2px 2px #0000003D;     margin: 10px; padding: 10px 5px;}
 .topicDivHolder{padding:1vw; cursor: pointer; }
 .topicDivHolder img{height: auto;  max-width: 100%;}
-.storiesContainer img{height: auto; max-width: 30%;}
+
 .topicDiv{ }
 .topicDiv, .subtopicDiv{    padding: 0 .5em;   overflow-wrap: break-word;   font-size: .8em;}
 
@@ -139,8 +149,10 @@ hr{ display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:0
 .topicHeaderTitle, .subtopicHeaderTitle{ display: inline;   text-align: left; }
 .topicHeaderImage, .subtopicHeaderImage{display: inline;     margin-left: 10px; margin-right:10px; min-height: 2em; }
 .topicHeaderImage img, .subtopicHeaderImage img{  width: 20px;}
-.topicHeaderIcon, .subtopicHeaderIcon{ margin-right: 20px; background-color: #FFF;}
+.topicHeaderIcon, .subtopicHeaderIcon{ margin-right: 20px; margin-left:10px; background-color: #FFF;}
 .topicHeaderIcon img, .subtopicHeaderIcon img{ width: 30px; }
+.topicHeaderRight{display:flex;}
+.topicHeaderLeft{display:flex;}
 .iconWhite{/*filter: invert(97%) sepia(50%) saturate(13%) hue-rotate(21deg) brightness(104%) contrast(102%);*/}/*white*/
 .subtopicDivContainer{width:25%;   background-color: #FFF; box-shadow: 0px 2px 2px #0000003D;     margin: 10px; padding: 10px 5px; }
 .subtopicDivHolder{padding:1vw; cursor: pointer;}
@@ -288,13 +300,13 @@ hr{ display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:0
 
 #imageentry img{max-width: 100%; width:100%;}
 #imageentry{    position: relative;}
-#creditsentry{ float: left; position: absolute; left: 0px; top: 0px; z-index: 1000;   background-color: #0000008a;   padding: 1em; color: #fff; display:none;}
-#infoentry{ padding: 1em 5vw; background-color: #021C40; color: #FFF; display: none; text-align: left;}
+#creditsentry{ float: left; position: absolute; left: 0px; top: 0px;    background-color: #0000008a;   padding: 1em; color: #fff; display:none;     word-break: break-word;}
+#infoentry{ padding: 1em 5vw; background-color: #021C40; color: #FFF; display: none; text-align: left;     word-break: break-word;}
 
 /*PLAY ALL*/
 .playAllHolder { padding: .5em; display: flex; justify-content: flex-end; align-content: center; align-items: center;}
-.playAllButtonHolder {    cursor: pointer; border: 1px solid #FFF; color: #FFF;    padding: .5em;   border-radius: 20px;   background-color: #000;}
-.playAllAudioIcon {height:1.2em; width:auto; margin-right:0.3em; max-width:20%; vertical-align: middle;}
+.playAllButtonHolder {    cursor: pointer; border: 1px solid #FFF; color: #FFF;    padding: .5em;   border-radius: 20px;   background-color: #000;     display: flex; justify-content: center; align-items: center;}
+.playAllAudioIcon {height:1.2em; width:auto; margin-right:0.3em; max-width:20%; }
 
 /*Conversation*/
 #conversationentry entry{}
@@ -422,15 +434,16 @@ margin: .5vw;
 #memoryBody{    flex-wrap: wrap;    justify-content: center; align-content: space-evenly;     padding: 20px 0;}
 .memoryInstructions{    color: #FFF; width: 100vw;    margin: 0; line-height: initial;  padding: 0 5px;}
 .memoryCardHolder{    width: 22vw;   height: 22vw; padding: 15px;}
-.memoryCardOn{background-color: #FFF; cursor: pointer; display: flex; align-items: center; justify-content: center; background-repeat: no-repeat; background-size: cover; width: 100%; height: 100%; background-image: url("../images/memory_square.jpg")}
+.memoryCardOn{background-color: #FFF; cursor: pointer; display: flex; align-items: center; justify-content: center; background-repeat: no-repeat;     background-size: 100% 100%; width: 100%; height: 100%; background-image: url("../images/memory_square.jpg")}
 .memoryReset{text-decoration: underline; color: #FFF; margin-top:1em; text-align: center; display: none; cursor: pointer;     width: 100%;}
 
 /*CATEGORIES (FILTER)*/
-.categoryresult {    background-color: #ffffff;  margin: 2px 0 0 0; text-align: left;}
+.categoryresult {    background-color: #ffffff;  margin: 2px 0 0 0; text-align: left; display: flex; justify-content: space-between; align-items: center;}
 .categoryresult .firstLetterUpper:first-letter {text-transform:capitalize;}
-.categoryresult .entryEnglish {width: 75%;}
+.categoryresult .entryEnglish {flex:1;}
 .categoryresultentries{display: none; border:5px solid #131114;}
 .categoryresultentries p{padding: 5%; background-color: #FFF; margin: 0; text-align: left;}
+.playAllFilterHolder{display:none; margin: 5px 5px 5px 0;}
 #categoryentries{padding-bottom: 2em;}
 #categoryentries h2{  color: #FFF; text-align: center; padding: 0.5em 0; }
 #categoryentries select{width:50vw; height: auto; background-color: #FFF; background-image: url("../images/icon_down.png");     background-position: 97% 50%; background-repeat: no-repeat;    background-size: auto 40%; margin-left: 5vw; padding-right: 5vw;}

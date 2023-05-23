@@ -4,7 +4,8 @@
 
 var language="mangarrayi"; if(getQueryVariable("lang")){language=getQueryVariable("lang");}
 var secondaryColor="#FF4C00"; if (language==="umpila") {secondaryColor="#198083"} //colour of buttons
-var recordLog = false; if (language==="umpila") {recordLog = true;}
+var recordLog = false; if (language==="umpila" || language==="mangarrayi") {recordLog = true;}
+var tokenEnabled=false; if (language==="umpila" || language==="mangarrayi") {tokenEnabled = true;}
 //var language="hungarian";
 var translation="english"; if(getQueryVariable("translation")){translation=getQueryVariable("translation");}
 var versionNo="1.0.0";
@@ -18,7 +19,6 @@ var translationCap = translation.toLowerCase().replace(/\b[a-z]/g, function(lett
 var startscreen="launch"; //var startscreen="launch"; //for testing web version
 var startpage="dashboard"; //which page to go to after launch?
 var web=true;
-var tokenEnabled=false; if (language==="umpila" || language==="mangarrayi") {tokenEnabled = true;}
 
 var web_dir="https://elearnaustralia.com.au/opal/";
 var apiPath=web_dir+"readandwrite/";
@@ -33,10 +33,8 @@ var appTitleShort=languageCap+" Listen and Talk";
 var appTitleLong=languageCap+" Listen and Talk";
 var projectInfo="<p>Information about this project.</p>";
 
-
-
 var currentpage=""; var referrer="dashboard"; //which page to go back to?
-var selectedlang="English"; var selectedAudio=0;  var selectedN=1; var selectedTopic=1; var selectedSubTopic=1; var selectedFilter;
+var selectedlang="English"; var selectedAudio=0;  var selectedN=1; var selectedTopic=1; var selectedSubTopic=1; var selectedFilter; var selectedFilterResult;
 var token="";
 
 var selectedEntry=1;
@@ -70,19 +68,19 @@ if (language==="umpila"){
 //backwards compatibility for mangarrayi app
 if (language==="mangarrayi"){
     $("#launch .launchlogo").attr("src", "images/logo_jcac.png");
-    imagepath="https://elearnaustralia.com.au/mangarrayi/img/";
-    audiopathServer="https://elearnaustralia.com.au/mangarrayi/mp3/";
-    translationColsoundfilename="kriolsoundfilename";//name of audio translation column in DB table
-    translationCol="english";//name of translation column in DB
-    keywordTranslationCol="keywordenglish";
-    languageCol="mangarrayi"; //name of language column in DB
-    topicCol="subtopic"; //name of topic column in DB
-    apiPath="https://www.elearnaustralia.com.au/mangarrayi/api/"; //hardcoded path to API and web files
-    web_dir="https://elearnaustralia.com.au/mangarrayi/";
+    //imagepath="https://elearnaustralia.com.au/mangarrayi/img/";
+    //audiopathServer="https://elearnaustralia.com.au/mangarrayi/mp3/";
+    //translationColsoundfilename="kriolsoundfilename";//name of audio translation column in DB table
+    //translationCol="english";//name of translation column in DB
+    //keywordTranslationCol="keywordenglish";
+    //languageCol="mangarrayi"; //name of language column in DB
+    //topicCol="subtopic"; //name of topic column in DB
+    //apiPath="https://www.elearnaustralia.com.au/mangarrayi/api/"; //hardcoded path to API and web files
+    //web_dir="https://elearnaustralia.com.au/mangarrayi/";
     
     translateNoText="dayi"; //text for yes and no buttons in language
     translateYesText="yowo";
-    versionNo="2.3.3";
+    versionNo="2.4.1";
     appTitleShort="Warrma Mangarrayi";
     appTitleLong="Warrma Mangarrayi (Listen to Mangarrayi)";
     projectInfo='<p class="leftText">Are you interested in learning Mangarrayi? This app is to help community members learn some phrases in your own language.</p><p class="leftText">We acknowledge the Mangarrayi speakers whose voices appear in this app: <strong>Sheila Yanybarrak Conway, Jesse Garalnganyjak Roberts, Amy Dirn.gayg.</strong></p><p class="leftText">This app has been co-designed by the Jilkminggan Community with Western Sydney University and Elearn Australia.</p><a href="http://www.jcac.com.au/" target="_blank"><img src="images/logo_jcac.png" alt="Jilkminggan Community Aboriginal Corporation logo" class="aboutLogo"></a><p class="leftText">Funding from: Australian Research Council Centre of Excellence for the Dynamics of Language</p><a href="https://www.westernsydney.edu.au/" target="_blank"><img src="images/logo_wsu.png" alt="Western Sydney University logo" class="aboutLogo rectLogo"></a><a href="https://www.dynamicsoflanguage.edu.au/" target="_blank"><img src="images/logo_arc.png" alt="ARC Centre of Excellence for the Dynamics of Language" class="aboutLogo rectLogo"></a><a href="https://www.elearnaustralia.com.au" target="_blank"><img src="images/logo_ela.png" alt="Elearn Australia" class="aboutLogo rectLogo"></a><p>&nbsp;</p>';
@@ -92,7 +90,7 @@ if (language==="mangarrayi"){
 
 //show token / warning system
 if (language==="umpila" || language==="mangarrayi"){
-    audiopath="mp3/"; //mp3 and image folder is inside app folder
+    if (web===false) audiopath="mp3/"; //mp3 and image folder is inside app folder
     startpage="warning";//go to warning and token screens on startup
 }
 
@@ -116,7 +114,6 @@ function showPage(page){
     }
   if(page==="entry"){//language entry screen
     //write to log
-    if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedEntry+"&interaction=6", function() { });}
     if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=6", function() { });}
     //show back button
     $(".menuButton img").attr("src","images/icon_left.png");
@@ -144,8 +141,9 @@ function getDictionary(){
     "use strict";
 
     //$.getJSON(apiPath+"get-topics.php", function(data) {if (data!==0) {topics=data; setupTopics();}});
-    //console.log(apiPath+"get-language.php?table="+language);
-     var getURL=apiPath+"get-language.php?table="+language; if (language==="mangarrayi"){getURL=apiPath+"get-mangarrayi.php";}
+    
+    var getURL=apiPath+"get-language.php?table="+language; 
+    //console.log(getURL);
     $.getJSON(getURL, function(data) {if (data!==0) {chunkbank=data; }})
     .done(function() {
     //console.log("Dictionary: "+JSON.stringify(chunkbank));
@@ -156,7 +154,7 @@ function getDictionary(){
 
 function getConversations(){
     "use strict";
-    var getURL=apiPath+"get-conversations.php?table="+language; if (language==="mangarrayi"){getURL=apiPath+"get-mangarrayi-conversations.php";}
+    var getURL=apiPath+"get-conversations.php?table="+language; 
   $.getJSON(getURL, function(data) {if (data!==0) {conversations=data; }})
     .done(function() {
         //console.log("Conversations: "+JSON.stringify(conversations));
@@ -183,12 +181,10 @@ function initialiseDictionary(){
     if (chunkbank[a][translationCol]!==""){ chunkbank[a][translationCol]= chunkbank[a][translationCol].substr(0,1).toUpperCase()+chunkbank[a][translationCol].substr(1); }
     //set glossing
         //var watch="33";
-        //if(chunkbank[a].id===watch){console.log("pre glossing "+chunkbank[a].mangarrayi);}
         chunkbank[a].glossing=setGlossing(chunkbank[a][languageCol]);
         chunkbank[a].explanation=setGlossing(chunkbank[a].explanation);
         //if(chunkbank[a].id===watch){console.log("with glossing "+chunkbank[a].glossing);}
         chunkbank[a][languageCol]=removeGlossing(chunkbank[a][languageCol]);
-        //if(chunkbank[a].id===watch){console.log("without glossing "+chunkbank[a].mangarrayi);}
         //remove any entries that have null for both languages
         //if (chunkbank[a].english==="" && chunkbank[a].mangarrayi===""){chunkbank=chunkbank.splice(a,1);}
     }
@@ -201,15 +197,15 @@ function initialiseDictionary(){
     if(parseInt(initialEntry)!==0){
         //if there is an id set in the URL then go straight to that id.
         if (tokenEnabled){
+            var gotoPage="dashboard";
             var tokenName = (language==="mangarrayi") ? "mang-token" : language+"-token";
             //check tokens if enabled
             if (localStorage.getItem(tokenName)===null){ //see if they have a stored token
-                showPage("token");//need to get token
+                gotoPage="token"; //need to get token
             } else {
                 //get token from storage
                 token=localStorage.getItem(tokenName);
                 //record interaction
-                if (language==="mangarrayi") { $.get("https://www.elearnaustralia.com.au/mangarrayi/api/sessions.php?token="+token, function() { });}
                 if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=0&interaction=12", function() { });}
                 //go straight to entry or conversation
                 setTimeout(function(){setEntry(initialEntry); showPage('entry'); if(initialConv==="true"){toggleConversation();}},500);
@@ -456,7 +452,6 @@ function toggleHide(x){
             //hide phrase from activity
             showAlert("<p>We won't show this phrase again.</p> ");
             $("#hideIcon img").removeClass("colourOff").addClass("colourOn");
-      if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedEntry+"&interaction=7", function() { });}
       if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=7", function() { });}
     } else{
       //remove hide
@@ -485,7 +480,6 @@ function toggleStar(x){
         //chunkbank[n].star=1;
         if ($.inArray(x,favourites)===-1){favourites.push(x);}
         $("#entryOption1 img").removeClass("colourOff").addClass("colourOn");
-        if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedEntry+"&interaction=2", function() { });}
         if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=2", function() { });}
     } else{
         //remove starred entry
@@ -518,16 +512,16 @@ function toggleSlow(x){
 
 
 function toggleEntryAudio(x){
-    "use strict";
     selectedAudio=x;
     var n=-1; for (var a=0; a<chunkbank.length; a++){if(chunkbank[a].id === x.toString()){n = a;}} if (n===-1){return;}
     if ($("#entryOption3 img").attr("src")==="images/icon_play.png") {
         //play audio
         var filename=chunkbank[n].soundfilename;
         //filename+=".mp3";
+        if (!filename) {showAlert("<p>Sorry there is no audio for this entry yet.</p> "); return;}
         $("#kriolAudio .audioIcon").attr("src","images/audio_on.png");
         $(".iconHeadphones").attr("src", "images/icon_headphones.png");
-    showEntryAudioPlayButton();
+        showEntryAudioPlayButton();
         playAudio(filename);
     } else {
         hideAudioPlayButtons();
@@ -559,7 +553,6 @@ function toggleInfo(){
         //hide convo if showing
          //if($("#entryOption5 img").hasClass("colourOn")){ $(".conventry").css("display","none");  $("#entryOption5 img").removeClass("colourOn").addClass("colourOff");}
         $("#entryOption4 img").removeClass("colourOff").addClass("colourOn");
-        if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedEntry+"&interaction=4", function() { });}
         if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=4", function() { });}
     } else{
         //hide glossing
@@ -576,7 +569,6 @@ function toggleConversation(){
         //hide mike if showing
         if($("#entryOption6 img").hasClass("colourOn")){ $("#entry .mikeentry").css("display","none");  $("#entryOption6 img").removeClass("colourOn").addClass("colourOff");}
         $("#entryOption5 img").removeClass("colourOff").addClass("colourOn");
-       if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedEntry+"&interaction=5", function() { });}
        if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=5", function() { });}
     } else{
         //hide conversation
@@ -590,40 +582,22 @@ function toggleConversation(){
 function checkToken(){
     "use strict";
     token=cleanUp($("#token input").val());
-    if (language==="mangarrayi"){
-        if(token==="test"){
-            showPage("dashboard");
-             $.get("https://www.elearnaustralia.com.au/mangarrayi/api/sessions.php?token="+token, function() { });
-            return false;
-        }
-        $.get("https://www.elearnaustralia.com.au/mangarrayi/api/check-token.php?token="+token, function(data) {
-            if (data.indexOf(1)!==-1){
-                audioOff();
-                localStorage.setItem("mang-token", token);
-                showPage("dashboard");
-                $.get("https://www.elearnaustralia.com.au/mangarrayi/api/sessions.php?token="+token, function() { });
-            } else {
-                alert("Token is not right or has already been used");
-            }
-         });
-    } else {
-        if(token==="test"){
+    if(token==="test"){
+        showPage("dashboard");
+        if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=0&interaction=11", function() { });}
+        return false;
+    }
+    $.get(apiPath+"check-token.php?table="+language+"&token="+token, function(data) {
+        if (data.indexOf(1)!==-1){
+            audioOff();
+            var tokenName = (language==="mangarrayi") ? "mang-token" : language+"-token";
+            localStorage.setItem(tokenName, token);
             showPage("dashboard");
             if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=0&interaction=11", function() { });}
-            return false;
+        } else {
+            alert("Token is not right or has already been used");
         }
-        $.get(apiPath+"check-token.php?table="+language+"&token="+token, function(data) {
-            if (data.indexOf(1)!==-1){
-                audioOff();
-                localStorage.setItem(language+"-token", token);
-                showPage("dashboard");
-                if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=0&interaction=11", function() { });}
-            } else {
-                alert("Token is not right or has already been used");
-            }
-         });
-    }
-    
+        });
 }
 
 
@@ -767,14 +741,14 @@ function setupTopics(){
           str+='<img src="'+imagepath+topics[t].image+'?v=2" alt="">';
         } else {
           var iconImage="icon_topic.png";
-          if (language==="mangarrayi"){ iconImage='icon_topic'+(t+1)+'.png?v=3';}
           str+='<img src="images/'+iconImage+'" alt="">';
         }
         str+='<div class="topicDiv">'+topics[t].title+'</div></div></div>';
     }
     $("#topicsContainer").html('<div class="topicsFlexContainer">'+str+'</div>');
     if (language==="mangarrayi"){
-      $("#topicsContainer").append('<a class="storiesContainer" href="https://www.jcac.com.au/library" target="_blank"><img src="images/icon_stories.png" alt="">Stories</a>');
+        var storiesContainerStr = '<div class="storiesContainer"><a href="https://www.jcac.com.au/stories" target="_blank"><img src="images/icon_stories.png" alt="">Mangarrayi stories</a></div>';
+      $("#topicsContainer").append(storiesContainerStr);
     }
 }
 
@@ -794,7 +768,6 @@ function showSubTopics(x){
     selectedTopic=parseInt(x);
     console.log("showSubTopics"+x+" selectedTopic: "+selectedTopic+" selectedSubTopic: "+selectedSubTopic);
     $(".topicHeaderTitle").html(topics[(selectedTopic-1)].title);
-    if (language==="mangarrayi"){ $(".topicHeaderIcon img").attr("src","images/icon_topic"+x+".png?v=2");}
     if (topics[(selectedTopic-1)].image) {
       $(".topicHeaderIcon img").attr("src",imagepath+topics[(selectedTopic-1)].image);
     } else {
@@ -805,10 +778,10 @@ function showSubTopics(x){
         var subtopicTitle = topics[(selectedTopic-1)].subtopics[t].title ? topics[(selectedTopic-1)].subtopics[t].title : topics[(selectedTopic-1)].subtopics[t].topic;
         str+='<div class="subtopicDivContainer" id="subtopicContainer'+(t+1)+'"  onclick="showSubTopicsExpanded(\''+(t+1)+'\');"><div class="subtopicDivHolder">';
         if (topics[(selectedTopic-1)].subtopics[t].image) {
+            
           str+='<img src="'+imagepath+topics[(selectedTopic-1)].subtopics[t].image+'?v=2" alt="">';
         } else {
           var iconImage="icon_topic.png";
-          if (language==="mangarrayi"){ iconImage='icon_topic'+selectedTopic+'_'+(t+1)+'.png';}
           str+='<img src="images/'+iconImage+'" alt="">';
         }
         str+='<div class="subtopicDiv">'+subtopicTitle+'</div></div></div>';
@@ -817,19 +790,19 @@ function showSubTopics(x){
     $("#subtopics").html('<div class="topicsFlexContainer">'+str+'</div>').css("display", "block");
 }
 
+var topicEntries=[];
+
 function showSubTopicsExpanded(x){
+    topicEntries=[]
     hideTopicsAndSubtopics();
     selectedSubTopic=parseInt(x);
-    console.log("showSubTopicsExpanded"+x+" selectedTopic: "+selectedTopic+" selectedSubTopic: "+selectedSubTopic);
+    //console.log("showSubTopicsExpanded"+x+" selectedTopic: "+selectedTopic+" selectedSubTopic: "+selectedSubTopic);
     var topicid=selectedTopic.toString();
     var subtopicid=topics[(selectedTopic-1)].subtopics[(selectedSubTopic-1)].id ? topics[(selectedTopic-1)].subtopics[(selectedSubTopic-1)].id : null;
     var subtopicname=topics[(selectedTopic-1)].subtopics[(selectedSubTopic-1)].title ? topics[(selectedTopic-1)].subtopics[(selectedSubTopic-1)].title : topics[(selectedTopic-1)].subtopics[(selectedSubTopic-1)].topic;
-    console.log("topicid: "+topicid+" subtopicid: "+subtopicid+" subtopicname: "+subtopicname);
+    //console.log("topicid: "+topicid+" subtopicid: "+subtopicid+" subtopicname: "+subtopicname);
     $(".topicHeaderTitle").html('');
     $(".subtopicHeaderTitle").html(subtopicname);
-    if (language==="mangarrayi"){
-      $(".subtopicHeaderIcon img").attr("src","images/icon_topic"+selectedTopic+"_"+selectedSubTopic+".png");
-    }
     if (topics[(selectedTopic-1)].subtopics[(selectedSubTopic-1)].image) {
       $(".subtopicHeaderIcon img").attr("src",imagepath+topics[(selectedTopic-1)].subtopics[(selectedSubTopic-1)].image);
     } else {
@@ -845,10 +818,11 @@ function showSubTopicsExpanded(x){
         (chunkbankSorted[a].related!==null && chunkbankSorted[a].related.toLowerCase().indexOf(subtopicname.toLowerCase())!==-1) //does selected topic match entry related (old)
     ){
         matchedEntry=true;
+        topicEntries.push(chunkbankSorted[a].id);
     }
     if(matchedEntry===true){
-                str+='<div class="entry"><div class="entryEnglish" onclick="setEntry(\''+chunkbankSorted[a].id+'\'); showPage(\'entry\');">'+chunkbankSorted[a][translationCol]+'</div> <div class="entryMangarrayi audioButtonDiv active" id="subtopicsexpa_'+chunkbankSorted[a].id+'" onclick="toggleAudio(\'subtopicsexpa_'+chunkbankSorted[a].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon" id="">'+chunkbankSorted[a][languageCol]+'</div> <div class="entryGo active" onclick="setEntry(\''+chunkbankSorted[a].id+'\');showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"> </div> </div>';
-        }
+        str+='<div class="entry"><div class="entryEnglish" onclick="setEntry(\''+chunkbankSorted[a].id+'\'); showPage(\'entry\');">'+chunkbankSorted[a][translationCol]+'</div> <div class="entryMangarrayi audioButtonDiv active" id="subtopicsexpa_'+chunkbankSorted[a].id+'" onclick="toggleAudio(\'subtopicsexpa_'+chunkbankSorted[a].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon" id="">'+chunkbankSorted[a][languageCol]+'</div> <div class="entryGo active" onclick="setEntry(\''+chunkbankSorted[a].id+'\');showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"> </div> </div>';
+    }
     }
     if (str===""){str="<p class='textLeft paddedContent note'>Nothing under this topic yet.</p>";}
     $(".subtopicsexpanded").html(str);
@@ -887,7 +861,7 @@ async function showActivity(){
 function showActivityHome(){
   $("#memoryBody, #activityBody").css("display", "none");
   $(".activityReset").css("display", "block");
-  $("#activityStart, ").css("display", "flex");
+  $("#activityStart").css("display", "flex");
   $(".menuButton img").attr("src","images/icon_menu.png");
   referrer="activity";
 }
@@ -1430,12 +1404,6 @@ async function setUpActivity(mode){
 
 
 
-    //currentActivityAnswerSet=[{id:"384",index:"376"},{id:"16",index:"15"},{id:"366",index:"358"}];
-    //answerSet=[{id:"384",index:"10"},{id:"1204",index:"2"},{id:"366",index:"9"}];
-    //if(language==="mangarrayi"){answerSet=[{id:"384",index:"376"},{id:"16",index:"15"},{id:"366",index:"358"}];}
-
-
-
     //determine activity type
     switch(chunkbankFlags[qI].flag){
         case "blue": currentActivityType=1; break;
@@ -1507,7 +1475,6 @@ async function setUpActivity(mode){
             });
             //show activity-related content
             $(".activity1, .activity1or2").css("display","flex");
-            if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+chunkbank[qI].id+"&interaction=8", function() { });}
             if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+chunkbank[qI].id+"&interaction=8", function() { });}
             toggleActivityAudio(); //auto play
             break;
@@ -1536,7 +1503,6 @@ async function setUpActivity(mode){
             });
             //show activity-related content
             $(".activity1or2, .reloadIconDiv").css("display","flex");
-            if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+chunkbank[qI].id+"&interaction=9", function() { });}
             if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+chunkbank[qI].id+"&interaction=9", function() { });}
             break;
 
@@ -1562,7 +1528,6 @@ async function setUpActivity(mode){
             //show activity-related content
             $(".reloadIconDiv").css("display","flex");
             $(".activity3").css("display","block");
-            if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+chunkbank[qI].id+"&interaction=10", function() { });}
             if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+chunkbank[qI].id+"&interaction=10", function() { });}
             break;
 
@@ -1774,7 +1739,6 @@ function recordAudio(){
     }
     // start audio capture
     navigator.device.capture.captureAudio(captureSuccess, captureError, {limit:1});
-
 }
 
 //triggered from Press to record label in activity 3
@@ -1811,7 +1775,6 @@ function togglePlayback(){
 }
 
 function stopPlayback(){
-    console.log("Stop playback");
     if (web){showAlert("<p class='centred'>Only in mobile app!</p>");return;}
     audioOff();
     $(".iconHeadphones").attr("src", "images/icon_headphones.png");
@@ -1889,8 +1852,11 @@ function setFilter(){
     loadFilterEntries();
 }
 
+var allFilteredEntries=[];
 function loadFilterEntries(){
-   //console.log("selectedFilter: "+selectedFilter);
+    //console.log("selectedFilter: "+selectedFilter);
+    allFilteredEntries=[];
+    selectedFilterResult=null;
     $("#filterEntries").val(selectedFilter);
     var filterArray=[];
     for (var b=0; b<chunkbank.length; b++){
@@ -1918,9 +1884,14 @@ function loadFilterEntries(){
         //if the filter is speaker names then capitalise every letter
         if (selectedFilter==="speaker"){displayItem=filterArray[d].toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ');}
         //Display the filtered item e.g. keyword
-        filterListHTML+='<a name="categoryresult_'+d+'_anchor" id="categoryresult_'+d+'_anchor"></a><div class="categoryresult active" id="categoryresult_'+d+'" onclick="showCategoryResult(\''+d+'\');"><div class="entryEnglish entryCol'+firstLetterUpper+'">'+displayItem+'</div><div class="clearBoth"></div></div>';
+        filterListHTML+='<a name="categoryresult_'+d+'_anchor" id="categoryresult_'+d+'_anchor"></a><div class="categoryresult active" id="categoryresult_'+d+'"><div class="entryEnglish entryCol'+firstLetterUpper+'"  onclick="showCategoryResult(\''+d+'\');">'+displayItem+'</div>';
+        //add play all to header
+        filterListHTML+='<div class="playAllButtonHolder playAllFilterHolder" onclick="playAll(\'filter\', '+d+');"><img src="images/icon_play_white.png" alt="play" title="Play all" class="playAllAudioIcon" id=""> Play all</div>';
+        filterListHTML+='<div class="clearBoth"></div></div>';
         //start the html for the filter item result entries
         filterListHTML+='<div class="categoryresultentries" id="categoryresult_'+d+'_entries">';
+        //create an empty array to store entry ids for each filter (used in play all functionality)
+        var filteredEntriesId = [];
 
         //loop through the dictionary and find entries with that filter item (list in order of length of english)
         for (var e=0; e<chunkbankSortedLength.length; e++){
@@ -1934,10 +1905,14 @@ function loadFilterEntries(){
                 // if (filterArray[d]==="talking about your body state."){  if(chunkbankSortedLength[e].english==="I'm hungry"){console.log("filterArray[d] "+filterArray[d]+" entryFilter: "+entryFilter+" isMatch "+isMatch);}}
             }
             if (isMatch){
+                //add entry id to array for this filter item (used in play all functionality)
+                filteredEntriesId.push(chunkbankSortedLength[e].id);
               // if (filterArray[d]==="Talking about your body state."){  if(chunkbankSortedLength[e].english==="I'm hungry"){console.log("chunkbankSortedLength[e].english "+chunkbankSortedLength[e].english);}}
                 filterListHTML+='<div class="entry"><div class="entryEnglish" onclick="referrer=\'categorylist\'; setEntry(\''+chunkbankSortedLength[e].id+'\'); showPage(\'entry\');">'+chunkbankSortedLength[e][translationCol]+'</div><div class="entryMangarrayi audioButtonDiv active" id="categoryaudio_'+chunkbankSortedLength[e].id+'" onclick="toggleAudio(\'categoryaudio_'+chunkbankSortedLength[e].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon">'+chunkbankSortedLength[e][languageCol]+'</div><div class="entryGo active" onclick="referrer=\'categorylist\'; setEntry(\''+chunkbankSortedLength[e].id+'\'); showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"></div></div>';
             }
         }
+        //push array if entry ids for this filter item into global filter id array
+        allFilteredEntries.push(filteredEntriesId);
         //clse the html for the filter item result
         filterListHTML+='</div>';
 
@@ -1948,23 +1923,25 @@ function loadFilterEntries(){
 }
 
 function showCategoryResult(name){
-    "use strict";
     if ($("#categoryresult_"+name+"_entries").css("display")==="none"){
-        $(".categoryresultentries").css("display", "none");
+        $(".categoryresultentries, .playAllFilterHolder").css("display", "none");
         $(".categoryresult").css({"background-color":"#ffffff", "color":"#000"});
         $(".categoryresult .entryCol").css("color","#000");
         $("#categoryresult_"+name).css("background-color","#131114");
         $("#categoryresult_"+name+" .entryCol").css("color","#fff");
         $("#categoryresult_"+name+"_entries").slideDown("fast");
+        $("#categoryresult_"+name+" .playAllFilterHolder").css("display","flex");
+        selectedFilterResult=name;
         //var num=parseInt(name); if (num>5){scrollToAnchor("categoryresult_"+(num-1)+"_anchor");}
     } else {
+        selectedFilterResult=null;
         hideCategoryResult();
     }
 }
 
 function hideCategoryResult(){
     "use strict";
-    $(".categoryresultentries").css("display", "none");
+    $(".categoryresultentries, .playAllFilterHolder").css("display", "none");
     $(".categoryresult").css("background-color","#ffffff");
     $(".categoryresult .entryCol").css("color","#000");
 }
@@ -2052,7 +2029,6 @@ function checkLoadedAudio(){
         audio.playbackRate=playbackspeed;
         if (chunkbank[selectedN].speaker==="Amy Dirn.gayg" && playbackspeed!==1){audio.playbackRate=0.6;} //if set to slow then slow down Amy a lot more
         if(playbackspeed!==1){//write to log if they are playing it slowly
-            if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedEntry+"&interaction=3", function() { });}
             if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=3", function() { });}
         }
     } else {
@@ -2060,7 +2036,7 @@ function checkLoadedAudio(){
     }
     audio.play();
     audioError=0;
-    //console.log("============ CHECK LOADED AUDIO page: "+currentpage+" | entry: "+selectedN+" | speaker: "+chunkbank[selectedN].speaker+" | audio loaded "+$("#audioPlayer").attr("src")+" | speed: "+audio.playbackRate);
+    console.log("============ CHECK LOADED AUDIO page: "+currentpage+" | entry: "+selectedN+" | speaker: "+chunkbank[selectedN].speaker+" | audio loaded "+$("#audioPlayer").attr("src")+" | speed: "+audio.playbackRate);
 }
 
 function playAudio(filename) {
@@ -2071,13 +2047,14 @@ function playAudio(filename) {
     var audio = document.getElementById('audioPlayer');
     audio.setAttribute("src", filename);
     audio.load();
-    if (language==="mangarrayi"){$.get("https://www.elearnaustralia.com.au/mangarrayi/api/log.php?token="+token+"&entry="+selectedAudio+"&interaction=1", function() { });}
     if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedAudio+"&interaction=1", function() { });}
  }
 
 var playAllFCounter=0;
 var playAllCCounter=0;
-function playAll(scr){
+var playAllTCounter=0;
+var playAllFFCounter=0;
+function playAll(scr, d){
   if (scr==="favourites"){
     if ($("#favouritesresults .playAllAudioIcon").attr("src")==="images/icon_play_white.png") {
       //play first favourite
@@ -2109,9 +2086,41 @@ function playAll(scr){
       $(".audioIcon").attr("src","images/audio_on.png");
       audioOff();
     }
+  } else if (scr==="topic" && topicEntries.length>0){
+    if ($("#subtopicsExpandedContainer .playAllAudioIcon").attr("src")==="images/icon_play_white.png") {
+        //play first phrase in topic
+        playAllTCounter=0;
+        //get the phrase's index in the chunkbank array
+        var m = chunkbank.findIndex(chunk=>chunk.id===topicEntries[playAllTCounter]);
+        var filename=chunkbank[m].soundfilename;
+        $(".audioIcon").attr("src","images/audio_on.png");
+        $("#subtopicsExpandedContainer .playAllAudioIcon").attr("src","images/icon_pause_white.png");
+        $("#subtopicsexpa_"+topicEntries[playAllTCounter]+" .audioIcon").attr("src","images/audio_off.png");
+        playAudio(filename);
+      } else {
+        $("#subtopicsExpandedContainer .playAllAudioIcon").attr("src","images/icon_play_white.png");
+        $(".audioIcon").attr("src","images/audio_on.png");
+        audioOff();
+      }
+    
+  } else if (scr==="filter" && d && allFilteredEntries[d].length>0){
+    if ($("#categoryresult_"+d+" .playAllAudioIcon").attr("src")==="images/icon_play_white.png") {
+        //play first phrase in filtered entries
+        playAllFFCounter=0;
+        //get the phrase's index in the chunkbank array
+        var ff = chunkbank.findIndex(chunk=>chunk.id===allFilteredEntries[d][playAllFFCounter]);
+        var filename=chunkbank[ff].soundfilename;
+        $(".audioIcon").attr("src","images/audio_on.png");
+        $("#categoryresult_"+d+" .playAllAudioIcon").attr("src","images/icon_pause_white.png");
+        $("#categoryaudio_"+allFilteredEntries[d][playAllFFCounter]+" .audioIcon").attr("src","images/audio_off.png");
+        playAudio(filename);
+      } else {
+        $("#categoryresult_"+d+" .playAllAudioIcon").attr("src","images/icon_play_white.png");
+        $(".audioIcon").attr("src","images/audio_on.png");
+        audioOff();
+      }
   }
 }
-
 
 function audioOff(){
     "use strict";
@@ -2128,7 +2137,8 @@ var captureSuccess = function(mediaFiles) {
     var i, len;
     for (i = 0, len = mediaFiles.length; i < len; i += 1) {
         recordedAudioPath = mediaFiles[i].fullPath;
-                console.log("recordedAudioPath "+recordedAudioPath);///var/mobile/Containers/Data/Application/97CE8C26-726D-4EA1-BBCE-B25B09F79632/tmp/audio_026.wav
+        console.log("recordedAudioPath "+recordedAudioPath);
+        ///var/mobile/Containers/Data/Application/97CE8C26-726D-4EA1-BBCE-B25B09F79632/tmp/audio_026.wav
     }
 };
 
@@ -2211,7 +2221,6 @@ $(document).ready(function(){
             gotoPage="token"; //need to get token
         } else {
             token=localStorage.getItem(tokenName);
-            if (language==="mangarrayi") { $.get("https://www.elearnaustralia.com.au/mangarrayi/api/sessions.php?token="+token, function() { });}
             if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=0&interaction=12", function() { });}
         }
         setTimeout(function(){audioOff();showPage(gotoPage);},500);
@@ -2338,7 +2347,34 @@ $(document).ready(function(){
           } else {
             $("#entry .playAllAudioIcon").attr("src","images/icon_play_white.png");
           }
-        }
+        } else if (currentpage==="dashboard" && $("#subtopicsExpandedContainer .playAllAudioIcon").attr("src")==="images/icon_pause_white.png") {
+            playAllTCounter++;
+            if (playAllTCounter<topicEntries.length){
+              var t = chunkbank.findIndex(chunk=>chunk.id===topicEntries[playAllTCounter]);
+              var filename=chunkbank[t].soundfilename;
+              //allow a half second break between playback
+              setTimeout(function(){
+                $("#subtopicsexpa_"+topicEntries[playAllTCounter]+" .audioIcon").attr("src","images/audio_off.png");
+                playAudio(filename);
+              }, 500);
+            } else {
+              $("#subtopicsExpandedContainer .playAllAudioIcon").attr("src","images/icon_play_white.png");
+            }
+          } else if (currentpage==="categorylist" && selectedFilterResult && $("#categoryresult_"+selectedFilterResult+" .playAllAudioIcon").attr("src")==="images/icon_pause_white.png") {
+            playAllFFCounter++;
+            var d = Number(selectedFilterResult);
+            if (playAllFFCounter<allFilteredEntries[d].length){
+              var ff = chunkbank.findIndex(chunk=>chunk.id===allFilteredEntries[d][playAllFFCounter]);
+              var filename=chunkbank[ff].soundfilename;
+              //allow a half second break between playback
+              setTimeout(function(){
+                $("#categoryaudio_"+allFilteredEntries[d][playAllFFCounter]+" .audioIcon").attr("src","images/audio_off.png");
+                playAudio(filename);
+              }, 500);
+            } else {
+                $("#categoryresult_"+d+" .playAllAudioIcon").attr("src","images/icon_play_white.png");
+            }
+          }
     });
 
 
@@ -2356,20 +2392,24 @@ $(document).ready(function(){
     audioError=0;
     $("#audioPlayer").on("error", function () {
         var missingaudio=$("#audioPlayer").attr("src").substr(audiopath.length);
-        console.log("Missing audio "+missingaudio);
+        console.log("Missing audio "+missingaudio+' online?',window.navigator.onLine);
         //try looking for the file online
-        if (audioError===0){
+        if (audioError===0 && window.navigator.onLine){
             var filename=audiopathServer+missingaudio;
             console.log("looking for "+filename);
             var audio = document.getElementById('audioPlayer');
             audio.setAttribute("src", filename);
             audioError++;
             audio.load();
-        } else if (audioError===1){
-            showAlert("<p>Sorry, but there's a problem playing the sound file. Let us know so that we can improve the app. Tell us which entry you are playing and which type of phone you have (e.g. Android 8).</p> ");
+        } else if (audioError===1 || !window.navigator.onLine){
+            if (!window.navigator.onLine) {
+                showAlert("<p>Sorry, that file isn't available offline yet. If your Internet connection is dropping out then try playing it again.</p> ");
+            } else {
+                showAlert("<p>Sorry, but there's a problem playing the sound file. Let us know so that we can improve the app. Tell us which entry you are playing and which type of phone you have (e.g. Android 8).</p> ");
+            }
              //$("#audioPlayer").attr("src").substr(audiopathServer.length));
             $(".audioIcon").attr("src","images/audio_on.png");
-      hideAudioPlayButtons();
+            hideAudioPlayButtons();
             audioError=0;
         }
     });
@@ -2393,46 +2433,38 @@ $(document).ready(function(){
     var extraCSS="";
 
     if (language==="mangarrayi"){
-
          //green 'OK' button is actually blue
          extraCSS+=".greenButton{background-color: #021C40;}";
          $("#modifiedStyles").html(extraCSS);
          
     } else {
-
         //hide mute icon as only mangarrayi has audio associated with correct / incorrect answers
         extraCSS+=".activityNav #muteIcon{display: none;} ";
-
-        //get customised glossing colours from the DB
-        $.getJSON(apiPath+"get-glossing.php?table="+language)
-        .done(function(data){
-
-            if (data!==0) {
-                    
-                data.forEach((item, i) => {
-                    if (item.title!==""){ //only group 2 has colours
-                        switch (item.id) {
-                            
-                            case "1": extraCSS+=".colour1{font-weight:bold;color:inherit;}"; break;
-                            case "2": extraCSS+=".colour2{font-style:italic; color:inherit;}"; break;
-                            default: extraCSS+=".colour"+item.id+"{color: #"+item.colour+";} ";
-                        }
-                    }
-                });
-            }
-
-            //umpila specific styles
-            if (language==='umpila'){
-                extraCSS+=".screen, body {background-color:#900001;} .activityProgressBlock{background-color:#000000;} .blue {background-color:#8dadae;} .entry, #activity .activityEntryQuestion, .activityAnswer {background-color:#c7c7c7;} .headerPictureSearch, .colourOn, .topicHeader, .subtopicHeader, .conversationHeading, .conventry, .greenButton, .activityNextButton, .activityAnswer.correct{background-color:#198083;}";
-            }
-
-            console.log(extraCSS)
-            $("#modifiedStyles").html(extraCSS);
-
-        });
-
-
     }
+
+    //get customised glossing colours from the DB
+    $.getJSON(apiPath+"get-glossing.php?table="+language)
+    .done(function(data){
+        if (data!==0) {
+            data.forEach((item, i) => {
+                if (item.title!==""){ //only group 2 has colours
+                    switch (item.id) {
+                        case "1": extraCSS+=".colour1{font-weight:bold;color:inherit;}"; break;
+                        case "2": extraCSS+=".colour2{font-style:italic; color:inherit;}"; break;
+                        default: extraCSS+=".colour"+item.id+"{color: #"+item.colour+";} ";
+                    }
+                }
+            });
+        }
+        //umpila specific styles
+        if (language==='umpila'){
+            extraCSS+=".screen, body {background-color:#900001;} .activityProgressBlock{background-color:#000000;} .blue {background-color:#8dadae;} .entry, #activity .activityEntryQuestion, .activityAnswer {background-color:#c7c7c7;} .headerPictureSearch, .colourOn, .topicHeader, .subtopicHeader, .conversationHeading, .conventry, .greenButton, .activityNextButton, .activityAnswer.correct{background-color:#198083;}";
+        }
+        $("#modifiedStyles").html(extraCSS);
+    })
+    .fail(function() {
+        $("#modifiedStyles").html(extraCSS);
+    });
 
     getDictionary();
     getConversations();
