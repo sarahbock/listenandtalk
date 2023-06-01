@@ -201,7 +201,8 @@ function initialiseDictionary(){
             var tokenName = (language==="mangarrayi") ? "mang-token" : language+"-token";
             //check tokens if enabled
             if (localStorage.getItem(tokenName)===null){ //see if they have a stored token
-                gotoPage="token"; //need to get token
+               //need to get token
+                setTimeout(function(){showPage('token');},500);
             } else {
                 //get token from storage
                 token=localStorage.getItem(tokenName);
