@@ -206,6 +206,7 @@ function initialiseDictionary(){
             } else {
                 //get token from storage
                 token=localStorage.getItem(tokenName);
+                console.log('token',token);
                 //record interaction
                 if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=0&interaction=12", function() { });}
                 //go straight to entry or conversation
@@ -982,8 +983,8 @@ function setUpQuestionSet(){
     var possiblePhraseCount=0; var possibleShortPhraseCount=0;
     // if (chunkbank[a][translationCol]===null){chunkbank[a][translationCol]="";}
     chunkbankFlags.forEach((item, i) => {
-        if(item.flag!=="green"&&item.flag!=="red"&&item.id!=="0"&&item.id!=="1"&&chunkbank[item.index][languageCol]!==""&&chunkbank[item.index][translationCol]!==""){
-          possiblePhraseCount++;
+        if(item.flag!=="green"&&item.flag!=="red"&&item.id!=="0"&&item.id!=="1"&&chunkbank[item.index]){
+            if (chunkbank[item.index][languageCol]!==""&&chunkbank[item.index][translationCol]!=="") { possiblePhraseCount++; }
         }
     });
     chunkbank.forEach((item, i) => {
@@ -1016,7 +1017,7 @@ console.log(chunkbankFlags)
         //first get any new favourites
         for (var f=0; f<chunkbankFlags.length; f++){
             //check phrase not already in the question set array and has language and translation content
-            if(!questionSet.some(el => el.id === chunkbankFlags[f].id)&&chunkbankFlags[f].id!=="0"&&chunkbank[f][languageCol]!==""&&chunkbank[f][translationCol]!==""){
+            if(!questionSet.some(el => el.id === chunkbankFlags[f].id) && chunkbankFlags[f].id!=="0"&&chunkbank[f][languageCol]!==""&&chunkbank[f][translationCol]!==""){
                 //check for favourite phrases that haven't already been mastered or hidden
                 if (chunkbankFlags[f].fave===1 &&(chunkbankFlags[f].flag!=="green"&&chunkbankFlags[f].flag!=="red")){
                     //add all these to set - fill up set but don't go over the number of questions needed
@@ -1191,26 +1192,28 @@ function setUpMemorySet(){
             //check phrase id not already in the memory set array and is long enough
             if(!memorySet.some(el => el.id === chunkbankFlags[randomNo].id) && chunkbankFlags[randomNo].id!=="0"){
                 //choose phrases with images and audio and check image is not a duplicate
-                if(chunkbank[chunkbankFlags[randomNo].index].soundfilename!=="" && chunkbank[chunkbankFlags[randomNo].index].image!=="" && !memorySet.some(el => el.image === chunkbank[chunkbankFlags[randomNo].index].image)){
-                  if(chunkbank[chunkbankFlags[randomNo].index][languageCol].length<maxMemoryWordLength){//choose short phrases
-                    memorySet.push({
-                      id:chunkbankFlags[randomNo].id,
-                      index:chunkbankFlags[randomNo].index,
-                      image:chunkbank[chunkbankFlags[randomNo].index].image,
-                      sound:chunkbank[chunkbankFlags[randomNo].index].soundfilename,
-                      found:false
-                    }); //add to set
-                    numMemoryNeeded--;
-                    memorySet.push({
-                      id:chunkbankFlags[randomNo].id,
-                      index:chunkbankFlags[randomNo].index,
-                      image:chunkbank[chunkbankFlags[randomNo].index].image,
-                      sound:chunkbank[chunkbankFlags[randomNo].index].soundfilename,
-                      found:false
-                    }); //add to set
-                    numMemoryNeeded--;
-                    //console.log("added "+chunkbankFlags[randomNo].id+" - "+chunkbank[chunkbankFlags[randomNo].index][translationCol]+" - "+chunkbank[chunkbankFlags[randomNo].index][languageCol]+". Memory still needed: "+numMemoryNeeded);
-                  }
+                if(chunkbank[chunkbankFlags[randomNo].index]){
+                    if(chunkbank[chunkbankFlags[randomNo].index].soundfilename!=="" && chunkbank[chunkbankFlags[randomNo].index].image!=="" && !memorySet.some(el => el.image === chunkbank[chunkbankFlags[randomNo].index].image)){
+                        if(chunkbank[chunkbankFlags[randomNo].index][languageCol].length<maxMemoryWordLength){//choose short phrases
+                          memorySet.push({
+                            id:chunkbankFlags[randomNo].id,
+                            index:chunkbankFlags[randomNo].index,
+                            image:chunkbank[chunkbankFlags[randomNo].index].image,
+                            sound:chunkbank[chunkbankFlags[randomNo].index].soundfilename,
+                            found:false
+                          }); //add to set
+                          numMemoryNeeded--;
+                          memorySet.push({
+                            id:chunkbankFlags[randomNo].id,
+                            index:chunkbankFlags[randomNo].index,
+                            image:chunkbank[chunkbankFlags[randomNo].index].image,
+                            sound:chunkbank[chunkbankFlags[randomNo].index].soundfilename,
+                            found:false
+                          }); //add to set
+                          numMemoryNeeded--;
+                          //console.log("added "+chunkbankFlags[randomNo].id+" - "+chunkbank[chunkbankFlags[randomNo].index][translationCol]+" - "+chunkbank[chunkbankFlags[randomNo].index][languageCol]+". Memory still needed: "+numMemoryNeeded);
+                        }
+                      }
                 }
             }
         }
@@ -1340,9 +1343,9 @@ async function setUpActivity(mode){
     //work out how many phrases have NOT been mastered or hidden
     var possiblePhraseCount=0;
     chunkbankFlags.forEach((item, i) => {
-      if(item.flag!=="green"&&item.flag!=="red"&&item.id!=="0" &&chunkbank[item.index].language!==""){
-        possiblePhraseCount++;
-      }
+        if(item.flag!=="green"&&item.flag!=="red"&&item.id!=="0" &&chunkbank[item.index]){
+            if (chunkbank[item.index][languageCol]!==""&&chunkbank[item.index][translationCol]!=="") { possiblePhraseCount++; }
+        }
     });
 
 
@@ -1821,7 +1824,7 @@ function showFaves(){
 
 function loadFavourites(){
     "use strict";
-        console.log("============LOAD FAVOURITES "+favourites);
+    console.log("============LOAD FAVOURITES "+favourites);
     var str="";
     if (favourites.length>1){
       //add play all button

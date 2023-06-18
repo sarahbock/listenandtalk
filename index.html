@@ -11,7 +11,7 @@
         <meta name="msapplication-tap-highlight" content="no">
        <meta name="viewport" content="height=device-height,width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,minimal-ui"/>
 
-			 <link rel="stylesheet" type="text/css" href="css/index.css?34">
+			 <link rel="stylesheet" type="text/css" href="css/index.css?1">
 			 <link rel="stylesheet" type="text/css" href="css/pyro.css">
 				<style id="modifiedStyles"></style>
         <title></title>
@@ -89,7 +89,12 @@
 						<div class="topicHeaderTitle"></div>
 						<div class="subtopicHeaderTitle"></div>
 					</div>
-				<div class="subtopicHeaderIcon"><img src="images/icon_topic.png" alt="" class="iconWhite"></div>
+					<div class="topicHeaderRight">
+						<div class="playAllButtonHolder playAllTopicHolder" onclick="playAll('topic');">
+							<img src="images/icon_play_white.png" alt="play" title="Play all" class="playAllAudioIcon" id=""> Play all
+						</div>
+						<div class="subtopicHeaderIcon"><img src="images/icon_topic.png" alt="" class="iconWhite"></div>
+					</div>
 				</div>
 
 				<div class="subtopicsexpanded"> </div>
@@ -413,11 +418,11 @@
 				<div id="dictionaryentry"></div>
                 <div id="conversationentry">
                     <div class="conventry">
-											<div class="conversationHeading">
-												<h2 class="coventryHeader">In conversation</h2>
-												<div class="playAllButtonHolder playAllConversationHolder" onclick="playAll('conversation');"><img src="images/icon_play_white.png" alt="play" title="Play all" class="playAllAudioIcon" id=""> Play all</div>
-											</div>
-											<div id="conversation"></div>
+					<div class="conversationHeading">
+						<h2 class="coventryHeader">In conversation</h2>
+						<div class="playAllButtonHolder playAllConversationHolder" onclick="playAll('conversation');"><img src="images/icon_play_white.png" alt="play" title="Play all" class="playAllAudioIcon" id=""> Play all</div>
+					</div>
+					<div id="conversation"></div>
                     </div>
                 </div>
                 <div class="mikeentry">
@@ -490,9 +495,7 @@
 							</div>
                 <div class="screenBody white textLeft">
                     <div class="paddedContent">
-                        <h2>Terms of use</h2>
-	   
-
+                        <h2>Warrma Mangarrayi: Terms of use</h2>
                     </div>
                 </div>
             </div>
@@ -515,7 +518,7 @@
                 <div class="screenBody white textLeft">
                     <div class="paddedContent">
                         <h2><br>Feedback</h2>
-                        <p id="appFeedbackText"></p>
+						<p id="appFeedbackText"></p>
                     </div>
                 </div>
             </div>
@@ -607,10 +610,10 @@
 			<script type="text/javascript" src="js/jquery.js"></script>
 			<script type="text/javascript" src="js/jquery.rwdImageMaps.min.js"></script>
 			<!--<script type="text/javascript" src="cordova.js"></script>-->
-			<script type="text/javascript" src="js/index.js?151"></script>
+			<script type="text/javascript" src="js/index.js?4"></script>
 			<!-- <script type="text/javascript" src="js/hammer.min.js"></script> For swipe detetcion-->
 			<script type="text/javascript" src="js/fastclick.js"></script>
-			<script type="text/javascript" src="js/dictionary.js?7"></script>
+			<script type="text/javascript" src="js/dictionary.js?1"></script>
 
 
 
