@@ -80,7 +80,7 @@ if (language==="mangarrayi"){
     
     translateNoText="dayi"; //text for yes and no buttons in language
     translateYesText="yowo";
-    versionNo="2.4.9";
+    versionNo="2.4.10";
     appTitleShort="Warrma Mangarrayi";
     appTitleLong="Warrma Mangarrayi (Listen to Mangarrayi)";
     projectInfo='<p class="leftText">Are you interested in learning Mangarrayi? This app is to help community members learn some phrases in your own language.</p><p class="leftText">We acknowledge the Mangarrayi speakers whose voices appear in this app: <strong>Sheila Yanybarrak Conway, Jesse Garalnganyjak Roberts, Amy Dirn.gayg.</strong></p><p class="leftText">This app has been co-designed by the Jilkminggan Community with Western Sydney University and Elearn Australia.</p><a href="http://www.jcac.com.au/" target="_blank"><img src="images/logo_jcac.png" alt="Jilkminggan Community Aboriginal Corporation logo" class="aboutLogo"></a><p class="leftText">Funding from: Australian Research Council Centre of Excellence for the Dynamics of Language</p><a href="https://www.westernsydney.edu.au/" target="_blank"><img src="images/logo_wsu.png" alt="Western Sydney University logo" class="aboutLogo rectLogo"></a><a href="https://www.dynamicsoflanguage.edu.au/" target="_blank"><img src="images/logo_arc.png" alt="ARC Centre of Excellence for the Dynamics of Language" class="aboutLogo rectLogo"></a><a href="https://www.elearnaustralia.com.au" target="_blank"><img src="images/logo_ela.png" alt="Elearn Australia" class="aboutLogo rectLogo"></a><p>&nbsp;</p>';
@@ -1557,7 +1557,9 @@ async function setUpActivity(mode){
             $(".activityEntryQuestionTextContent").html(chunkbank[qI][translationCol]);
             //set answer text
             $("#activity .mikeentry").css("display","flex");
-            $(".mikePrompt").html("Press to open recorder");
+            //$("#activityBody .checkActivity").removeClass("invisible");
+            //$(".mikePrompt").html("Press to open recorder");
+            $(".mikePrompt").html("Try saying it yourself, then Press here.");
             //set image in answers
             $(".activityAnswerText img").css("display", "inline");
             //enable answer playback
@@ -1739,7 +1741,7 @@ function toggleGlossing(){
 
 function toggleMike(){
     "use strict";
-    if (web){showAlert("<p class='centred'>Only in mobile app!</p>"); return;}
+    //if (web){showAlert("<p class='centred'>Only in mobile app!</p>"); return;}
     if($("#entryOption6 img").hasClass("colourOff")){
       //show mike
       $("#entryOption6 img").removeClass("colourOff").addClass("colourOn");
@@ -1764,10 +1766,10 @@ function recordAudio(){
     if($("#activity").css("display")==="block"){
         //show play headphone buttons and answer text
         $("#activityBody .mikeOption2, #activityBody .mikeOption4").removeClass("invisible");
-        $(".mikePrompt").html(chunkbank[qI][languageCol]+"<br><br>Have a listen back. Did you get it?");
+        $(".mikePrompt").html(chunkbank[qI][languageCol]+"<br><br>Have a listen back. How did you go?");
         $("#activityBody .checkActivity").removeClass("invisible");
     } else {
-        $(".mikePrompt").html("Press the headphones to have a listen back");
+        $(".mikePrompt").html("Have a go yourself. Press the Play button to listen back.");
     }
     var id=selectedEntry;
 
@@ -1775,19 +1777,19 @@ function recordAudio(){
         //id=chunkbankFlags[qI].id; //which phrase is active in the activity
     }
     // start audio capture
-    navigator.device.capture.captureAudio(captureSuccess, captureError, {limit:1});
+    //navigator.device.capture.captureAudio(captureSuccess, captureError, {limit:1});
 }
 
 //triggered from Press to record label in activity 3
 function recordActivityFromLabel(id){
-    if ($(".mikePrompt").html().indexOf("Press")===-1){return;} //return if pressing on activityMikePrompt later in the activity
+    //if ($(".mikePrompt").html().indexOf("Press")===-1){return;} //return if pressing on activityMikePrompt later in the activity
     recordAudio();
 }
 
 
 //====================================================================================================================== PLAY BACK RECORDED MEDIA
 function togglePlayback(){
-    if (web){showAlert("<p class='centred'>Only in mobile app!</p>");return;}
+    //if (web){showAlert("<p class='centred'>Only in mobile app!</p>");return;}
     if ($(".iconHeadphones").attr("src").indexOf("headphones")!==-1){
         if(recordedAudioPath===undefined||recordedAudioPath===""||recordedAudioPath==="undefined"){
             showAlert("There is nothing to play yet. <br><br>Make sure you use tap the talking head and then press record first.");
@@ -1812,7 +1814,7 @@ function togglePlayback(){
 }
 
 function stopPlayback(){
-    if (web){showAlert("<p class='centred'>Only in mobile app!</p>");return;}
+    //if (web){showAlert("<p class='centred'>Only in mobile app!</p>");return;}
     audioOff();
     $(".iconHeadphones").attr("src", "images/icon_headphones.png");
 }
@@ -1825,7 +1827,7 @@ function resetPlaybackButton(){
 
 //====================================================================================================================== SHARE MEDIA
 function sharePlayback(){
-    if (web){showAlert("<p class='centred'>Only in mobile app!</p>");return;}
+    //if (web){showAlert("<p class='centred'>Only in mobile app!</p>");return;}
     if(recordedAudioPath===undefined||recordedAudioPath===""||recordedAudioPath==="undefined"){
         showAlert("There is nothing to share yet. <br><br>Make sure you use tap the talking head and then press record first.");
         return;
@@ -2171,6 +2173,7 @@ function audioOff(){
 
 
 //=========================================================================================================================== INITIALISE APP
+                            
 
 // capture callback
 var recordedAudioPath;
@@ -2178,7 +2181,7 @@ var captureSuccess = function(mediaFiles) {
     var i, len;
     for (i = 0, len = mediaFiles.length; i < len; i += 1) {
         recordedAudioPath = mediaFiles[i].fullPath;
-        //console.log("recordedAudioPath "+recordedAudioPath);
+        console.log("recordedAudioPath "+recordedAudioPath);
         ///var/mobile/Containers/Data/Application/97CE8C26-726D-4EA1-BBCE-B25B09F79632/tmp/audio_026.wav
     }
 };
@@ -2209,7 +2212,7 @@ var app = {
         "use strict";
         $(".listening").css("display","none");
         $(".received").css("display","none");
-
+        //console.log(navigator.device.capture);
         /*Put all plugin related calls in here*/
         //console.log("DEVICE READY");
 

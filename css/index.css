@@ -387,7 +387,7 @@ h2.coventryHeader{}
 */
 
 
-#activity .mikeOption2{margin-right: 10vw;}
+#activity .mikeOption2{/*margin-right: 10vw;*/}
 #activity .mikeOption4{margin-left: 10vw;}
 #activity .activityLabel{color: #FFF; margin: 1em 0; font-weight: bold; }
 
