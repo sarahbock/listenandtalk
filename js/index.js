@@ -6,6 +6,7 @@ var language="mangarrayi"; if(getQueryVariable("lang")){language=getQueryVariabl
 var secondaryColor="#FF4C00"; if (language==="umpila") {secondaryColor="#198083"} //colour of buttons
 var recordLog = false; if (language==="umpila" || language==="mangarrayi") {recordLog = true;}
 var tokenEnabled=false; if (language==="umpila" || language==="mangarrayi") {tokenEnabled = true;}
+var languageFirst = false; if (language==="umpila" || language ==="guugu_yimithirr"){ languageFirst = false;}
 //var language="hungarian";
 var translation="english"; if(getQueryVariable("translation")){translation=getQueryVariable("translation");}
 var versionNo="1.0.0";
@@ -290,36 +291,41 @@ function stripHTML(html){//strip HTML tags from string
 
 
 function getData(){
-    "use strict";
     //this function is called when dictionary is initialised or when language is changed
-    //console.log("============GET DATA ");
+    console.log("============GET DATA ",languageFirst);
 
     //create full list
-        var listHTML="";
+    var listHTML = ""; var startHTML=""; var languageColHTML = ""; var translationColHTML = ""; var endHTML="";
     for (var a=0; a<chunkbankSorted.length; a++){ //chunkbankSorted is in A-Z order of english text
-    if(chunkbankSorted[a].id!=="0" && chunkbankSorted[a][languageCol]!==""){
-            listHTML+='<div class="entry"><div class="entryEnglish" onclick="setEntry(\''+chunkbankSorted[a].id+'\'); showPage(\'entry\');">'+ chunkbankSorted[a][translationCol]+'</div> <div class="entryMangarrayi audioButtonDiv active" id="fulllistaudio_'+chunkbankSorted[a].id+'" onclick="toggleAudio(\'fulllistaudio_'+chunkbankSorted[a].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon">'+chunkbankSorted[a][languageCol]+'</div> <div class="entryGo active" onclick="setEntry(\''+chunkbankSorted[a].id+'\');showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"> </div> </div>';
+        if(chunkbankSorted[a].id!=="0" && chunkbankSorted[a][languageCol]!==""){
+            startHTML='<div class="entry">';
+            translationColHTML = '<div class="entryEnglish" onclick="setEntry(\''+chunkbankSorted[a].id+'\'); showPage(\'entry\');">'+ chunkbankSorted[a][translationCol]+'</div>';
+            languageColHTML = '<div class="entryMangarrayi audioButtonDiv active" id="fulllistaudio_'+chunkbankSorted[a].id+'" onclick="toggleAudio(\'fulllistaudio_'+chunkbankSorted[a].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon">'+chunkbankSorted[a][languageCol]+'</div>';
+            endHTML='<div class="entryGo active" onclick="setEntry(\''+chunkbankSorted[a].id+'\');showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"> </div> </div>';
+            //set column 1 to be language column if this display is prefered
+            if (languageFirst){
+                listHTML+=startHTML+languageColHTML+translationColHTML+endHTML;
+            } else {
+                listHTML+=startHTML+translationColHTML+languageColHTML+endHTML;
+            }
         }
     }
     $("#fulllist .entries").html(listHTML);
 
     //create filter list (english key word as default)
-        var filterSelectStr='';
-        filterSelectStr+='<option value="keyword'+translationCol+'">Keywords ('+translationCap+')</option>';
-        filterSelectStr+='<option value="keyword">Keywords ('+languageHeader+')</option>';
-        filterSelectStr+='<option value="class">Words or phrases</option>';
-        filterSelectStr+='<option value="function">Language function</option>';
-        filterSelectStr+='<option value="keywordling">Linguistic keyword</option>';
-        filterSelectStr+='<option value="speaker">Speaker</option>';
-        $("#filterEntries").html(filterSelectStr);
+    var filterSelectStr='';
+    filterSelectStr+='<option value="keyword'+translationCol+'">Keywords ('+translationCap+')</option>';
+    filterSelectStr+='<option value="keyword">Keywords ('+languageHeader+')</option>';
+    filterSelectStr+='<option value="class">Words or phrases</option>';
+    filterSelectStr+='<option value="function">Language function</option>';
+    filterSelectStr+='<option value="keywordling">Linguistic keyword</option>';
+    filterSelectStr+='<option value="speaker">Speaker</option>';
+    $("#filterEntries").html(filterSelectStr);
 
-        selectedFilter="keyword"+translationCol;
-        // selectedFilter="function";
-        loadFilterEntries();
-
+    selectedFilter="keyword"+translationCol;
+    // selectedFilter="function";
+    loadFilterEntries();
     loadFavourites();
-
-
 }
 
 
@@ -385,8 +391,8 @@ function setEntry(x){
 
     var closingStr='</div><div class="clearBoth"></div>';
 
-    //change order of display for umpila
-    if (language==="umpila"){
+    //change order of display if language is to be diplayed first
+    if (languageFirst){
       $("#dictionaryentry").html(startingStr+entryLangStr+entryEngStr+closingStr);
     } else {
       $("#dictionaryentry").html(startingStr+entryEngStr+entryLangStr+closingStr);
@@ -406,7 +412,16 @@ function setEntry(x){
                 //console.log("conversation x "+x+" c "+cid+" chunkbank[n].id "+chunkbank[n].id+" chunkbank[cid].id "+chunkbank[cid].id);
                 if (cid!==-1){
                   var boldClass=""; if(chunkbank[n].id===chunkbank[cid].id){boldClass=' boldClass';}
-                  cstr+='<div class="entry"><div class="entryEnglish'+boldClass+'" onclick="referrer=\'convolist\'; setEntry(\''+chunkbank[cid].id+'\'); showPage(\'entry\');">'+chunkbank[cid][translationCol]+'</div><div class="entryMangarrayi audioButtonDiv active" id="conversaaudio_'+chunkbank[cid].id+'" onclick="toggleAudio(\'conversaaudio_'+chunkbank[cid].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon">'+chunkbank[cid][languageCol]+'</div><div class="entryGo active" onclick="referrer=\'convolist\'; setEntry(\''+chunkbank[cid].id+'\'); showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"></div></div>';
+                  var startHTML = '<div class="entry">';
+                  var languageHTML = '<div class="entryMangarrayi audioButtonDiv active" id="conversaaudio_'+chunkbank[cid].id+'" onclick="toggleAudio(\'conversaaudio_'+chunkbank[cid].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon">'+chunkbank[cid][languageCol]+'</div>';
+                  var translationHTML = '<div class="entryEnglish'+boldClass+'" onclick="referrer=\'convolist\'; setEntry(\''+chunkbank[cid].id+'\'); showPage(\'entry\');">'+chunkbank[cid][translationCol]+'</div>';
+                  var endHTML = '<div class="entryGo active" onclick="referrer=\'convolist\'; setEntry(\''+chunkbank[cid].id+'\'); showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"></div></div>';
+                  //set column 1 to be language column if this display is prefered
+                  if (languageFirst){
+                    cstr+=startHTML+languageHTML+translationHTML+endHTML;
+                  } else {
+                    cstr+=startHTML+translationHTML+languageHTML+endHTML;
+                  }
                 }
             }
         }
@@ -827,7 +842,16 @@ function showSubTopicsExpanded(x){
         topicEntries.push(chunkbankSorted[a].id);
     }
     if(matchedEntry===true){
-        str+='<div class="entry"><div class="entryEnglish" onclick="setEntry(\''+chunkbankSorted[a].id+'\'); showPage(\'entry\');">'+chunkbankSorted[a][translationCol]+'</div> <div class="entryMangarrayi audioButtonDiv active" id="subtopicsexpa_'+chunkbankSorted[a].id+'" onclick="toggleAudio(\'subtopicsexpa_'+chunkbankSorted[a].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon" id="">'+chunkbankSorted[a][languageCol]+'</div> <div class="entryGo active" onclick="setEntry(\''+chunkbankSorted[a].id+'\');showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"> </div> </div>';
+        var startHTML = '<div class="entry">';
+        var languageHTML = '<div class="entryMangarrayi audioButtonDiv active" id="subtopicsexpa_'+chunkbankSorted[a].id+'" onclick="toggleAudio(\'subtopicsexpa_'+chunkbankSorted[a].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon" id="">'+chunkbankSorted[a][languageCol]+'</div>';
+        var translationHTML = '<div class="entryEnglish" onclick="setEntry(\''+chunkbankSorted[a].id+'\'); showPage(\'entry\');">'+chunkbankSorted[a][translationCol]+'</div>';
+        var endHTML = '<div class="entryGo active" onclick="setEntry(\''+chunkbankSorted[a].id+'\');showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"> </div> </div>';
+        //set column 1 to be language column if this display is prefered
+        if (languageFirst){
+          str+=startHTML+languageHTML+translationHTML+endHTML;
+        } else {
+          str+=startHTML+translationHTML+languageHTML+endHTML;
+        }
     }
     }
     if (str===""){str="<p class='textLeft paddedContent note'>Nothing under this topic yet.</p>";}
@@ -1869,9 +1893,16 @@ function loadFavourites(){
     }
     for (var f=0; f<favourites.length; f++){//go through what they have saved
         var n=0; for (var a=0; a<chunkbank.length; a++){if(chunkbank[a].id === favourites[f].toString()){n = a;}} //get the relevant element
-        str+='<div class="starRemove active" onclick="toggleStar(\''+chunkbank[n].id+'\');">X</div>';
-        str+='<div class="entry"><div class="entryEnglish" onclick="setEntry(\''+chunkbank[n].id+'\'); showPage(\'entry\');">'+ chunkbank[n][translationCol]+'</div> <div class="entryMangarrayi audioButtonDiv active" id="favoriteentry_'+chunkbank[n].id+'" onclick="toggleAudio(\'favoriteentry_'+chunkbank[n].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon" id="">'+chunkbank[n][languageCol]+'</div> <div class="entryGo active" onclick="setEntry(\''+chunkbank[n].id+'\');showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"></div></div>';
-
+        var startHTML = '<div class="starRemove active" onclick="toggleStar(\''+chunkbank[n].id+'\');">X</div><div class="entry">';
+        var languageHTML = '<div class="entryMangarrayi audioButtonDiv active" id="favoriteentry_'+chunkbank[n].id+'" onclick="toggleAudio(\'favoriteentry_'+chunkbank[n].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon" id="">'+chunkbank[n][languageCol]+'</div>';
+        var translationHTML = '<div class="entryEnglish" onclick="setEntry(\''+chunkbank[n].id+'\'); showPage(\'entry\');">'+ chunkbank[n][translationCol]+'</div>';
+        var endHTML = '<div class="entryGo active" onclick="setEntry(\''+chunkbank[n].id+'\');showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"></div></div>';
+        //set column 1 to be language column if this display is prefered
+        if (languageFirst){
+            str+=startHTML+languageHTML+translationHTML+endHTML;
+        } else {
+            str+=startHTML+translationHTML+languageHTML+endHTML;
+        }
     }
     if (str===""){str='<p class="paddedContent note">Tap the star on any words you want to learn and they will show up here. </p><p class="paddedContent note">You will also be able to practice them in the "Have a go" part.</p>';} //default text if empty
     $("#favouritesresults").html(str);
@@ -1946,16 +1977,23 @@ function loadFilterEntries(){
             if (isMatch){
                 //add entry id to array for this filter item (used in play all functionality)
                 filteredEntriesId.push(chunkbankSortedLength[e].id);
-              // if (filterArray[d]==="Talking about your body state."){  if(chunkbankSortedLength[e].english==="I'm hungry"){//console.log("chunkbankSortedLength[e].english "+chunkbankSortedLength[e].english);}}
-                filterListHTML+='<div class="entry"><div class="entryEnglish" onclick="referrer=\'categorylist\'; setEntry(\''+chunkbankSortedLength[e].id+'\'); showPage(\'entry\');">'+chunkbankSortedLength[e][translationCol]+'</div><div class="entryMangarrayi audioButtonDiv active" id="categoryaudio_'+chunkbankSortedLength[e].id+'" onclick="toggleAudio(\'categoryaudio_'+chunkbankSortedLength[e].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon">'+chunkbankSortedLength[e][languageCol]+'</div><div class="entryGo active" onclick="referrer=\'categorylist\'; setEntry(\''+chunkbankSortedLength[e].id+'\'); showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"></div></div>';
+                var startFilterHTML = '<div class="entry">';
+                var languageFilterHTML = '<div class="entryMangarrayi audioButtonDiv active" id="categoryaudio_'+chunkbankSortedLength[e].id+'" onclick="toggleAudio(\'categoryaudio_'+chunkbankSortedLength[e].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon">'+chunkbankSortedLength[e][languageCol]+'</div>';
+                var translationFilterHTML = '<div class="entryEnglish" onclick="referrer=\'categorylist\'; setEntry(\''+chunkbankSortedLength[e].id+'\'); showPage(\'entry\');">'+chunkbankSortedLength[e][translationCol]+'</div>';
+                var endFilterHTML = '<div class="entryGo active" onclick="referrer=\'categorylist\'; setEntry(\''+chunkbankSortedLength[e].id+'\'); showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"></div></div>';
+                filterListHTML+='';
+                //set column 1 to be language column if this display is prefered
+                if (languageFirst){
+                    filterListHTML+=startFilterHTML+languageFilterHTML+translationFilterHTML+endFilterHTML;
+                } else {
+                    filterListHTML+=startFilterHTML+translationFilterHTML+languageFilterHTML+endFilterHTML;
+                }
             }
         }
         //push array if entry ids for this filter item into global filter id array
         allFilteredEntries.push(filteredEntriesId);
         //clse the html for the filter item result
         filterListHTML+='</div>';
-
-
     }
    //console.log(tempstr);
     $("#categorylist .categoryresults").html(filterListHTML);

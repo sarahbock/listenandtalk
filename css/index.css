@@ -263,8 +263,8 @@ hr{ display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:0
 #entry .headerYolngu {    width: 55%; padding: 0.5em 0 0.5em 5%;}
 .headerPrefLang {    clear: both; color: #000; font-size: 0.8em;  background-color: #CCC;     padding: 0.5em;  margin-bottom: 1em;}
 
-#fulllist .entry, #categorylist .entry{margin: 0; margin-bottom: 0.5em;display: flex; align-items: center;}
-#categorylist .entry{padding:5px; margin:0; border-bottom: 1px solid #131114;}
+#fulllist .entry, #categorylist .entry, #favouritesresults .entry, .subtopicsexpanded .entry{margin: 0; margin-bottom: 0.5em;display: flex; align-items: center;     padding: 0.5em;}
+#categorylist .entry{padding:5px; margin:0; border-bottom: 1px solid #131114; align-items: flex-start;}
 
 /*Entry screen*/
 #entry .entry{ margin-bottom: 1em;}
@@ -441,6 +441,13 @@ margin: .5vw;
 .categoryresult {    background-color: #ffffff;  margin: 2px 0 0 0; text-align: left; display: flex; justify-content: space-between; align-items: center;}
 .categoryresult .firstLetterUpper:first-letter {text-transform:capitalize;}
 .categoryresult .entryEnglish {flex:1;}
+
+
+.categoryresultentries .entryEnglish, #fulllist .entryEnglish, #favouritesresults .entryEnglish, .subtopicsexpanded .entryEnglish {display: flex; flex: 3; float: none; width: auto; padding: 0 10px;}
+.categoryresultentries .entryMangarrayi, #fulllist .entryMangarrayi, #favouritesresults .entryMangarrayi, .subtopicsexpanded .entryMangarrayi {display: flex; flex: 4; float: none; width: auto; padding: 0 10px;}
+.categoryresultentries .entryGo, #fulllist .entryGo, #favouritesresults .entryGo, .subtopicsexpanded .entryGo {display: flex; flex: 1; float: none; width: auto; padding: 0; justify-content: flex-end;}
+.categoryresultentries .entryGo img, #fulllist .entryGo img, #favouritesresults .entryGo img, .subtopicsexpanded .entryGo img{width:30px; height: auto; max-width: none;}
+
 .categoryresultentries{display: none; border:5px solid #131114;}
 .categoryresultentries p{padding: 5%; background-color: #FFF; margin: 0; text-align: left;}
 .playAllFilterHolder{display:none; margin: 5px 5px 5px 0;}
