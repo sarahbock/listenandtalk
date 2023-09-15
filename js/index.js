@@ -2343,10 +2343,13 @@ $(document).ready(function(){
     $("#disclaimerButton").click(function(){
         if (language==="mangarrayi"){
             location.href="https://www.elearnaustralia.com.au/mangarrayi/privacy/";
+        } else if (language==="umpila") {
+            location.href="https://lockhart.qld.gov.au/wp-content/uploads/2023/03/ADM-045kuuku-ngaachiku-app-privacy-policy.pdf";
         } else {
             showPage("terms");
         }
     });
+    
     $("#feedbackButton").click(function(){
         if (language==="mangarrayi"){
             $("#appFeedbackText").html('Please <a href="https://forms.gle/6hoS5Vrb3oHBPeWU6" target="_blank">contact us</a> if you have feedback or suggestions.');
