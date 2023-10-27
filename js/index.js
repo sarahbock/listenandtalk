@@ -6,7 +6,7 @@ var language="mangarrayi"; if(getQueryVariable("lang")){language=getQueryVariabl
 var secondaryColor="#FF4C00"; if (language==="umpila") {secondaryColor="#198083"} //colour of buttons
 var recordLog = false; if (language==="umpila" || language==="mangarrayi") {recordLog = true;}
 var tokenEnabled=false; if (language==="umpila" || language==="mangarrayi") {tokenEnabled = true;}
-var languageFirst = false; if (language==="umpila" || language ==="guugu_yimithirr"){ languageFirst = false;}
+var languageFirst = false; if (language==="umpila" || language ==="guugu_yimithirr" || language ==="wik_mungkan"){ languageFirst = true;}
 //var language="hungarian";
 var translation="english"; if(getQueryVariable("translation")){translation=getQueryVariable("translation");}
 var versionNo="1.0.0";
@@ -2343,13 +2343,10 @@ $(document).ready(function(){
     $("#disclaimerButton").click(function(){
         if (language==="mangarrayi"){
             location.href="https://www.elearnaustralia.com.au/mangarrayi/privacy/";
-        } else if (language==="umpila") {
-            location.href="https://lockhart.qld.gov.au/wp-content/uploads/2023/03/ADM-045kuuku-ngaachiku-app-privacy-policy.pdf";
         } else {
             showPage("terms");
         }
     });
-    
     $("#feedbackButton").click(function(){
         if (language==="mangarrayi"){
             $("#appFeedbackText").html('Please <a href="https://forms.gle/6hoS5Vrb3oHBPeWU6" target="_blank">contact us</a> if you have feedback or suggestions.');
@@ -2368,8 +2365,15 @@ $(document).ready(function(){
     $(".headerPictureSearch").click(function(){showTopics();});
     $(".headerListSearch").click(function(){showFull();});
     $(".headerCategorySearch").click(function(){showCategory();});
-  $(".headerFavourites").click(function(){showFaves();});
-  $(".headerActivity").click(function(){showActivity();});
+    $(".headerFavourites").click(function(){showFaves();});
+    $(".headerActivity").click(function(){
+        const checklength = chunkbank.filter(entry => entry.language);
+        if (checklength.length > 10) {
+            showActivity();
+        } else {
+            alert('At least 10 phrases must be added to display activities.')
+        }
+    });
 
     //TOPICS
     $(".entryBack").click(function(){showPage(referrer);});
