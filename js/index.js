@@ -6,7 +6,7 @@ var language="mangarrayi"; if(getQueryVariable("lang")){language=getQueryVariabl
 var secondaryColor="#FF4C00"; if (language==="umpila") {secondaryColor="#198083"} //colour of buttons
 var recordLog = false; if (language==="umpila" || language==="mangarrayi") {recordLog = true;}
 var tokenEnabled=false; if (language==="umpila" || language==="mangarrayi") {tokenEnabled = true;}
-var languageFirst = false; if (language==="umpila" || language ==="guugu_yimithirr" || language ==="wik_mungkan"  || language ==="mpakwith"){ languageFirst = true;}
+var languageFirst = false; if (language==="umpila" || language ==="guugu_yimithirr" || language ==="wik_mungkan"  || language ==="mpakwithi"){ languageFirst = true;}
 //var language="hungarian";
 var translation="english"; if(getQueryVariable("translation")){translation=getQueryVariable("translation");}
 var versionNo="1.0.0";
