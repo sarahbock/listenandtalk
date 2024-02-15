@@ -66,6 +66,18 @@ if (language==="umpila"){
   tokenRequest='<a href="https://forms.gle/qqmGhZWsaAcK1XAB6" target="_blank">Ask Lockhart River Aboriginal Shire Council</a>';
 }
 
+
+
+//PAMA apps
+if (language==="finders"){
+    appTitleShort="Flinders Island";
+    appTitleLong="Flinders Island"; 
+    //$("#launch .launchlogo").attr("src", "images/logo_lcasc.png");
+    //projectInfo='<p class="leftText">Are you interested in learning Umpila / Kuuku Ya’u? This app is to help community members learn some phrases in your own language.</p><p class="leftText">We acknowledge the language speakers whose voices appear in this app: <strong>Maria Butcher, Lorraine Clarmont, Elizabeth Giblet, Lucy Hobson, Minnie Pascoe, Josiah Omeenyo, Lawrence Omeenyo, Dorothy Short</strong>.</p><p class="leftText">Illustrators: <strong>Phyllis Hobson and Krystal Dean</strong>.</p><a href="http://www.jcac.com.au/" target="_blank"><img src="images/logo_lcasc.png" alt="Lockhart River Aboriginal Shire Council logo" class="aboutLogo"></a><p class="leftText">Funding from: Australian Research Council Centre of Excellence for the Dynamics of Language, and Indigenous Languages and the Arts, Department of Infrastructure, Transport, regional Development, Communications and the Arts.</p><p class="leftText">In kind support from: The MARCS Institute for Brain, Behaviour and Development, Western Sydney University and School of Humanities and Languages, UNSW.</p><a href="https://www.dynamicsoflanguage.edu.au/" target="_blank"><img src="images/logo_arc.png" alt="Australian Research Council Centre of Excellence for the Dynamics of Language logo" class="aboutLogo rectLogo"></a><a href="https://www.arts.gov.au/funding-and-support/indigenous-languages-and-arts-program" target="_blank"><img src="images/logo_ausgov.png" alt="Indigenous Languages and the Arts, Department of Infrastructure, Transport, regional Development, Communications and the Arts logo" class="aboutLogo rectLogo"></a><a href="https://www.westernsydney.edu.au/" target="_blank"><img src="images/logo_wsu.png" alt="Western Sydney University logo" class="aboutLogo rectLogo"></a><a href="https://www.unsw.edu.au/arts-design-architecture/our-schools/humanities-languages" target="_blank"><img src="images/logo_unsw.png" alt="UNSW Sydney logo" class="aboutLogo rectLogo"></a><a href="https://www.elearnaustralia.com.au" target="_blank"><img src="images/logo_ela.png" alt="Elearn Australia" class="aboutLogo rectLogo"></a><p>&nbsp;</p>';
+    versionNo="1.0.0";
+    //tokenRequest='<a href="https://forms.gle/qqmGhZWsaAcK1XAB6" target="_blank">Ask Lockhart River Aboriginal Shire Council</a>';
+  }
+  
 //backwards compatibility for mangarrayi app
 if (language==="mangarrayi"){
     $("#launch .launchlogo").attr("src", "images/logo_jcac.png");
@@ -352,7 +364,12 @@ function setEntry(x){
     entryEngStr +='<div class="entryEnglishText">'+chunkbank[n][translationCol]+'</div>';
     //show translation audio if available
     if (chunkbank[n][translationColsoundfilename]!==""){
-        entryEngStr+='<div class="entryKriol active" id="kriolAudio" onclick="toggleKriolAudio(\''+chunkbank[n][translationColsoundfilename]+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon"></div>';
+        if(language==="mangarrayi"){
+            //only mangarrayi specifically has K for Kriol after the audio button
+            entryEngStr+='<div class="entryKriol entryK active" id="kriolAudio" onclick="toggleKriolAudio(\''+chunkbank[n][translationColsoundfilename]+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon"></div>';
+        } else {
+            entryEngStr+='<div class="entryKriol active" id="kriolAudio" onclick="toggleKriolAudio(\''+chunkbank[n][translationColsoundfilename]+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon"></div>';
+        }   
     }
     entryEngStr+='</div>';//end entryEnglish
     if (chunkbank[n].meaning) entryEngStr+='<div class="entryMeaning">'+chunkbank[n].meaning+'</div>';

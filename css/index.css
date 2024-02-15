@@ -274,7 +274,7 @@ hr{ display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:0
 #entry .audioButtonDiv{display: inline; vertical-align: middle;}
 #entry .audioIcon{float:none; vertical-align: middle;}
 #entry .entryKriol{    width: 70px;}
-#entry .entryKriol::before{    content: "K"; font-size: .8em; font-weight: 600; margin-right: 2px;}
+#entry .entryK::before{    content: "K"; font-size: .8em; font-weight: 600; margin-right: 2px;}
 #entry .entryKriol .audioIcon{max-width: none;}
 /*Entry body*/
 #dictionaryentry .entry{margin-bottom: 0; }
