@@ -351,7 +351,7 @@ function setEntry(x){
         $(".conventry").css("display","none"); $("#entryOption5 img").removeClass("colourOn").addClass("colourOff");
     }
     //hide microphone entry
-  $("#entry .mikeentry").css("display","none"); $("#entryOption6 img").removeClass("colourOn").addClass("colourOff");
+    $("#entry .mikeentry").css("display","none"); $("#entryOption6 img").removeClass("colourOn").addClass("colourOff");
 
     //get right id from dictionary
     var n=0; for (var a=0; a<chunkbank.length; a++){if(chunkbank[a].id === x.toString()){n = a; selectedN=n;}}
@@ -403,7 +403,9 @@ function setEntry(x){
     entryLangStr+='<img src="images/icon_mike.png" alt="mike" title="Open microphone" class="slowIcon colourOff">';
     entryLangStr+='</div>';
     entryLangStr+='<div class="clearBoth"></div>';
+    
     entryLangStr+='</div>';
+    if (chunkbank[n].speaker) entryLangStr+='<div class="entryGlossing entrySpeakerText">'+chunkbank[n].speaker+'</div>';
     entryLangStr+='</div>';
 
     var closingStr='</div><div class="clearBoth"></div>';
@@ -805,7 +807,8 @@ function showSubTopics(x){
     hideTopicsAndSubtopics();
     selectedTopic=parseInt(x);
     //console.log("showSubTopics"+x+" selectedTopic: "+selectedTopic+" selectedSubTopic: "+selectedSubTopic);
-    $(".topicHeaderTitle").html(topics[(selectedTopic-1)].title);
+    var topicTitle = topics[(selectedTopic-1)].title;
+    $(".topicHeaderTitle").html(topicTitle);
     if (topics[(selectedTopic-1)].image) {
       $(".topicHeaderIcon img").attr("src",imagepath+topics[(selectedTopic-1)].image);
     } else {
@@ -817,10 +820,10 @@ function showSubTopics(x){
         str+='<div class="subtopicDivContainer" id="subtopicContainer'+(t+1)+'"  onclick="showSubTopicsExpanded(\''+(t+1)+'\');"><div class="subtopicDivHolder">';
         if (topics[(selectedTopic-1)].subtopics[t].image) {
             
-          str+='<img src="'+imagepath+topics[(selectedTopic-1)].subtopics[t].image+'?v=2" alt="">';
+            str+='<img src="'+imagepath+topics[(selectedTopic-1)].subtopics[t].image+'?v=2" alt="">';
         } else {
-          var iconImage="icon_topic.png";
-          str+='<img src="images/'+iconImage+'" alt="">';
+            var iconImage="icon_topic.png";
+            str+='<img src="images/'+iconImage+'" alt="">';
         }
         str+='<div class="subtopicDiv">'+subtopicTitle+'</div></div></div>';
     }
@@ -848,28 +851,29 @@ function showSubTopicsExpanded(x){
     }
     var str="";
     for (var a=0; a<chunkbankSorted.length; a++){
-    var matchedEntry=false; //see if subtopic word is found in entry subtopics or related
-    if(
-        (subtopicid && chunkbankSorted[a][topicCol]===subtopicid) || //does selected topic match entry topic (new)
-        (chunkbankSorted[a].related && chunkbankSorted[a].related.split(',').find(item => item === subtopicid)) || //does selected topic match entry related (new)
-        (chunkbankSorted[a][topicCol]!==null && chunkbankSorted[a][topicCol].toLowerCase().indexOf(subtopicname.toLowerCase())!==-1) || //does selected topic match entry topic (old)
-        (chunkbankSorted[a].related!==null && chunkbankSorted[a].related.toLowerCase().indexOf(subtopicname.toLowerCase())!==-1) //does selected topic match entry related (old)
-    ){
-        matchedEntry=true;
-        topicEntries.push(chunkbankSorted[a].id);
-    }
-    if(matchedEntry===true){
-        var startHTML = '<div class="entry">';
-        var languageHTML = '<div class="entryMangarrayi audioButtonDiv active" id="subtopicsexpa_'+chunkbankSorted[a].id+'" onclick="toggleAudio(\'subtopicsexpa_'+chunkbankSorted[a].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon" id="">'+chunkbankSorted[a][languageCol]+'</div>';
-        var translationHTML = '<div class="entryEnglish" onclick="setEntry(\''+chunkbankSorted[a].id+'\'); showPage(\'entry\');">'+chunkbankSorted[a][translationCol]+'</div>';
-        var endHTML = '<div class="entryGo active" onclick="setEntry(\''+chunkbankSorted[a].id+'\');showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"> </div> </div>';
-        //set column 1 to be language column if this display is prefered
-        if (languageFirst){
-          str+=startHTML+languageHTML+translationHTML+endHTML;
-        } else {
-          str+=startHTML+translationHTML+languageHTML+endHTML;
+        var matchedEntry=false; //see if subtopic word is found in entry subtopics or related or speaker is a match
+        if(
+            (subtopicname?.toLowerCase() === chunkbankSorted[a].speaker?.toLowerCase() ) ||
+            (subtopicid && chunkbankSorted[a][topicCol]===subtopicid) || //does selected topic match entry topic (new)
+            (chunkbankSorted[a].related && chunkbankSorted[a].related.split(',').find(item => item === subtopicid)) || //does selected topic match entry related (new)
+            (chunkbankSorted[a][topicCol]!==null && chunkbankSorted[a][topicCol].toLowerCase().indexOf(subtopicname.toLowerCase())!==-1) || //does selected topic match entry topic (old)
+            (chunkbankSorted[a].related!==null && chunkbankSorted[a].related.toLowerCase().indexOf(subtopicname.toLowerCase())!==-1) //does selected topic match entry related (old)
+        ){
+            matchedEntry=true;
+            topicEntries.push(chunkbankSorted[a].id);
         }
-    }
+        if(matchedEntry===true){
+            var startHTML = '<div class="entry">';
+            var languageHTML = '<div class="entryMangarrayi audioButtonDiv active" id="subtopicsexpa_'+chunkbankSorted[a].id+'" onclick="toggleAudio(\'subtopicsexpa_'+chunkbankSorted[a].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon" id="">'+chunkbankSorted[a][languageCol]+'</div>';
+            var translationHTML = '<div class="entryEnglish" onclick="setEntry(\''+chunkbankSorted[a].id+'\'); showPage(\'entry\');">'+chunkbankSorted[a][translationCol]+'</div>';
+            var endHTML = '<div class="entryGo active" onclick="setEntry(\''+chunkbankSorted[a].id+'\');showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"> </div> </div>';
+            //set column 1 to be language column if this display is prefered
+            if (languageFirst){
+                str+=startHTML+languageHTML+translationHTML+endHTML;
+            } else {
+                str+=startHTML+translationHTML+languageHTML+endHTML;
+            }
+        }
     }
     if (str===""){str="<p class='textLeft paddedContent note'>Nothing under this topic yet.</p>";}
     $(".subtopicsexpanded").html(str);
@@ -1945,7 +1949,7 @@ function loadFilterEntries(){
     allFilteredEntries=[];
     selectedFilterResult=null;
     $("#filterEntries").val(selectedFilter);
-    var filterArray=[];
+    var allFilterArray=[];
     for (var b=0; b<chunkbank.length; b++){
         //get all the items for that filter e.g. all the english keywords in the dictionary
         if (chunkbank[b][selectedFilter]==null){chunkbank[b][selectedFilter]="";}
@@ -1956,18 +1960,31 @@ function loadFilterEntries(){
            if (newItem==="I am"){newItem="I'm";}
            // if (selectedFilter==="keywordenglish"){newItem=newItem.toLowerCase();}//change english items to lower case so they appear in alphabetical order
            // if (selectedFilter==="keyword"){newItem=newItem.toLowerCase();}//change mangarrayi  items to lower case
-            newItem=newItem.toLowerCase();//change all filter items to lower case
-            if (filterArray.indexOf(newItem) === -1 && newItem!==""){filterArray.push(newItem);} //push filter items into an array and avoid duplicates
+            //change all filter items to lower case, unless the filter word is all caps
+            newItem = (newItem === newItem?.toUpperCase()) ? newItem : newItem=newItem?.toLowerCase();
+            //push filter items into an array and avoid duplicates
+            if (allFilterArray.indexOf(newItem) === -1 && newItem!==""){
+                allFilterArray.push(newItem);
+            } 
         }
     }
     //now sort filter item list into alphabetical order
-    filterArray.sort();
+    allFilterArray.sort();
+    //separate suffix keywords into separate array
+    var suffixFilters = allFilterArray?.filter( el => (el.charAt(0) === '+' || el.charAt(0) === '*' ));
+    var nonSuffixFilters = allFilterArray?.filter( el => (el.charAt(0) !== '+' && el.charAt(0) !== '*'));
+    //display normal keywords first, then display suffix keywords
+    var filterArray = nonSuffixFilters.concat(suffixFilters);
+    //console.log('newFilterArray',filterArray)
+    //console.log('suffixFilters',suffixFilters)
+    //console.log('nonSuffixFilters',nonSuffixFilters)
     //now create headings for all the filter items
     var filterListHTML="";
     for (var d=0; d<filterArray.length; d++){//loop through filter items
         let displayItem=filterArray[d];
+        var firstLetterUpper=""; 
         //transform first letter to uppercase unless it's a language keyword
-        var firstLetterUpper=""; if (selectedFilter!=="keyword"){firstLetterUpper=" firstLetterUpper";}
+        //if (selectedFilter!=="keyword"){firstLetterUpper=" firstLetterUpper";}
         //if the filter is speaker names then capitalise every letter
         if (selectedFilter==="speaker"){displayItem=filterArray[d].toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ');}
         //Display the filtered item e.g. keyword
@@ -1987,7 +2004,9 @@ function loadFilterEntries(){
             var entryFilterArray = chunkbankSortedLength[e][selectedFilter].split(","); //e.g. hungry
             for (var f=0; f<entryFilterArray.length; f++){
                 var entryFilter=entryFilterArray[f].replace(/-/g, '').trim(); //trim filter item and remove dashes
-                if (selectedFilter!=="keyword"){entryFilter=entryFilter.toLowerCase();}//change all filter items to lower case except for mangarrayi keywords
+                 //change filter item to lower case, unless the filter word is all caps
+                entryFilter = (entryFilter === entryFilter?.toUpperCase()) ? entryFilter : entryFilter=entryFilter?.toLowerCase();
+                //if (selectedFilter!=="keyword"){entryFilter=entryFilter.toLowerCase();}
                 if (entryFilter===filterArray[d]){isMatch=true;}
                 // if (filterArray[d]==="talking about your body state."){  if(chunkbankSortedLength[e].english==="I'm hungry"){//console.log("filterArray[d] "+filterArray[d]+" entryFilter: "+entryFilter+" isMatch "+isMatch);}}
             }

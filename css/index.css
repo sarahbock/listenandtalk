@@ -284,6 +284,8 @@ hr{ display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:0
 #dictionaryentry .entryGlossing .entryMangarrayiText{color: #000;}
 #dictionaryentry .entryProgress{display:inline; background-size: 0 10px; background-repeat: no-repeat; background-image: url("../images/progress_bg.png");}
 #dictionaryentry .entryExplanationText{ padding: 1em 5vw; color: #000; }
+#dictionaryentry .entrySpeakerText{     padding: 0 10px 10px 10px; margin-top: -15px; color: #000; text-align: center; font-size: 80%;}
+
 #dictionaryentry .entryEnglish{float:none;     font-weight: 900; width: 100%; padding: 0; display: flex;  align-items: center;}
 #dictionaryentry .entryEnglishText{    padding: 1em 5vw;     font-size: 1.5em;}
 
