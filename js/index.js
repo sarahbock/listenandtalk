@@ -160,6 +160,35 @@ function getDictionary(){
     $.getJSON(getURL, function(data) {if (data!==0) {chunkbank=data; }})
     .done(function() {
     //console.log("Dictionary: "+JSON.stringify(chunkbank));
+    /*chunkbank.forEach( entry => {
+        if (entry.keywordtranslation?.indexOf(',SOURCE')!==-1 ||
+            entry.keywordtranslation?.indexOf('+')!==-1
+            entry.keywordtranslation?.indexOf('%2B')!==-1 || 
+            entry.keywordtranslation?.indexOf(' PRESENT')!==-1 ||
+            entry.keywordtranslation?.indexOf(' PAST')!==-1 ||
+            entry.keywordtranslation?.indexOf(' SOURCE')!==-1 ||
+            entry.keywordtranslation?.indexOf(' IMPERATIVE')!==-1 ||
+            entry.keywordtranslation?.indexOf(' NEG')!==-1 ||
+            entry.keywordtranslation?.indexOf(' SELF')!==-1 ||
+            entry.keywordtranslation?.indexOf(' GOAL')!==-1 ||
+            entry.keywordtranslation?.indexOf(' FUTURE')!==-1 ||
+            entry.keywordtranslation?.indexOf(' LOCATION')!==-1
+            ) {
+            //why,+you (just one),foot,sore,
+            //replace + with *
+            var newString = entry.keywordtranslation.replaceAll(',SOURCE',',*SOURCE');
+            var query = apiPath+"set-data.php?id="+entry.id+"&field=keywordtranslation&table=dharug&value="+newString;
+            $.get(query, function() {})
+            .done(function(){ console.log(entry.id,entry.keywordtranslation,newString); });
+        }
+        if (entry.keyword?.indexOf("*lyi.*buni")!==-1) {
+            //replace + with *
+            var newString1 = entry.keyword.replaceAll("*lyi.*buni","*lyi,*buni");
+            var query1 = apiPath+"set-data.php?id="+entry.id+"&field=keyword&table=dharug&value="+newString1;
+            $.get(query1, function() {})
+            .done(function(){ console.log(entry.id,entry.keyword,newString1); });
+        }
+    })*/
     initialiseDictionary();
     })
     .fail(function() {console.log("Updated dictionary data could not be retrieved."); initialiseDictionary();});
