@@ -379,7 +379,15 @@ h2.coventryHeader{}
 
 .activityAnswer.correct{    background-color: #007d00; color: #FFF;}
 .activityAnswer.incorrect{    background-color: #FF4B00; color: #FFF;}
-.activityAnswerText{text-align: left;    padding: 1em;}
+.activityAnswerText{
+    text-align: left;
+    display: flex;
+    flex-direction: row;
+    padding: 1em;
+    column-gap: 5px;
+    align-items: center;
+    justify-content: flex-start;
+}
 .activityAnswerText img, .activityEntryQuestionText img{  display: inline; vertical-align: middle; max-width: 20%;     margin-right: .5em;}
 .activityAnswerHorizontalHolder .activityAnswerText{text-align: center;}
 
