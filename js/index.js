@@ -190,8 +190,10 @@ function initialiseDictionary(){
         }//preload audio for testing
     if (chunkbank[a][translationCol]===null){chunkbank[a][translationCol]="";}
         if (chunkbank[a][languageCol]===null){chunkbank[a][languageCol]="";}
-    //capitalise first letter of English
-    if (chunkbank[a][translationCol]!==""){ chunkbank[a][translationCol]= chunkbank[a][translationCol].substr(0,1).toUpperCase()+chunkbank[a][translationCol].substr(1); }
+    //automatically capitalise first letter of English, unless it's for Dharug
+    if (chunkbank[a][translationCol]!=="" && language!=="dharug"){ 
+        chunkbank[a][translationCol]= chunkbank[a][translationCol].substr(0,1).toUpperCase()+chunkbank[a][translationCol].substr(1); 
+    }
     //set glossing
         //var watch="33";
         chunkbank[a].glossing=setGlossing(chunkbank[a][languageCol]);
@@ -1968,13 +1970,19 @@ function loadFilterEntries(){
             } 
         }
     }
-    //now sort filter item list into alphabetical order
-    allFilterArray.sort();
+    //now sort filter item list into alphabetical order, ignoring any * sign at the start
+    allFilterArray.sort(function (a, b) {
+        function getRaw(s) {
+            return s.replace('*','').trim();
+        }
+        return getRaw(a).localeCompare(getRaw(b));
+    });
+    var filterArray = allFilterArray;
     //separate suffix keywords into separate array
-    var suffixFilters = allFilterArray?.filter( el => (el.charAt(0) === '+' || el.charAt(0) === '*' ));
-    var nonSuffixFilters = allFilterArray?.filter( el => (el.charAt(0) !== '+' && el.charAt(0) !== '*'));
+    //var suffixFilters = allFilterArray?.filter( el => (el.charAt(0) === '+' || el.charAt(0) === '*' ));
+    //var nonSuffixFilters = allFilterArray?.filter( el => (el.charAt(0) !== '+' && el.charAt(0) !== '*'));
     //display normal keywords first, then display suffix keywords
-    var filterArray = nonSuffixFilters.concat(suffixFilters);
+    //var filterArray = nonSuffixFilters.concat(suffixFilters);
     //console.log('newFilterArray',filterArray)
     //console.log('suffixFilters',suffixFilters)
     //console.log('nonSuffixFilters',nonSuffixFilters)
