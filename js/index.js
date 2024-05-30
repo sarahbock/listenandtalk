@@ -352,8 +352,9 @@ function setEntry(x){
     if($("#entryOption5 img").hasClass("colourOn")){
         $(".conventry").css("display","none"); $("#entryOption5 img").removeClass("colourOn").addClass("colourOff");
     }
-    //hide microphone entry
-    $("#entry .mikeentry").css("display","none"); $("#entryOption6 img").removeClass("colourOn").addClass("colourOff");
+    //hide microphone entry and notes
+    $("#entry .mikeentry, #infoentry").css("display","none"); 
+    $("#entryOption6 img").removeClass("colourOn").addClass("colourOff");
 
     //get right id from dictionary
     var n=0; for (var a=0; a<chunkbank.length; a++){if(chunkbank[a].id === x.toString()){n = a; selectedN=n;}}
