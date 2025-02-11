@@ -6,7 +6,7 @@ var language="mangarrayi"; if(getQueryVariable("lang")){language=getQueryVariabl
 var secondaryColor="#FF4C00"; if (language==="umpila") {secondaryColor="#198083"} //colour of buttons
 var recordLog = false; if (language==="umpila" || language==="mangarrayi") {recordLog = true;}
 var tokenEnabled=false; if (language==="umpila" || language==="mangarrayi") {tokenEnabled = true;}
-var languageFirst = false; if (language==="umpila" || language ==="guugu_yimithirr" || language ==="wik_mungkan"  || language ==="mpakwithi" || language ==="flinders" || language ==="dharug"){ languageFirst = true;}
+var languageFirst = false; if (language==="umpila" || language ==="guugu_yimithirr" || language ==="wik_mungkan"  || language ==="mpakwithi" || language ==="flinders" || language ==="dharug"|| language ==="injinoo"){ languageFirst = true;}
 //var language="hungarian";
 var translation="english"; if(getQueryVariable("translation")){translation=getQueryVariable("translation");}
 var versionNo="1.0.0";
@@ -156,9 +156,10 @@ function getDictionary(){
     "use strict";
 
     //$.getJSON(apiPath+"get-topics.php", function(data) {if (data!==0) {topics=data; setupTopics();}});
-    
-    var getURL=apiPath+"get-language.php?table="+language;
-    //console.log(getURL);
+    //time stamp to force cache refresh
+    var timeStamp = new Date().getTime();
+    var getURL=apiPath+"get-language.php?table="+language+'&v='+timeStamp;
+    console.log(getURL);
     $.getJSON(getURL, function(data) {if (data!==0) {chunkbank=data; }})
     .done(function() {
     //console.log("Dictionary: "+JSON.stringify(chunkbank));
@@ -215,7 +216,7 @@ function initialiseDictionary(){
         chunkbankSorted = [...chunkbank].sort((a,b) => (a[translationCol] > b[translationCol]) ? 1 : ((b[translationCol] > a[translationCol]) ? -1 : 0));//sort in A-Z order of english
     }
     var keyArray = chunkbankSorted.map(function(item) { return {'display':item.displayorder,'english':item[translationCol]}; });
-    console.log(keyArray)
+    //console.log(keyArray)
     chunkbankSortedLength=[...chunkbank].sort((a,b) => (a[translationCol].length > b[translationCol].length) ? 1 : ((b[translationCol].length > a[translationCol].length) ? -1 : 0));//sort by length of english
     getData();
     $(".preloadContainer").html(preloadHTML);
