@@ -2,11 +2,11 @@
 
 //GENERAL
 
-var language="mangarrayi"; if(getQueryVariable("lang")){language=getQueryVariable("lang");}
+var language="dharug"; if(getQueryVariable("lang")){language=getQueryVariable("lang");}
 var secondaryColor="#FF4C00"; if (language==="umpila") {secondaryColor="#198083"} //colour of buttons
 var recordLog = false; if (language==="umpila" || language==="mangarrayi") {recordLog = true;}
 var tokenEnabled=false; if (language==="umpila" || language==="mangarrayi") {tokenEnabled = true;}
-var languageFirst = false; if (language==="umpila" || language ==="guugu_yimithirr" || language ==="wik_mungkan"  || language ==="mpakwithi" || language ==="flinders" || language ==="dharug"){ languageFirst = true;}
+var languageFirst = false; if (language==="umpila" || language ==="guugu_yimithirr" || language ==="wik_mungkan"  || language ==="mpakwithi" || language ==="flinders" || language ==="dharug"|| language ==="injinoo"){ languageFirst = true;}
 //var language="hungarian";
 var translation="english"; if(getQueryVariable("translation")){translation=getQueryVariable("translation");}
 var versionNo="1.0.0";
@@ -51,7 +51,9 @@ var audioError=0;
 var playbackspeed=1;
 //get local images if offline
 var imagepath= (window.navigator.onLine) ? web_dir+language+"/img/" : "img/";
-var speakers=[]; var topics=[]; var conversations=[]; var favourites=[]; var chunkbank=[]; var chunkbankSorted=[]; var chunkbankSortedLength=[]; var chunkbankFlags=[]; var entryConversation=[];
+var speakers=[]; var topics=[]; var conversations=[]; var favourites=[]; var chunkbank=[]; var chunkbankSorted=[]; var chunkbankAlphabetical=[]; var chunkbankSortedLength=[]; var chunkbankFlags=[]; var entryConversation=[];
+var topicsToHide = (language === 'dharug') ? ['27','28','37','38','39','42','43','44','45','46','47','48','49','50'] : [];
+//any entries with these as topics will be hidden from the filtered and full list
 var initialActivityWordLength=20;//maximum length of words for intial set up of Have a go activity
 var maxMemoryWordLength=200;//maximum length of words memory activity
 var tokenRequest=""; //link and text to point people to right place to get token
@@ -154,41 +156,13 @@ function getDictionary(){
     "use strict";
 
     //$.getJSON(apiPath+"get-topics.php", function(data) {if (data!==0) {topics=data; setupTopics();}});
-    
-    var getURL=apiPath+"get-language.php?table="+language;
+    //time stamp to force cache refresh
+    var timeStamp = new Date().getTime();
+    var getURL=apiPath+"get-language.php?table="+language+'&v='+timeStamp;
     //console.log(getURL);
     $.getJSON(getURL, function(data) {if (data!==0) {chunkbank=data; }})
     .done(function() {
     //console.log("Dictionary: "+JSON.stringify(chunkbank));
-    /*chunkbank.forEach( entry => {
-        if (entry.keywordtranslation?.indexOf(',SOURCE')!==-1 ||
-            entry.keywordtranslation?.indexOf('+')!==-1
-            entry.keywordtranslation?.indexOf('%2B')!==-1 || 
-            entry.keywordtranslation?.indexOf(' PRESENT')!==-1 ||
-            entry.keywordtranslation?.indexOf(' PAST')!==-1 ||
-            entry.keywordtranslation?.indexOf(' SOURCE')!==-1 ||
-            entry.keywordtranslation?.indexOf(' IMPERATIVE')!==-1 ||
-            entry.keywordtranslation?.indexOf(' NEG')!==-1 ||
-            entry.keywordtranslation?.indexOf(' SELF')!==-1 ||
-            entry.keywordtranslation?.indexOf(' GOAL')!==-1 ||
-            entry.keywordtranslation?.indexOf(' FUTURE')!==-1 ||
-            entry.keywordtranslation?.indexOf(' LOCATION')!==-1
-            ) {
-            //why,+you (just one),foot,sore,
-            //replace + with *
-            var newString = entry.keywordtranslation.replaceAll(',SOURCE',',*SOURCE');
-            var query = apiPath+"set-data.php?id="+entry.id+"&field=keywordtranslation&table=dharug&value="+newString;
-            $.get(query, function() {})
-            .done(function(){ console.log(entry.id,entry.keywordtranslation,newString); });
-        }
-        if (entry.keyword?.indexOf("*lyi.*buni")!==-1) {
-            //replace + with *
-            var newString1 = entry.keyword.replaceAll("*lyi.*buni","*lyi,*buni");
-            var query1 = apiPath+"set-data.php?id="+entry.id+"&field=keyword&table=dharug&value="+newString1;
-            $.get(query1, function() {})
-            .done(function(){ console.log(entry.id,entry.keyword,newString1); });
-        }
-    })*/
     initialiseDictionary();
     })
     .fail(function() {console.log("Updated dictionary data could not be retrieved."); initialiseDictionary();});
@@ -219,8 +193,10 @@ function initialiseDictionary(){
         }//preload audio for testing
     if (chunkbank[a][translationCol]===null){chunkbank[a][translationCol]="";}
         if (chunkbank[a][languageCol]===null){chunkbank[a][languageCol]="";}
-    //capitalise first letter of English
-    if (chunkbank[a][translationCol]!==""){ chunkbank[a][translationCol]= chunkbank[a][translationCol].substr(0,1).toUpperCase()+chunkbank[a][translationCol].substr(1); }
+    //automatically capitalise first letter of English, unless it's for Dharug
+    if (chunkbank[a][translationCol]!=="" && language!=="dharug"){ 
+        chunkbank[a][translationCol]= chunkbank[a][translationCol].substr(0,1).toUpperCase()+chunkbank[a][translationCol].substr(1); 
+    }
     //set glossing
         //var watch="33";
         chunkbank[a].glossing=setGlossing(chunkbank[a][languageCol]);
@@ -229,8 +205,18 @@ function initialiseDictionary(){
         chunkbank[a][languageCol]=removeGlossing(chunkbank[a][languageCol]);
         //remove any entries that have null for both languages
         //if (chunkbank[a].english==="" && chunkbank[a].mangarrayi===""){chunkbank=chunkbank.splice(a,1);}
+        if (language==="dharug" || language==="sandpit") {
+            chunkbank[a].displayorder = Number(chunkbank[a].displayorder)
+        }
     }
-    chunkbankSorted = [...chunkbank].sort((a,b) => (a[translationCol] > b[translationCol]) ? 1 : ((b[translationCol] > a[translationCol]) ? -1 : 0));//sort in A-Z order of english
+    chunkbankAlphabetical = [...chunkbank].sort((a,b) => (a[translationCol] > b[translationCol]) ? 1 : ((b[translationCol] > a[translationCol]) ? -1 : 0));//sort in A-Z order of english
+    if (language==="dharug" || language==="sandpit") {
+        chunkbankSorted = [...chunkbank].sort((a,b) => ( a.displayorder - b.displayorder || a[translationCol].localeCompare(b[translationCol])));//sort in display order then in A-Z order of english
+    } else {
+        chunkbankSorted = [...chunkbank].sort((a,b) => (a[translationCol] > b[translationCol]) ? 1 : ((b[translationCol] > a[translationCol]) ? -1 : 0));//sort in A-Z order of english
+    }
+    var keyArray = chunkbankSorted.map(function(item) { return {'display':item.displayorder,'english':item[translationCol]}; });
+    //console.log(keyArray)
     chunkbankSortedLength=[...chunkbank].sort((a,b) => (a[translationCol].length > b[translationCol].length) ? 1 : ((b[translationCol].length > a[translationCol].length) ? -1 : 0));//sort by length of english
     getData();
     $(".preloadContainer").html(preloadHTML);
@@ -333,16 +319,18 @@ function stripHTML(html){//strip HTML tags from string
 
 function getData(){
     //this function is called when dictionary is initialised or when language is changed
-    console.log("============GET DATA ",languageFirst);
-
+    //console.log("============GET DATA ",languageFirst);
+    console.log(chunkbankAlphabetical);
     //create full list
     var listHTML = ""; var startHTML=""; var languageColHTML = ""; var translationColHTML = ""; var endHTML="";
-    for (var a=0; a<chunkbankSorted.length; a++){ //chunkbankSorted is in A-Z order of english text
-        if(chunkbankSorted[a].id!=="0" && chunkbankSorted[a][languageCol]!==""){
+    for (var a=0; a<chunkbankAlphabetical.length; a++){ //chunkbankAlphabetical is in A-Z order of english text
+        //don't show any entries from the hidden topics in the full list
+        if(chunkbankAlphabetical[a].id!=="0" && chunkbankAlphabetical[a][languageCol]!=="" && !topicsToHide.includes(chunkbankAlphabetical[a].topic)){
+            //console.log(chunkbankAlphabetical[a].topic);
             startHTML='<div class="entry">';
-            translationColHTML = '<div class="entryEnglish" onclick="setEntry(\''+chunkbankSorted[a].id+'\'); showPage(\'entry\');">'+ chunkbankSorted[a][translationCol]+'</div>';
-            languageColHTML = '<div class="entryMangarrayi audioButtonDiv active" id="fulllistaudio_'+chunkbankSorted[a].id+'" onclick="toggleAudio(\'fulllistaudio_'+chunkbankSorted[a].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon">'+chunkbankSorted[a][languageCol]+'</div>';
-            endHTML='<div class="entryGo active" onclick="setEntry(\''+chunkbankSorted[a].id+'\');showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"> </div> </div>';
+            translationColHTML = '<div class="entryEnglish" onclick="setEntry(\''+chunkbankAlphabetical[a].id+'\'); showPage(\'entry\');">'+ chunkbankAlphabetical[a][translationCol]+'</div>';
+            languageColHTML = '<div class="entryMangarrayi audioButtonDiv active" id="fulllistaudio_'+chunkbankAlphabetical[a].id+'" onclick="toggleAudio(\'fulllistaudio_'+chunkbankAlphabetical[a].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon">'+chunkbankAlphabetical[a][languageCol]+'</div>';
+            endHTML='<div class="entryGo active" onclick="setEntry(\''+chunkbankAlphabetical[a].id+'\');showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"> </div> </div>';
             //set column 1 to be language column if this display is prefered
             if (languageFirst){
                 listHTML+=startHTML+languageColHTML+translationColHTML+endHTML;
@@ -379,8 +367,9 @@ function setEntry(x){
     if($("#entryOption5 img").hasClass("colourOn")){
         $(".conventry").css("display","none"); $("#entryOption5 img").removeClass("colourOn").addClass("colourOff");
     }
-    //hide microphone entry
-    $("#entry .mikeentry").css("display","none"); $("#entryOption6 img").removeClass("colourOn").addClass("colourOff");
+    //hide microphone entry and notes
+    $("#entry .mikeentry, #infoentry").css("display","none"); 
+    $("#entryOption6 img").removeClass("colourOn").addClass("colourOff");
 
     //get right id from dictionary
     var n=0; for (var a=0; a<chunkbank.length; a++){if(chunkbank[a].id === x.toString()){n = a; selectedN=n;}}
@@ -687,17 +676,18 @@ function searchDictionary(word){
     var results=[]; var resultEnglish=""; var resultMang="";
     var count=0; var limit=1000;//limit number of search results
 
-    var needle = word.replace(/-/g, '').trim().toLowerCase(); //remove dashes
+    var needle = word.replace(/-|,/g, '').trim().toLowerCase(); //remove dashes and commas
     //console.log("============SEARCH: "+needle);
     var length=needle.length;
     var haystack;
 
 
 
-    //search start of mangarray words (to cater for n, ny, nya- etc)
+    //search start of language words (to cater for n, ny, nya- etc)
+    //don't include anything from 'hidden' topics
     for (var f=0; f<chunkbank.length; f++){
-        if (count<limit){
-            haystack=chunkbank[f][languageCol].toLowerCase().replace(/-/g, ''); haystack=haystack.substring(0,length);
+        if (count<limit && !topicsToHide.includes(chunkbank[f].topic)){
+            haystack=chunkbank[f][languageCol].toLowerCase().replace(/-|,/g, ''); haystack=haystack.substring(0,length);
             if (haystack.indexOf(needle)!==-1){
                 //console.log(haystack);
                 if ($.inArray(f,results)===-1){results.push(f);count++;}//push into results if not already in results
@@ -705,10 +695,10 @@ function searchDictionary(word){
         }
     }
 
-    //search anywhere in mangarray words
+    //search anywhere in language words
     for (var k=0; k<chunkbank.length; k++){
-        if (count<limit){
-            haystack=chunkbank[k][languageCol].toLowerCase().replace(/-/g, '');
+        if (count<limit && !topicsToHide.includes(chunkbank[k].topic)){
+            haystack=chunkbank[k][languageCol].toLowerCase().replace(/-|,/g, '');
             if (haystack.indexOf(needle)!==-1){
                 //console.log(haystack);
                 if ($.inArray(k,results)===-1){results.push(k);count++;}//push into results if not already in results
@@ -718,8 +708,8 @@ function searchDictionary(word){
 
     //then search english
     for (var d=0; d<chunkbank.length; d++){
-        if (count<limit){
-            haystack = chunkbank[d][translationCol].toLowerCase().replace(/-/g, ''); //haystack=haystack.substring(0,length);
+        if (count<limit && !topicsToHide.includes(chunkbank[d].topic)){
+            haystack = chunkbank[d][translationCol].toLowerCase().replace(/-|,/g, ''); //haystack=haystack.substring(0,length);
             //if (chunkbank[d].id==="137"){//console.log("Tag: "+haystack+" Needle: "+needle);}
             if (haystack.indexOf(needle)!==-1){
                 if ($.inArray(d,results)===-1){results.push(d);count++;}//push into results if not already in results
@@ -728,12 +718,12 @@ function searchDictionary(word){
     }
 
 
-    //search keyword mangarray
+    //search keyword language
     for (var e=0; e<chunkbank.length; e++){
-        if (count<limit && chunkbank[e].keyword!==null){
+        if (count<limit && chunkbank[e].keyword!==null && !topicsToHide.includes(chunkbank[e].topic)){
             var keywordarray=chunkbank[e].keyword.split(",");
             for (var km=0; km<keywordarray.length; km++){//array of separate keywords for each entry
-                haystack=keywordarray[km].toLowerCase().replace(/-/g, '').trim(); //keyword to lower case and trim
+                haystack=keywordarray[km].toLowerCase().replace(/-|,/g, '').trim(); //keyword to lower case and trim
                 haystack=haystack.substring(0,length);
                 if (needle===haystack){ if ($.inArray(e,results)===-1){ results.push(e); count++; } }
             }
@@ -741,10 +731,10 @@ function searchDictionary(word){
     }
     //search keyword english
     for (var g=0; g<chunkbank.length; g++){
-        if (count<limit && chunkbank[g][keywordTranslationCol]!==null){
+        if (count<limit && chunkbank[g][keywordTranslationCol]!==null && !topicsToHide.includes(chunkbank[g].topic)){
             var keywordengarray=chunkbank[g][keywordTranslationCol].split(",");
             for (var ke=0; ke<keywordengarray.length; ke++){//array of separate keywords for each entry
-                haystack=keywordengarray[ke].toLowerCase().replace(/-/g, '').trim(); //keyword to lower case and trim
+                haystack=keywordengarray[ke].toLowerCase().replace(/-|,/g, '').trim(); //keyword to lower case and trim
                 haystack=haystack.substring(0,length);
                 if (needle===haystack){ if ($.inArray(g,results)===-1){ results.push(g); count++; } }
             }
@@ -752,10 +742,10 @@ function searchDictionary(word){
     }
 //search tags
     for (var t=0; t<chunkbank.length; t++){
-        if (count<limit  && chunkbank[t].tags!==null){
+        if (count<limit  && chunkbank[t].tags!==null && !topicsToHide.includes(chunkbank[t].topic)){
             var tagarray=chunkbank[t].tags.split(",");
             for (var tt=0; tt<tagarray.length; tt++){//array of separate tags for each entry
-                haystack=tagarray[tt].toLowerCase().replace(/-/g, '').trim(); //keyword to lower case and trim
+                haystack=tagarray[tt].toLowerCase().replace(/-|,/g, '').trim(); //keyword to lower case and trim
                 //if (chunkbank[t].id==="2"){//console.log("Tag: "+haystack+" Needle: "+needle);}
                 haystack=haystack.substring(0,length);
                 if (needle===haystack){ if ($.inArray(t,results)===-1){ results.push(t); count++; } }
@@ -768,8 +758,8 @@ function searchDictionary(word){
             var a=parseInt(results[r]);
             //console.log("============SEARCH: "+r+" needle: "+word+" haystack: "+haystack);
             //clean up haystacks
-            var english=chunkbank[a][translationCol]; resultEnglish=english; var englishHaystack=english.toLowerCase().replace(/-/g, '');
-            var mangarray=chunkbank[a][languageCol]; resultMang=mangarray; var mangarrayHaystack=mangarray.toLowerCase().replace(/-/g, '');
+            var english=chunkbank[a][translationCol]; resultEnglish=english; var englishHaystack=english.toLowerCase().replace(/-|,/g, '');
+            var mangarray=chunkbank[a][languageCol]; resultMang=mangarray; var mangarrayHaystack=mangarray.toLowerCase().replace(/-|,/g, '');
 
             //can we find search terms in the mangarray word?
             var yolS=mangarrayHaystack.indexOf(needle);
@@ -1980,30 +1970,39 @@ function loadFilterEntries(){
     $("#filterEntries").val(selectedFilter);
     var allFilterArray=[];
     for (var b=0; b<chunkbank.length; b++){
-        //get all the items for that filter e.g. all the english keywords in the dictionary
-        if (chunkbank[b][selectedFilter]==null){chunkbank[b][selectedFilter]="";}
-        var tempFilterArray = chunkbank[b][selectedFilter].split(",");
-        for (var c=0; c<tempFilterArray.length; c++){
-            var newItem = tempFilterArray[c].replace(/-/g, '').trim();//replace dashes and extra space from filter item
-            //fix spelling mistakes and duplicates
-           if (newItem==="I am"){newItem="I'm";}
-           // if (selectedFilter==="keywordenglish"){newItem=newItem.toLowerCase();}//change english items to lower case so they appear in alphabetical order
-           // if (selectedFilter==="keyword"){newItem=newItem.toLowerCase();}//change mangarrayi  items to lower case
-            //change all filter items to lower case, unless the filter word is all caps
-            newItem = (newItem === newItem?.toUpperCase()) ? newItem : newItem=newItem?.toLowerCase();
-            //push filter items into an array and avoid duplicates
-            if (allFilterArray.indexOf(newItem) === -1 && newItem!==""){
-                allFilterArray.push(newItem);
-            } 
+        //don't include any entries from the topics that are hidden from the filtered list
+        if (!topicsToHide.includes(chunkbank[b].topic)) {
+             //get all the items for that filter e.g. all the english keywords in the dictionary
+            if (chunkbank[b][selectedFilter]==null){chunkbank[b][selectedFilter]="";}
+            var tempFilterArray = chunkbank[b][selectedFilter].split(",");
+            for (var c=0; c<tempFilterArray.length; c++){
+                var newItem = tempFilterArray[c].replace(/-/g, '').trim();//replace dashes and extra space from filter item
+                //fix spelling mistakes and duplicates
+            if (newItem==="I am"){newItem="I'm";}
+            // if (selectedFilter==="keywordenglish"){newItem=newItem.toLowerCase();}//change english items to lower case so they appear in alphabetical order
+            // if (selectedFilter==="keyword"){newItem=newItem.toLowerCase();}//change mangarrayi  items to lower case
+                //change all filter items to lower case, unless the filter word is all caps
+                newItem = (newItem === newItem?.toUpperCase()) ? newItem : newItem=newItem?.toLowerCase();
+                //push filter items into an array and avoid duplicates
+                if (allFilterArray.indexOf(newItem) === -1 && newItem!==""){
+                    allFilterArray.push(newItem);
+                } 
+            }
         }
     }
-    //now sort filter item list into alphabetical order
-    allFilterArray.sort();
+    //now sort filter item list into alphabetical order, ignoring any * sign at the start
+    allFilterArray.sort(function (a, b) {
+        function getRaw(s) {
+            return s.replace('*','').trim();
+        }
+        return getRaw(a).localeCompare(getRaw(b));
+    });
+    var filterArray = allFilterArray;
     //separate suffix keywords into separate array
-    var suffixFilters = allFilterArray?.filter( el => (el.charAt(0) === '+' || el.charAt(0) === '*' ));
-    var nonSuffixFilters = allFilterArray?.filter( el => (el.charAt(0) !== '+' && el.charAt(0) !== '*'));
+    //var suffixFilters = allFilterArray?.filter( el => (el.charAt(0) === '+' || el.charAt(0) === '*' ));
+    //var nonSuffixFilters = allFilterArray?.filter( el => (el.charAt(0) !== '+' && el.charAt(0) !== '*'));
     //display normal keywords first, then display suffix keywords
-    var filterArray = nonSuffixFilters.concat(suffixFilters);
+    //var filterArray = nonSuffixFilters.concat(suffixFilters);
     //console.log('newFilterArray',filterArray)
     //console.log('suffixFilters',suffixFilters)
     //console.log('nonSuffixFilters',nonSuffixFilters)
@@ -2012,10 +2011,15 @@ function loadFilterEntries(){
     for (var d=0; d<filterArray.length; d++){//loop through filter items
         let displayItem=filterArray[d];
         var firstLetterUpper=""; 
-        //transform first letter to uppercase unless it's a language keyword
+        //add CSS class to transform first letter to uppercase unless it's a language keyword
         //if (selectedFilter!=="keyword"){firstLetterUpper=" firstLetterUpper";}
-        //if the filter is speaker names then capitalise every letter
-        if (selectedFilter==="speaker"){displayItem=filterArray[d].toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ');}
+        if (selectedFilter==="speaker"){
+            //if the filter is speaker names then capitalise every letter
+            displayItem=filterArray[d].toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ');
+        } else if (selectedFilter==='keyword' || selectedFilter==='keywordtranslation') {
+            //if the filter is keyword replace first instances of * with + (plus signs are ignored in the input tool)
+            displayItem=filterArray[d].replace('*','+');
+        }
         //Display the filtered item e.g. keyword
         filterListHTML+='<a name="categoryresult_'+d+'_anchor" id="categoryresult_'+d+'_anchor"></a><div class="categoryresult active" id="categoryresult_'+d+'"><div class="entryEnglish entryCol'+firstLetterUpper+'"  onclick="showCategoryResult(\''+d+'\');">'+displayItem+'</div>';
         //add play all to header

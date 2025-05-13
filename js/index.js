@@ -52,7 +52,7 @@ var playbackspeed=1;
 //get local images if offline
 var imagepath= (window.navigator.onLine) ? web_dir+language+"/img/" : "img/";
 var speakers=[]; var topics=[]; var conversations=[]; var favourites=[]; var chunkbank=[]; var chunkbankSorted=[]; var chunkbankAlphabetical=[]; var chunkbankSortedLength=[]; var chunkbankFlags=[]; var entryConversation=[];
-var topicsToHide = (language === 'dharug') ? ['27','28','37','42','43','39','38','44','45','46','47'] : [];
+var topicsToHide = (language === 'dharug') ? ['27','28','37','38','39','42','43','44','45','46','47','48','49','50'] : [];
 //any entries with these as topics will be hidden from the filtered and full list
 var initialActivityWordLength=20;//maximum length of words for intial set up of Have a go activity
 var maxMemoryWordLength=200;//maximum length of words memory activity
@@ -159,7 +159,7 @@ function getDictionary(){
     //time stamp to force cache refresh
     var timeStamp = new Date().getTime();
     var getURL=apiPath+"get-language.php?table="+language+'&v='+timeStamp;
-    console.log(getURL);
+    //console.log(getURL);
     $.getJSON(getURL, function(data) {if (data!==0) {chunkbank=data; }})
     .done(function() {
     //console.log("Dictionary: "+JSON.stringify(chunkbank));
@@ -319,7 +319,8 @@ function stripHTML(html){//strip HTML tags from string
 
 function getData(){
     //this function is called when dictionary is initialised or when language is changed
-    console.log("============GET DATA ",languageFirst);
+    //console.log("============GET DATA ",languageFirst);
+    console.log(chunkbankAlphabetical);
     //create full list
     var listHTML = ""; var startHTML=""; var languageColHTML = ""; var translationColHTML = ""; var endHTML="";
     for (var a=0; a<chunkbankAlphabetical.length; a++){ //chunkbankAlphabetical is in A-Z order of english text
@@ -682,9 +683,10 @@ function searchDictionary(word){
 
 
 
-    //search start of mangarray words (to cater for n, ny, nya- etc)
+    //search start of language words (to cater for n, ny, nya- etc)
+    //don't include anything from 'hidden' topics
     for (var f=0; f<chunkbank.length; f++){
-        if (count<limit){
+        if (count<limit && !topicsToHide.includes(chunkbank[f].topic)){
             haystack=chunkbank[f][languageCol].toLowerCase().replace(/-|,/g, ''); haystack=haystack.substring(0,length);
             if (haystack.indexOf(needle)!==-1){
                 //console.log(haystack);
@@ -693,9 +695,9 @@ function searchDictionary(word){
         }
     }
 
-    //search anywhere in mangarray words
+    //search anywhere in language words
     for (var k=0; k<chunkbank.length; k++){
-        if (count<limit){
+        if (count<limit && !topicsToHide.includes(chunkbank[k].topic)){
             haystack=chunkbank[k][languageCol].toLowerCase().replace(/-|,/g, '');
             if (haystack.indexOf(needle)!==-1){
                 //console.log(haystack);
@@ -706,7 +708,7 @@ function searchDictionary(word){
 
     //then search english
     for (var d=0; d<chunkbank.length; d++){
-        if (count<limit){
+        if (count<limit && !topicsToHide.includes(chunkbank[d].topic)){
             haystack = chunkbank[d][translationCol].toLowerCase().replace(/-|,/g, ''); //haystack=haystack.substring(0,length);
             //if (chunkbank[d].id==="137"){//console.log("Tag: "+haystack+" Needle: "+needle);}
             if (haystack.indexOf(needle)!==-1){
@@ -716,9 +718,9 @@ function searchDictionary(word){
     }
 
 
-    //search keyword mangarray
+    //search keyword language
     for (var e=0; e<chunkbank.length; e++){
-        if (count<limit && chunkbank[e].keyword!==null){
+        if (count<limit && chunkbank[e].keyword!==null && !topicsToHide.includes(chunkbank[e].topic)){
             var keywordarray=chunkbank[e].keyword.split(",");
             for (var km=0; km<keywordarray.length; km++){//array of separate keywords for each entry
                 haystack=keywordarray[km].toLowerCase().replace(/-|,/g, '').trim(); //keyword to lower case and trim
@@ -729,7 +731,7 @@ function searchDictionary(word){
     }
     //search keyword english
     for (var g=0; g<chunkbank.length; g++){
-        if (count<limit && chunkbank[g][keywordTranslationCol]!==null){
+        if (count<limit && chunkbank[g][keywordTranslationCol]!==null && !topicsToHide.includes(chunkbank[g].topic)){
             var keywordengarray=chunkbank[g][keywordTranslationCol].split(",");
             for (var ke=0; ke<keywordengarray.length; ke++){//array of separate keywords for each entry
                 haystack=keywordengarray[ke].toLowerCase().replace(/-|,/g, '').trim(); //keyword to lower case and trim
@@ -740,7 +742,7 @@ function searchDictionary(word){
     }
 //search tags
     for (var t=0; t<chunkbank.length; t++){
-        if (count<limit  && chunkbank[t].tags!==null){
+        if (count<limit  && chunkbank[t].tags!==null && !topicsToHide.includes(chunkbank[t].topic)){
             var tagarray=chunkbank[t].tags.split(",");
             for (var tt=0; tt<tagarray.length; tt++){//array of separate tags for each entry
                 haystack=tagarray[tt].toLowerCase().replace(/-|,/g, '').trim(); //keyword to lower case and trim
