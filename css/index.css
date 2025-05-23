@@ -490,10 +490,10 @@ margin: .5vw;
 .menuHeader{background-color: #131114; background-image: url(../images/icon_close.png);     background-position: 73vw 1vh; background-size: 3vh;     background-repeat: no-repeat; min-height: 5%; }
 .menuHeaderName{ font-family: "Patua One","Helvetica","Arial",Sans-Serif;color:#FFF; font-size: 1.3em; font-weight:500;     padding-top: 1vh; padding-left: 5%; padding-bottom: 1vh;}
 .menuBody{min-height:93%; overflow:auto; overflow-y: scroll;  -webkit-overflow-scrolling: touch; } .menuBody::-webkit-scrollbar { width: 0; }
-.menuBodyItem, .menuBodyItem2{border-bottom:1px solid #D7D7D7; cursor: pointer; padding: 3% 0;  }
-.menuBodyItemLeft{float:left; text-align: center; width:10%;padding-top: 1%;}
+.menuBodyItem{border-bottom:1px solid #D7D7D7; cursor: pointer; padding: 3% 0; display: flex; flex-direction: row; justify-content: flex-start; align-items: center; }
+.menuBodyItemLeft{ text-align: center; width:10%;padding-top: 1%;}
 .menuBodyItemIcon{width: 50%;}
-.menuBodyItemRight {color: #0B0A12; font-size:1.3em; width:80%; padding-right: 5%; float:right;font-weight: 300;}
+.menuBodyItemRight {color: #0B0A12; font-size:1.3em; width:80%; padding-right: 5%; font-weight: 300;}
 
 #terms p{text-align: left;}
 #about h2, #terms h2{margin-top:1em;}
