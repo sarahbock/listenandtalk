@@ -2,9 +2,9 @@
 
 //GENERAL
 
-var language="dharug"; if(getQueryVariable("lang")){language=getQueryVariable("lang");}
+var language="mangarrayi"; if(getQueryVariable("lang")){language=getQueryVariable("lang");}
 var secondaryColor="#FF4C00"; if (language==="umpila") {secondaryColor="#198083"} //colour of buttons
-var recordLog = false; if (language==="umpila" || language==="mangarrayi" || language==="dharug") {recordLog = true;}
+var recordLog = false; if (language==="umpila" || language==="mangarrayi") {recordLog = true;}
 var tokenEnabled=false; if (language==="umpila" || language==="mangarrayi") {tokenEnabled = true;}
 var languageFirst = false; if (language==="umpila" || language ==="guugu_yimithirr" || language ==="wik_mungkan"  || language ==="mpakwithi" || language ==="flinders" || language ==="dharug"|| language ==="injinoo"){ languageFirst = true;}
 //var language="hungarian";
@@ -68,14 +68,6 @@ if (language==="umpila"){
   tokenRequest='<a href="https://forms.gle/qqmGhZWsaAcK1XAB6" target="_blank">Ask Lockhart River Aboriginal Shire Council</a>';
 }
 
-//dharug app
-if (language==="dharug"){
-  appTitleShort="Bayala Dharug";
-  appTitleLong="Bayala Dharug"; 
-  $("#launch .launchlogo").attr("src", "images/logo_bayala.png");
-  projectInfo=`<p class="leftText"><a href="https://bayala.net.au/" target="_blank">Bayala Aboriginal Corporation</a> has designed this app to assist with the important cultural obligation of Dharug language revival. The Bayala Dharug app is shared in spirit with other Dharug community members and their much wider circle of allies. </p><p class="leftText">The development of this Bayala Dharug app has been supported by the Australian Institute for Aboriginal and Torres Strait Islander Studies (AIATSIS), Elearn Australia and Western Sydney University. </p><p class="leftText">Dharug Dhalang 'Dharug language', sometimes spelled Darug and Dharruk, is also known as the Sydney Language. Dharug was spoken across much of the Sydney basin, from the Hawkesbury to the Georges River and from the Blue Mountains to the sea. As Dharug Country was the site of the first English colony intergenerational language transmission of Dharug was disrupted early and severely. Consequently, the Dharug community has been on a journey of language revitalisation. </p><p class="leftText">Language revival is a long road. Bayala Aboriginal Corporation shares in a cultural responsibility for nurturing our shared Dharug language and informing Sydneysiders about the traditional language of Sydney and the protocols for using it. This responsibility is equally important as looking after Country and Community. The Bayala Aboriginal Corporation is championing Dharug language learning and teaching, researching and publishing activities. This care for our language has been inspired by Dharug people who led Dharug language work including Aunty Edna Watson and Richard Green.</p><p class="leftText">The Bayala Dharug app has been developed as an accessible language learning resource which adds to an ever-growing suite of Dharug language revival materials. The Bayala Dharug app is intended for individual and personal use to enable Dharug language learning. The app should be used in contexts such as family language learning, shared language learning between community members, private language learning by students and so forth. The Bayala Dharug app does not replace Dharug language programs for the community, in preschool, school, TAFE or university. Permission must be sought from copyright holders Bayala Aboriginal Corporation for public use of any and all elements contained in the app, including images and sound files (see Terms of Use). </p><p class="leftText">The Bayala Dharug app is a rich and living Dharug language learning resource and a reliable source of Dharug language information. It currently provides over 500 individual entries for Dharug words and sentences, with explanations, recordings and images. This initial language offering will be regularly updated and expanded by the Bayala Aboriginal Corporation to facilitate access to Dharug Dhalang and the language resources it develops ongoingly through its teaching and research activities. </p><p class="leftText">The app shares Dharug language knowledge that has been built up through contemporary Dharug teaching and researching endeavours. The focus on Dharug sentences enables Dharug language learners to move beyond single words and into becoming conversational and using the language more communicatively. Each item in the app provides a model of how Dharug language is said and written, and how Dharug sentences are assembled. The app enables all Dharug language learners to sing from the same language song sheet, respecting the language and fostering communication and mutual comprehension. </p><p class="leftText">Acknowledgements (in alphabetical order):<br>Illustrations: Corina Norman, Jasmine Seymour, Leanne Watson, Rhiannon Wright. </br>Sound recordings: Corina Norman, Debbie Smith, Jasmine Seymour, Lani Barnes, Leanne King, Leanne Watson, Libby Coplin, Rhiannon Wright and Richard Torning.</p>`;
-  versionNo="1.0.0";
-}
 
 
 //PAMA apps
@@ -614,7 +606,7 @@ function toggleInfo(){
         //hide convo if showing
          //if($("#entryOption5 img").hasClass("colourOn")){ $(".conventry").css("display","none");  $("#entryOption5 img").removeClass("colourOn").addClass("colourOff");}
         $("#entryOption4 img").removeClass("colourOff").addClass("colourOn");
-        if (recordLog){console.log(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=4");$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=4", function() { });}
+        if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=4", function() { });}
     } else{
         //hide glossing
         $(".entryGlossing, #infoentry, #creditsentry").css("display", "none"); $(".entryNormal").fadeIn();
@@ -803,11 +795,7 @@ function showSearchResult(id){
 function setupTopics(){
     var str="";
     for (var t=0; t<topics.length; t++){
-        if (language==="dharug" && topics[t].title.includes('Bayala website')){
-            str+=`<div class="topicDivContainer" id="topicContainer'+(t+1)+'" onclick="window.open('https://bayala.net.au/');"><div class="topicDivHolder">`;
-        } else {
-            str+='<div class="topicDivContainer" id="topicContainer'+(t+1)+'" onclick="showSubTopics(\''+(t+1)+'\');"><div class="topicDivHolder">';
-        }
+        str+='<div class="topicDivContainer" id="topicContainer'+(t+1)+'" onclick="showSubTopics(\''+(t+1)+'\');"><div class="topicDivHolder">';
         if (topics[t].image) {
           str+='<img src="'+imagepath+topics[t].image+'?v=2" alt="">';
         } else {
@@ -821,7 +809,6 @@ function setupTopics(){
         var storiesContainerStr = '<div class="storiesContainer"><a href="https://www.jcac.com.au/stories" target="_blank"><img src="images/icon_stories.png" alt="">Mangarrayi stories</a></div>';
       $("#topicsContainer").append(storiesContainerStr);
     }
-    
 }
 
 function showTopics(){
@@ -2199,7 +2186,7 @@ function checkLoadedAudio(){
 }
 
 function playAudio(filename, x) {
-    filename=audiopath+filename;
+    filename=audiopath+filename+'?1';
     //x is selected audio id. only log play if x is not 0
     if (x) { selectedAudio = parseInt(x); }
     //console.log("play audio "+filename);
@@ -2425,8 +2412,6 @@ $(document).ready(function(){
     $("#disclaimerButton").click(function(){
         if (language==="mangarrayi"){
             location.href="https://www.elearnaustralia.com.au/mangarrayi/privacy/";
-        } else if (language==="dharug"){
-            location.href="https://www.elearnaustralia.com.au/dharug/privacy/";
         } else {
             showPage("terms");
         }
@@ -2434,9 +2419,6 @@ $(document).ready(function(){
     $("#feedbackButton").click(function(){
         if (language==="mangarrayi"){
             $("#appFeedbackText").html('Please <a href="https://forms.gle/6hoS5Vrb3oHBPeWU6" target="_blank">contact us</a> if you have feedback or suggestions.');
-            showPage("feedback");
-        } else if (language==="dharug"){
-            $("#appFeedbackText").html('Please <a href="mailto:admin@bayala.net.au">contact us</a> if you have feedback or suggestions.');
             showPage("feedback");
         } else if (language==="umpila"){
             $("#appFeedbackText").html('Please <a href="https://forms.gle/DWuNVfoigvPpauaT6" target="_blank">contact us</a> if you have feedback or suggestions.');
