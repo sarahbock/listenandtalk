@@ -4,8 +4,9 @@
 
 var language="mangarrayi"; if(getQueryVariable("lang")){language=getQueryVariable("lang");}
 var secondaryColor="#FF4C00"; if (language==="umpila") {secondaryColor="#198083"} //colour of buttons
-var recordLog = false; if (language==="umpila" || language==="mangarrayi") {recordLog = true;}
+var recordLog = false; if (language==="umpila" || language==="mangarrayi" || language==="dharug") {recordLog = true;}
 var tokenEnabled=false; if (language==="umpila" || language==="mangarrayi") {tokenEnabled = true;}
+var languageFunctionFilter=true; if (language==="dharug") {languageFunctionFilter = false;}
 var languageFirst = false; if (language==="umpila" || language ==="guugu_yimithirr" || language ==="wik_mungkan"  || language ==="mpakwithi" || language ==="flinders" || language ==="dharug"|| language ==="injinoo"){ languageFirst = true;}
 //var language="hungarian";
 var translation="english"; if(getQueryVariable("translation")){translation=getQueryVariable("translation");}
@@ -13,7 +14,7 @@ var versionNo="1.0.0";
 
 var languageCap = language.toLowerCase().replace(/\b[a-z]/g, function(letter) { return letter.toUpperCase();}); //capitalises first letter of each word in string
 var languageHeader = "Language";
-if (language==="hungarian" ||language==="german" ||language==="ktunaxa" ||language==="chinese" ||language==="mangarrayi"){ languageHeader=languageCap; }
+if (language==="hungarian" ||language==="german" ||language==="ktunaxa" ||language==="chinese" ||language==="mangarrayi" ||language==="dharug"){ languageHeader=languageCap; }
 var translationCap = translation.toLowerCase().replace(/\b[a-z]/g, function(letter) { return letter.toUpperCase();}); //capitalises first letter of each word in string
 
 
@@ -21,6 +22,7 @@ var startscreen="launch"; //var startscreen="launch"; //for testing web version
 var startpage="dashboard"; //which page to go to after launch?
 var web=true;
 
+var cacheBuster = Math.random();
 var web_dir="https://elearnaustralia.com.au/opal/";
 var apiPath=web_dir+"readandwrite/";
 var languageCol="language";
@@ -52,11 +54,22 @@ var playbackspeed=1;
 //get local images if offline
 var imagepath= (window.navigator.onLine) ? web_dir+language+"/img/" : "img/";
 var speakers=[]; var topics=[]; var conversations=[]; var favourites=[]; var chunkbank=[]; var chunkbankSorted=[]; var chunkbankAlphabetical=[]; var chunkbankSortedLength=[]; var chunkbankFlags=[]; var entryConversation=[];
-var topicsToHide = (language === 'dharug') ? ['27','28','37','38','39','42','43','44','45','46','47','48','49','50'] : [];
+var topicsToHide = 
+(language === 'dharug') ? ['27','28','38','50','37','42','48','39','43','49','47','52','53','54','55'] : 
+[];
 //any entries with these as topics will be hidden from the filtered and full list
 var initialActivityWordLength=20;//maximum length of words for intial set up of Have a go activity
 var maxMemoryWordLength=200;//maximum length of words memory activity
 var tokenRequest=""; //link and text to point people to right place to get token
+
+//dharug app
+if (language==="dharug"){
+  appTitleShort="Bayala Dharug";
+  appTitleLong="Bayala Dharug"; 
+  $("#launch .launchlogo").attr("src", "images/logo_bayala.png");
+  projectInfo=`<p class="leftText"><a href="https://bayala.net.au/" target="_blank">Bayala Aboriginal Corporation</a> has designed this app to assist with the important cultural obligation of Dharug language revival. The Bayala Dharug app is shared in spirit with other Dharug community members and their much wider circle of allies. </p><p class="leftText">The development of this Bayala Dharug app has been supported by the Australian Institute for Aboriginal and Torres Strait Islander Studies (AIATSIS), ElearnAustralia and Western Sydney University. </p><p class="leftText">Dharug Dhalang 'Dharug language', sometimes spelled Darug and Dharruk, is also known as the Sydney Language. Dharug was spoken across much of the Sydney basin, from the Hawkesbury to the Georges River and from the Blue Mountains to the sea. As Dharug Country was the site of the first English colony intergenerational language transmission of Dharug was disrupted early and severely. Consequently, the Dharug community has been on a journey of language revitalisation. </p><p class="leftText">Language revival is a long road. Bayala Aboriginal Corporation shares in a cultural responsibility for nurturing our shared Dharug language and informing Sydneysiders about the traditional language of Sydney and the protocols for using it. This responsibility is equally important as looking after Country and Community. The Bayala Aboriginal Corporation is championing Dharug language learning and teaching, researching and publishing activities. This care for our language has been inspired by Dharug people who led Dharug language work including Aunty Edna Watson and Richard Green.</p><p class="leftText">The Bayala Dharug app has been developed as an accessible language learning resource which adds to an ever-growing suite of Dharug language revival materials. The Bayala Dharug app is intended for individual and personal use to enable Dharug language learning. The app should be used in contexts such as family language learning, shared language learning between community members, private language learning by students and so forth. The Bayala Dharug app does not replace Dharug language programs for the community, in preschool, school, TAFE or university. Permission must be sought from copyright holders Bayala Aboriginal Corporation for public use of any and all elements contained in the app, including images and sound files (see Terms of Use). </p><p class="leftText">The Bayala Dharug app is a rich and living Dharug language learning resource and a reliable source of Dharug language information. It currently provides over 500 individual entries for Dharug words and sentences, with explanations, recordings and images. This initial language offering will be regularly updated and expanded by the Bayala Aboriginal Corporation to facilitate access to Dharug Dhalang and the language resources it develops ongoingly through its teaching and research activities.</p><p class="leftText">The app shares Dharug language knowledge that has been built up through contemporary Dharug teaching and researching endeavours. The focus on Dharug sentences enables Dharug language learners to move beyond single words and into becoming conversational and using the language more communicatively. Each item in the app provides a model of how Dharug language is said and written, and how Dharug sentences are assembled. The app enables all Dharug language learners to sing from the same language song sheet, respecting the language and fostering communication and mutual comprehension. </p><p class="leftText">Acknowledgements (in alphabetical order):<br>Illustrations: Corina Norman, Jasmine Seymour, Leanne Watson, Rhiannon Wright. <br>Sound recordings: Corina Norman, Debbie Smith, Jasmine Seymour, Lani Barnes, Leanne King, Leanne Watson, Libby Coplin, Rhiannon Wright and Richard Torning. </p>`;
+  versionNo="1.0.0";
+}
 
 //umpila app
 if (language==="umpila"){
@@ -66,6 +79,8 @@ if (language==="umpila"){
   projectInfo='<p class="leftText">Are you interested in learning Umpila / Kuuku Ya’u? This app is to help community members learn some phrases in your own language.</p><p class="leftText">We acknowledge the language speakers whose voices appear in this app: <strong>Maria Butcher, Lorraine Clarmont, Elizabeth Giblet, Lucy Hobson, Minnie Pascoe, Josiah Omeenyo, Lawrence Omeenyo, Dorothy Short</strong>.</p><p class="leftText">Illustrators: <strong>Phyllis Hobson and Krystal Dean</strong>.</p><a href="http://www.jcac.com.au/" target="_blank"><img src="images/logo_lcasc.png" alt="Lockhart River Aboriginal Shire Council logo" class="aboutLogo"></a><p class="leftText">Funding from: Australian Research Council Centre of Excellence for the Dynamics of Language, and Indigenous Languages and the Arts, Department of Infrastructure, Transport, regional Development, Communications and the Arts.</p><p class="leftText">In kind support from: The MARCS Institute for Brain, Behaviour and Development, Western Sydney University and School of Humanities and Languages, UNSW.</p><a href="https://www.dynamicsoflanguage.edu.au/" target="_blank"><img src="images/logo_arc.png" alt="Australian Research Council Centre of Excellence for the Dynamics of Language logo" class="aboutLogo rectLogo"></a><a href="https://www.arts.gov.au/funding-and-support/indigenous-languages-and-arts-program" target="_blank"><img src="images/logo_ausgov.png" alt="Indigenous Languages and the Arts, Department of Infrastructure, Transport, regional Development, Communications and the Arts logo" class="aboutLogo rectLogo"></a><a href="https://www.westernsydney.edu.au/" target="_blank"><img src="images/logo_wsu.png" alt="Western Sydney University logo" class="aboutLogo rectLogo"></a><a href="https://www.unsw.edu.au/arts-design-architecture/our-schools/humanities-languages" target="_blank"><img src="images/logo_unsw.png" alt="UNSW Sydney logo" class="aboutLogo rectLogo"></a><a href="https://www.elearnaustralia.com.au" target="_blank"><img src="images/logo_ela.png" alt="Elearn Australia" class="aboutLogo rectLogo"></a><p>&nbsp;</p>';
   versionNo="1.0.2";
   tokenRequest='<a href="https://forms.gle/qqmGhZWsaAcK1XAB6" target="_blank">Ask Lockhart River Aboriginal Shire Council</a>';
+  speakers=[{"id":"1","name":"Elizabeth Giblet"},{"id":"2","name":"Dorothy Short"},{"id":"3","name":"Maria Butcher"},{"id":"4","name":"Lucy Hobson"},{"id":"5","name":"Lorraine Clarmont"},{"id":"6","name":"Minnie Pascoe"},{"id":"7","name":"Josiah Omeenyo"},{"id":"8","name":"Susan Pascoe"}];
+
 }
 
 
@@ -101,6 +116,7 @@ if (language==="mangarrayi"){
     projectInfo='<p class="leftText">Are you interested in learning Mangarrayi? This app is to help community members learn some phrases in your own language.</p><p class="leftText">We acknowledge the Mangarrayi speakers whose voices appear in this app: <strong>Sheila Yanybarrak Conway, Jesse Garalnganyjak Roberts, Amy Dirn.gayg.</strong></p><p class="leftText">This app has been co-designed by the Jilkminggan Community with Western Sydney University and Elearn Australia.</p><a href="http://www.jcac.com.au/" target="_blank"><img src="images/logo_jcac.png" alt="Jilkminggan Community Aboriginal Corporation logo" class="aboutLogo"></a><p class="leftText">Funding from: Australian Research Council Centre of Excellence for the Dynamics of Language</p><a href="https://www.westernsydney.edu.au/" target="_blank"><img src="images/logo_wsu.png" alt="Western Sydney University logo" class="aboutLogo rectLogo"></a><a href="https://www.dynamicsoflanguage.edu.au/" target="_blank"><img src="images/logo_arc.png" alt="ARC Centre of Excellence for the Dynamics of Language" class="aboutLogo rectLogo"></a><a href="https://www.elearnaustralia.com.au" target="_blank"><img src="images/logo_ela.png" alt="Elearn Australia" class="aboutLogo rectLogo"></a><p>&nbsp;</p>';
     maxMemoryWordLength=50;
     tokenRequest='<a href="https://forms.gle/Mp36U4kGuf3MEv7P7" target="_blank">Ask JCAC</a>';
+    speakers=[{"title":"Sheila Conway","id":"2"},{"title":"Phyllis Conway","id":"8"},{"title":"Amy Dirn.gayg","id":"1"},{"title":"Jennifer Doctor","id":"6"},{"title":"Gina Farrar","id":"7"},{"title":"Josie Lardy","id":"3"},{"title":"Jessie Roberts","id":"4"},{"title":"Syrita Conway","id":"5"}];
 }
 
 //show token / warning system
@@ -129,6 +145,7 @@ function showPage(page){
     }
   if(page==="entry"){//language entry screen
     //write to log
+    //console.log(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=6");
     if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=6", function() { });}
     //show back button
     $(".menuButton img").attr("src","images/icon_left.png");
@@ -192,22 +209,25 @@ function initialiseDictionary(){
             //preloadHTML+="<audio preload=\"auto\" id=\"preloadAudio"+a+"\"><source src=\"mp3/"+chunkbank[a].soundfilename+"\" id=\"mp3Source\" type=\"audio/mpeg\"></audio>";
         }//preload audio for testing
     if (chunkbank[a][translationCol]===null){chunkbank[a][translationCol]="";}
-        if (chunkbank[a][languageCol]===null){chunkbank[a][languageCol]="";}
+    if (chunkbank[a][languageCol]===null){chunkbank[a][languageCol]="";}
+    //replace * with + in dharug (+ is ignored in PHP input tool)
+    if (language==='dharug') {
+        chunkbank[a][translationCol]=chunkbank[a][translationCol].replace('*','+');
+        chunkbank[a][languageCol]=chunkbank[a][languageCol].replace('*','+');
+    }
     //automatically capitalise first letter of English, unless it's for Dharug
     if (chunkbank[a][translationCol]!=="" && language!=="dharug"){ 
         chunkbank[a][translationCol]= chunkbank[a][translationCol].substr(0,1).toUpperCase()+chunkbank[a][translationCol].substr(1); 
     }
     //set glossing
-        //var watch="33";
-        chunkbank[a].glossing=setGlossing(chunkbank[a][languageCol]);
-        chunkbank[a].explanation=setGlossing(chunkbank[a].explanation);
-        //if(chunkbank[a].id===watch){//console.log("with glossing "+chunkbank[a].glossing);}
-        chunkbank[a][languageCol]=removeGlossing(chunkbank[a][languageCol]);
-        //remove any entries that have null for both languages
-        //if (chunkbank[a].english==="" && chunkbank[a].mangarrayi===""){chunkbank=chunkbank.splice(a,1);}
-        if (language==="dharug" || language==="sandpit") {
-            chunkbank[a].displayorder = Number(chunkbank[a].displayorder)
-        }
+    chunkbank[a].glossing=setGlossing(chunkbank[a][languageCol]);
+    chunkbank[a].explanation=setGlossing(chunkbank[a].explanation);
+    chunkbank[a][languageCol]=removeGlossing(chunkbank[a][languageCol]);
+    //remove any entries that have null for both languages
+    //if (chunkbank[a].english==="" && chunkbank[a].mangarrayi===""){chunkbank=chunkbank.splice(a,1);}
+    if (language==="dharug" || language==="sandpit") {
+        chunkbank[a].displayorder = Number(chunkbank[a].displayorder)
+    }
     }
     chunkbankAlphabetical = [...chunkbank].sort((a,b) => (a[translationCol] > b[translationCol]) ? 1 : ((b[translationCol] > a[translationCol]) ? -1 : 0));//sort in A-Z order of english
     if (language==="dharug" || language==="sandpit") {
@@ -216,7 +236,6 @@ function initialiseDictionary(){
         chunkbankSorted = [...chunkbank].sort((a,b) => (a[translationCol] > b[translationCol]) ? 1 : ((b[translationCol] > a[translationCol]) ? -1 : 0));//sort in A-Z order of english
     }
     var keyArray = chunkbankSorted.map(function(item) { return {'display':item.displayorder,'english':item[translationCol]}; });
-    //console.log(keyArray)
     chunkbankSortedLength=[...chunkbank].sort((a,b) => (a[translationCol].length > b[translationCol].length) ? 1 : ((b[translationCol].length > a[translationCol].length) ? -1 : 0));//sort by length of english
     getData();
     $(".preloadContainer").html(preloadHTML);
@@ -320,16 +339,23 @@ function stripHTML(html){//strip HTML tags from string
 function getData(){
     //this function is called when dictionary is initialised or when language is changed
     //console.log("============GET DATA ",languageFirst);
-    console.log(chunkbankAlphabetical);
+    //console.log(chunkbankAlphabetical);
     //create full list
-    var listHTML = ""; var startHTML=""; var languageColHTML = ""; var translationColHTML = ""; var endHTML="";
+    var listHTML = ""; var startHTML=""; let languageColHTML = ""; var translationColHTML = ""; var endHTML="";
     for (var a=0; a<chunkbankAlphabetical.length; a++){ //chunkbankAlphabetical is in A-Z order of english text
         //don't show any entries from the hidden topics in the full list
         if(chunkbankAlphabetical[a].id!=="0" && chunkbankAlphabetical[a][languageCol]!=="" && !topicsToHide.includes(chunkbankAlphabetical[a].topic)){
             //console.log(chunkbankAlphabetical[a].topic);
             startHTML='<div class="entry">';
             translationColHTML = '<div class="entryEnglish" onclick="setEntry(\''+chunkbankAlphabetical[a].id+'\'); showPage(\'entry\');">'+ chunkbankAlphabetical[a][translationCol]+'</div>';
-            languageColHTML = '<div class="entryMangarrayi audioButtonDiv active" id="fulllistaudio_'+chunkbankAlphabetical[a].id+'" onclick="toggleAudio(\'fulllistaudio_'+chunkbankAlphabetical[a].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon">'+chunkbankAlphabetical[a][languageCol]+'</div>';
+
+            //hide audio icon if there is no sound file
+            if (chunkbankAlphabetical[a].soundfilename) {
+                 languageColHTML = '<div class="entryMangarrayi audioButtonDiv active" id="fulllistaudio_'+chunkbankAlphabetical[a].id+'" onclick="toggleAudio(\'fulllistaudio_'+chunkbankAlphabetical[a].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon">'+chunkbankAlphabetical[a][languageCol]+'</div>';
+            } else {
+               languageColHTML = '<div class="entryMangarrayi audioButtonDiv active" id="fulllistaudio_'+chunkbankAlphabetical[a].id+'" >&nbsp;</div>';
+            }
+            
             endHTML='<div class="entryGo active" onclick="setEntry(\''+chunkbankAlphabetical[a].id+'\');showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"> </div> </div>';
             //set column 1 to be language column if this display is prefered
             if (languageFirst){
@@ -346,9 +372,9 @@ function getData(){
     filterSelectStr+='<option value="keyword'+translationCol+'">Keywords ('+translationCap+')</option>';
     filterSelectStr+='<option value="keyword">Keywords ('+languageHeader+')</option>';
     filterSelectStr+='<option value="class">Words or phrases</option>';
-    filterSelectStr+='<option value="function">Language function</option>';
+    if (languageFunctionFilter) { filterSelectStr+='<option value="function">Language function</option>';}
     filterSelectStr+='<option value="keywordling">Linguistic keyword</option>';
-    filterSelectStr+='<option value="speaker">Speaker</option>';
+    if (speakers.length>0) { filterSelectStr+='<option value="speaker">Speaker</option>';}
     $("#filterEntries").html(filterSelectStr);
 
     selectedFilter="keyword"+translationCol;
@@ -412,7 +438,7 @@ function setEntry(x){
     entryLangStr+='<img src="images/icon_turtle.png" alt="turtle" title="Slow down audio" class="slowIcon '+slowClass+'">';
     entryLangStr+='</div>';
     entryLangStr+='<div class="entryOption" id="entryOption3" onclick="toggleEntryAudio(\''+chunkbank[n].id+'\');">';
-    entryLangStr+='<img src="images/icon_play.png" alt="play" title="Play/Pause" class="playIcon colourOff">';
+    if (chunkbank[n].soundfilename) entryLangStr+='<img src="images/icon_play.png" alt="play" title="Play/Pause" class="playIcon colourOff">';
     entryLangStr+='</div>';
     entryLangStr+='<div class="entryOption" id="entryOption5" onclick="toggleConversation();">';
     entryLangStr+='<img src="images/icon_chat.png" alt="chat" title="Suggested conversation" class="chatIcon colourOff">';
@@ -686,7 +712,7 @@ function searchDictionary(word){
     //search start of language words (to cater for n, ny, nya- etc)
     //don't include anything from 'hidden' topics
     for (var f=0; f<chunkbank.length; f++){
-        if (count<limit && !topicsToHide.includes(chunkbank[f].topic)){
+        if (count<limit && chunkbank[f][languageCol]!=="" && !topicsToHide.includes(chunkbank[f].topic)){
             haystack=chunkbank[f][languageCol].toLowerCase().replace(/-|,/g, ''); haystack=haystack.substring(0,length);
             if (haystack.indexOf(needle)!==-1){
                 //console.log(haystack);
@@ -697,7 +723,7 @@ function searchDictionary(word){
 
     //search anywhere in language words
     for (var k=0; k<chunkbank.length; k++){
-        if (count<limit && !topicsToHide.includes(chunkbank[k].topic)){
+        if (count<limit && chunkbank[k][languageCol]!=="" && !topicsToHide.includes(chunkbank[k].topic)){
             haystack=chunkbank[k][languageCol].toLowerCase().replace(/-|,/g, '');
             if (haystack.indexOf(needle)!==-1){
                 //console.log(haystack);
@@ -708,7 +734,7 @@ function searchDictionary(word){
 
     //then search english
     for (var d=0; d<chunkbank.length; d++){
-        if (count<limit && !topicsToHide.includes(chunkbank[d].topic)){
+        if (count<limit && chunkbank[d][languageCol]!=="" && !topicsToHide.includes(chunkbank[d].topic)){
             haystack = chunkbank[d][translationCol].toLowerCase().replace(/-|,/g, ''); //haystack=haystack.substring(0,length);
             //if (chunkbank[d].id==="137"){//console.log("Tag: "+haystack+" Needle: "+needle);}
             if (haystack.indexOf(needle)!==-1){
@@ -720,7 +746,7 @@ function searchDictionary(word){
 
     //search keyword language
     for (var e=0; e<chunkbank.length; e++){
-        if (count<limit && chunkbank[e].keyword!==null && !topicsToHide.includes(chunkbank[e].topic)){
+        if (count<limit && chunkbank[e].keyword!==null && chunkbank[e][languageCol]!=="" && !topicsToHide.includes(chunkbank[e].topic)){
             var keywordarray=chunkbank[e].keyword.split(",");
             for (var km=0; km<keywordarray.length; km++){//array of separate keywords for each entry
                 haystack=keywordarray[km].toLowerCase().replace(/-|,/g, '').trim(); //keyword to lower case and trim
@@ -731,7 +757,7 @@ function searchDictionary(word){
     }
     //search keyword english
     for (var g=0; g<chunkbank.length; g++){
-        if (count<limit && chunkbank[g][keywordTranslationCol]!==null && !topicsToHide.includes(chunkbank[g].topic)){
+        if (count<limit && chunkbank[g][keywordTranslationCol]!==null && chunkbank[g][languageCol]!=="" && !topicsToHide.includes(chunkbank[g].topic)){
             var keywordengarray=chunkbank[g][keywordTranslationCol].split(",");
             for (var ke=0; ke<keywordengarray.length; ke++){//array of separate keywords for each entry
                 haystack=keywordengarray[ke].toLowerCase().replace(/-|,/g, '').trim(); //keyword to lower case and trim
@@ -742,7 +768,7 @@ function searchDictionary(word){
     }
 //search tags
     for (var t=0; t<chunkbank.length; t++){
-        if (count<limit  && chunkbank[t].tags!==null && !topicsToHide.includes(chunkbank[t].topic)){
+        if (count<limit  && chunkbank[t].tags!==null && chunkbank[t][languageCol]!=="" && !topicsToHide.includes(chunkbank[t].topic)){
             var tagarray=chunkbank[t].tags.split(",");
             for (var tt=0; tt<tagarray.length; tt++){//array of separate tags for each entry
                 haystack=tagarray[tt].toLowerCase().replace(/-|,/g, '').trim(); //keyword to lower case and trim
@@ -794,10 +820,16 @@ function showSearchResult(id){
 
 function setupTopics(){
     var str="";
+    
     for (var t=0; t<topics.length; t++){
-        str+='<div class="topicDivContainer" id="topicContainer'+(t+1)+'" onclick="showSubTopics(\''+(t+1)+'\');"><div class="topicDivHolder">';
+        if (language === 'dharug' && (t+1)===topics.length ) {
+            //CUSTOM = for dharug the last topic tile links to website
+            str+=`<div class="topicDivContainer" id="topicContainer'+(t+1)+'" onclick="window.open('https://bayala.net.au/');"><div class="topicDivHolder">`;
+        } else {
+            str+='<div class="topicDivContainer" id="topicContainer'+(t+1)+'" onclick="showSubTopics(\''+(t+1)+'\');"><div class="topicDivHolder">';
+        }
         if (topics[t].image) {
-          str+='<img src="'+imagepath+topics[t].image+'?v=2" alt="">';
+          str+='<img src="'+imagepath+topics[t].image+'?v='+cacheBuster+'" alt="">';
         } else {
           var iconImage="icon_topic.png";
           str+='<img src="images/'+iconImage+'" alt="">';
@@ -825,7 +857,7 @@ function showTopics(){
 function showSubTopics(x){
     hideTopicsAndSubtopics();
     selectedTopic=parseInt(x);
-    //console.log("showSubTopics"+x+" selectedTopic: "+selectedTopic+" selectedSubTopic: "+selectedSubTopic);
+    //console.log("showSubTopics"+x+" selectedTopic: "+selectedTopic+" selectedSubTopic: "+selectedSubTopic);  
     var topicTitle = topics[(selectedTopic-1)].title;
     $(".topicHeaderTitle").html(topicTitle);
     if (topics[(selectedTopic-1)].image) {
@@ -836,15 +868,20 @@ function showSubTopics(x){
     var str="";
     for (var t=0; t<topics[(selectedTopic-1)].subtopics.length; t++){
         var subtopicTitle = topics[(selectedTopic-1)].subtopics[t].title ? topics[(selectedTopic-1)].subtopics[t].title : topics[(selectedTopic-1)].subtopics[t].topic;
-        str+='<div class="subtopicDivContainer" id="subtopicContainer'+(t+1)+'"  onclick="showSubTopicsExpanded(\''+(t+1)+'\');"><div class="subtopicDivHolder">';
+        var topicTileString = '';
+        topicTileString+='<div class="subtopicDivContainer" id="subtopicContainer'+(t+1)+'"  onclick="showSubTopicsExpanded(\''+(t+1)+'\');"><div class="subtopicDivHolder">';
         if (topics[(selectedTopic-1)].subtopics[t].image) {
-            
-            str+='<img src="'+imagepath+topics[(selectedTopic-1)].subtopics[t].image+'?v=2" alt="">';
+            topicTileString+='<img src="'+imagepath+topics[(selectedTopic-1)].subtopics[t].image+'?v=2" alt="">';
         } else {
             var iconImage="icon_topic.png";
-            str+='<img src="images/'+iconImage+'" alt="">';
+            topicTileString+='<img src="images/'+iconImage+'" alt="">';
         }
-        str+='<div class="subtopicDiv">'+subtopicTitle+'</div></div></div>';
+        topicTileString+='<div class="subtopicDiv">'+subtopicTitle+'</div></div></div>';
+        //hide any topic tiles that don't have an icon from the dhaurg version
+        if (language==='dharug' && !topics[(selectedTopic-1)].subtopics[t].image) {
+            topicTileString='';
+        }
+        str+=topicTileString;
     }
     $("#subtopicsContainer").slideDown();
     $("#subtopics").html('<div class="topicsFlexContainer">'+str+'</div>').css("display", "block");
@@ -883,7 +920,15 @@ function showSubTopicsExpanded(x){
         }
         if(matchedEntry===true){
             var startHTML = '<div class="entry">';
-            var languageHTML = '<div class="entryMangarrayi audioButtonDiv active" id="subtopicsexpa_'+chunkbankSorted[a].id+'" onclick="toggleAudio(\'subtopicsexpa_'+chunkbankSorted[a].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon" id="">'+chunkbankSorted[a][languageCol]+'</div>';
+            
+            let languageHTML = '';
+            //hide audio icon if there is no sound file
+            if (chunkbankSorted[a].soundfilename) {
+                 languageHTML = '<div class="entryMangarrayi audioButtonDiv active" id="subtopicsexpa_'+chunkbankSorted[a].id+'" onclick="toggleAudio(\'subtopicsexpa_'+chunkbankSorted[a].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon" id="">'+chunkbankSorted[a][languageCol]+'</div>';
+            } else {
+               languageHTML = '<div class="entryMangarrayi audioButtonDiv active" id="subtopicsexpa_'+chunkbankSorted[a].id+'">&nbsp;</div>';
+            }
+            
             var translationHTML = '<div class="entryEnglish" onclick="setEntry(\''+chunkbankSorted[a].id+'\'); showPage(\'entry\');">'+chunkbankSorted[a][translationCol]+'</div>';
             var endHTML = '<div class="entryGo active" onclick="setEntry(\''+chunkbankSorted[a].id+'\');showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"> </div> </div>';
             //set column 1 to be language column if this display is prefered
@@ -1934,7 +1979,15 @@ function loadFavourites(){
     for (var f=0; f<favourites.length; f++){//go through what they have saved
         var n=0; for (var a=0; a<chunkbank.length; a++){if(chunkbank[a].id === favourites[f].toString()){n = a;}} //get the relevant element
         var startHTML = '<div class="starRemove active" onclick="toggleStar(\''+chunkbank[n].id+'\');">X</div><div class="entry">';
-        var languageHTML = '<div class="entryMangarrayi audioButtonDiv active" id="favoriteentry_'+chunkbank[n].id+'" onclick="toggleAudio(\'favoriteentry_'+chunkbank[n].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon" id="">'+chunkbank[n][languageCol]+'</div>';
+
+        //hide audio icon if there is no sound file
+        var languageHTML ='';
+        if (chunkbank[n].soundfilename) {
+            languageHTML = '<div class="entryMangarrayi audioButtonDiv active" id="favoriteentry_'+chunkbank[n].id+'" onclick="toggleAudio(\'favoriteentry_'+chunkbank[n].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon" id="">'+chunkbank[n][languageCol]+'</div>';
+        } else {
+            languageHTML = '<div class="entryMangarrayi audioButtonDiv active" id="favoriteentry_'+chunkbank[n].id+'">&nbsp;</div>';
+        }
+
         var translationHTML = '<div class="entryEnglish" onclick="setEntry(\''+chunkbank[n].id+'\'); showPage(\'entry\');">'+ chunkbank[n][translationCol]+'</div>';
         var endHTML = '<div class="entryGo active" onclick="setEntry(\''+chunkbank[n].id+'\');showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"></div></div>';
         //set column 1 to be language column if this display is prefered
@@ -2186,13 +2239,13 @@ function checkLoadedAudio(){
 }
 
 function playAudio(filename, x) {
-    filename=audiopath+filename+'?1';
+    if (filename==='') return false;
+    filename=audiopath+filename;
     //x is selected audio id. only log play if x is not 0
     if (x) { selectedAudio = parseInt(x); }
-    //console.log("play audio "+filename);
     //filename="mp3/jananggarriba_ganyamurrma.mp3"; //for testing
     var audio = document.getElementById('audioPlayer');
-    audio.setAttribute("src", filename);
+    audio.setAttribute("src", filename+'?'+cacheBuster);
     audio.load();
     if (recordLog && selectedAudio!==0 ){
         //console.log('log audio play',selectedAudio);
@@ -2411,7 +2464,9 @@ $(document).ready(function(){
 
     $("#disclaimerButton").click(function(){
         if (language==="mangarrayi"){
-            location.href="https://www.elearnaustralia.com.au/mangarrayi/privacy/";
+            window.open("https://www.elearnaustralia.com.au/mangarrayi/privacy/");
+        } else if (language==="dharug"){
+            window.open("https://www.elearnaustralia.com.au/dharug/privacy/");
         } else {
             showPage("terms");
         }
@@ -2422,6 +2477,9 @@ $(document).ready(function(){
             showPage("feedback");
         } else if (language==="umpila"){
             $("#appFeedbackText").html('Please <a href="https://forms.gle/DWuNVfoigvPpauaT6" target="_blank">contact us</a> if you have feedback or suggestions.');
+            showPage("feedback");
+        } else if (language==="dharug"){
+            $("#appFeedbackText").html('Please <a href="mailto:admin@bayala.net.au" target="_blank">contact us</a> if you have feedback or suggestions.');
             showPage("feedback");
         }
     }); //link to feedback
@@ -2550,7 +2608,11 @@ $(document).ready(function(){
     audioError=0;
     $("#audioPlayer").on("error", function () {
         var missingaudio=$("#audioPlayer").attr("src").substr(audiopath.length);
-        //console.log("Missing audio "+missingaudio+' online?',window.navigator.onLine);
+        const missingaudioIndex = missingaudio.indexOf('?');
+        const missingAudioFilename = (missingaudioIndex === -1) ? missingaudio : missingaudio.substring(0, missingaudioIndex);
+        //console.log("Missing audio "+missingAudioFilename+' online?',window.navigator.onLine);
+        if (missingAudioFilename === '') return false;
+        
         //try looking for the file online
         if (audioError===0 && window.navigator.onLine){
             var filename=audiopathServer+missingaudio;
@@ -2563,7 +2625,7 @@ $(document).ready(function(){
             if (!window.navigator.onLine) {
                 showAlert("<p>Sorry, that file isn't available offline yet. If your Internet connection is dropping out then try playing it again.</p> ");
             } else {
-                showAlert("<p>Sorry, but there's a problem playing the sound file. Let us know so that we can improve the app. Tell us which entry you are playing and which type of phone you have (e.g. Android 8).</p> ");
+                showAlert("<p>Sorry, but there's a problem playing the sound file. Let us know so that we can improve the app. Tell us which entry you are playing and which type of phone you have.</p> ");
             }
              //$("#audioPlayer").attr("src").substr(audiopathServer.length));
             $(".audioIcon").attr("src","images/audio_on.png");
@@ -2627,6 +2689,7 @@ $(document).ready(function(){
     getDictionary();
     getConversations();
     setupTopics();
+    console.log(speakers)
     //getSpeakers();
 });
 
