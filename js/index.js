@@ -212,8 +212,10 @@ function initialiseDictionary(){
     if (chunkbank[a][languageCol]===null){chunkbank[a][languageCol]="";}
     //replace * with + in dharug (+ is ignored in PHP input tool)
     if (language==='dharug') {
-        chunkbank[a][translationCol]=chunkbank[a][translationCol].replace('*','+');
-        chunkbank[a][languageCol]=chunkbank[a][languageCol].replace('*','+');
+        if (chunkbank[a][translationCol]) chunkbank[a][translationCol]=chunkbank[a][translationCol].replace('*','+');
+        if (chunkbank[a][languageCol]) chunkbank[a][languageCol]=chunkbank[a][languageCol].replace('*','+');
+        if (chunkbank[a].explanation) chunkbank[a].explanation = chunkbank[a].explanation.replace('*','+');
+        if (chunkbank[a].notes) chunkbank[a].notes = chunkbank[a].notes.replace('*','+');
     }
     //automatically capitalise first letter of English, unless it's for Dharug
     if (chunkbank[a][translationCol]!=="" && language!=="dharug"){ 
@@ -2235,7 +2237,7 @@ function checkLoadedAudio(){
     }
     audio.play();
     audioError=0;
-    console.log("============ CHECK LOADED AUDIO page: "+currentpage+" | entry: "+selectedN+" | speaker: "+chunkbank[selectedN].speaker+" | audio loaded "+$("#audioPlayer").attr("src")+" | speed: "+audio.playbackRate);
+    //console.log("============ CHECK LOADED AUDIO page: "+currentpage+" | entry: "+selectedN+" | speaker: "+chunkbank[selectedN].speaker+" | audio loaded "+$("#audioPlayer").attr("src")+" | speed: "+audio.playbackRate);
 }
 
 function playAudio(filename, x) {
@@ -2689,7 +2691,6 @@ $(document).ready(function(){
     getDictionary();
     getConversations();
     setupTopics();
-    console.log(speakers)
     //getSpeakers();
 });
 
