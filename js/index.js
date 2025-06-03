@@ -212,10 +212,10 @@ function initialiseDictionary(){
     if (chunkbank[a][languageCol]===null){chunkbank[a][languageCol]="";}
     //replace * with + in dharug (+ is ignored in PHP input tool)
     if (language==='dharug') {
-        if (chunkbank[a][translationCol]) chunkbank[a][translationCol]=chunkbank[a][translationCol].replace('*','+');
-        if (chunkbank[a][languageCol]) chunkbank[a][languageCol]=chunkbank[a][languageCol].replace('*','+');
-        if (chunkbank[a].explanation) chunkbank[a].explanation = chunkbank[a].explanation.replace('*','+');
-        if (chunkbank[a].notes) chunkbank[a].notes = chunkbank[a].notes.replace('*','+');
+        if (chunkbank[a][translationCol]) chunkbank[a][translationCol]=chunkbank[a][translationCol].replace(/\*/g, '+');
+        if (chunkbank[a][languageCol]) chunkbank[a][languageCol]=chunkbank[a][languageCol].replace(/\*/g, '+');
+        if (chunkbank[a].explanation) chunkbank[a].explanation = chunkbank[a].explanation.replace(/\*/g, '+');
+        if (chunkbank[a].notes) chunkbank[a].notes = chunkbank[a].notes.replace(/\*/g, '+');
     }
     //automatically capitalise first letter of English, unless it's for Dharug
     if (chunkbank[a][translationCol]!=="" && language!=="dharug"){ 
@@ -2026,7 +2026,11 @@ function loadFilterEntries(){
     var allFilterArray=[];
     for (var b=0; b<chunkbank.length; b++){
         //don't include any entries from the topics that are hidden from the filtered list
-        if (!topicsToHide.includes(chunkbank[b].topic)) {
+        const hideFromResults = 
+        topicsToHide.includes(chunkbank[b].topic) ||
+        (chunkbank[b].related &&
+        chunkbank[b].related.split(',').some(item => topicsToHide.includes(item.trim())));
+        if (!hideFromResults) {
              //get all the items for that filter e.g. all the english keywords in the dictionary
             if (chunkbank[b][selectedFilter]==null){chunkbank[b][selectedFilter]="";}
             var tempFilterArray = chunkbank[b][selectedFilter].split(",");
@@ -2048,7 +2052,7 @@ function loadFilterEntries(){
     //now sort filter item list into alphabetical order, ignoring any * sign at the start
     allFilterArray.sort(function (a, b) {
         function getRaw(s) {
-            return s.replace('*','').trim();
+            return s.replace(/\*/g, '+').trim();
         }
         return getRaw(a).localeCompare(getRaw(b));
     });
@@ -2073,7 +2077,7 @@ function loadFilterEntries(){
             displayItem=filterArray[d].toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ');
         } else if (selectedFilter==='keyword' || selectedFilter==='keywordtranslation') {
             //if the filter is keyword replace first instances of * with + (plus signs are ignored in the input tool)
-            displayItem=filterArray[d].replace('*','+');
+            displayItem=filterArray[d].replace(/\*/g, '+');
         }
         //Display the filtered item e.g. keyword
         filterListHTML+='<a name="categoryresult_'+d+'_anchor" id="categoryresult_'+d+'_anchor"></a><div class="categoryresult active" id="categoryresult_'+d+'"><div class="entryEnglish entryCol'+firstLetterUpper+'"  onclick="showCategoryResult(\''+d+'\');">'+displayItem+'</div>';
@@ -2098,7 +2102,12 @@ function loadFilterEntries(){
                 if (entryFilter===filterArray[d]){isMatch=true;}
                 // if (filterArray[d]==="talking about your body state."){  if(chunkbankSortedLength[e].english==="I'm hungry"){//console.log("filterArray[d] "+filterArray[d]+" entryFilter: "+entryFilter+" isMatch "+isMatch);}}
             }
-            if (isMatch){
+            /*const hideFromResults = 
+            topicsToHide.includes(chunkbankSortedLength[e].topic) ||
+            (chunkbank[b].related &&
+            chunkbank[b].related.split(',').some(item => topicsToHide.includes(item.trim())));*/
+            //if (chunkbank[b].id==='499') console.log(hideFromResults);
+            if (isMatch && !topicsToHide.includes(chunkbankSortedLength[e].topic)){
                 //add entry id to array for this filter item (used in play all functionality)
                 filteredEntriesId.push(chunkbankSortedLength[e].id);
                 var startFilterHTML = '<div class="entry">';
