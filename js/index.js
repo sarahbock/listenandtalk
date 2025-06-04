@@ -145,8 +145,10 @@ function showPage(page){
     }
   if(page==="entry"){//language entry screen
     //write to log
-    //console.log(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=6");
-    if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=6", function() { });}
+    if (recordLog){
+        var timeStamp = new Date().getTime();
+        $.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=6&v="+timeStamp, function() { });
+    }
     //show back button
     $(".menuButton img").attr("src","images/icon_left.png");
     audioOff(); $(".playAllAudioIcon").attr("src","images/icon_play_white.png");
@@ -186,9 +188,9 @@ function getDictionary(){
 }
 
 function getConversations(){
-    "use strict";
-    var getURL=apiPath+"get-conversations.php?table="+language;
-  $.getJSON(getURL, function(data) {if (data!==0) {conversations=data; }})
+    var timeStamp = new Date().getTime();
+    var getURL=apiPath+"get-conversations.php?table="+language+"&v="+timeStamp;
+    $.getJSON(getURL, function(data) {if (data!==0) {conversations=data; }})
     .done(function() {
         //console.log("Conversations: "+JSON.stringify(conversations));
     })
@@ -249,14 +251,18 @@ function initialiseDictionary(){
             var gotoPage="dashboard";
             var tokenName = (language==="mangarrayi") ? "mang-token" : language+"-token";
             //check tokens if enabled
-            if (localStorage.getItem(tokenName)===null){ //see if they have a stored token
+            if (localStorage.getItem(tokenName)===null){ 
+                //see if they have a stored token
                 //need to get token
                 setTimeout(function(){showPage('token');},500);
             } else {
                 //get token from storage
                 token=localStorage.getItem(tokenName);
                 //record interaction
-                if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=0&interaction=12", function() { });}
+                if (recordLog){
+                    var timeStamp = new Date().getTime();
+                    $.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=1&interaction=12&v="+timeStamp, function() { });
+                }
                 //go straight to entry or conversation
                 setTimeout(function(){setEntry(initialEntry); showPage('entry'); if(initialConv==="true"){toggleConversation();}},500);
             }
@@ -527,13 +533,16 @@ function setEntry(x){
 }
 
 
-function toggleHide(x){
+function toggleHide(){
     //console.log("TOGGLE HIDE");
     if($("#hideIcon img").hasClass("colourOff")){
-            //hide phrase from activity
-            showAlert("<p>We won't show this phrase again.</p> ");
-            $("#hideIcon img").removeClass("colourOff").addClass("colourOn");
-      if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=7", function() { });}
+        //hide phrase from activity
+        showAlert("<p>We won't show this phrase again.</p> ");
+        $("#hideIcon img").removeClass("colourOff").addClass("colourOn");
+        if (recordLog){
+            var timeStamp = new Date().getTime();
+            $.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+chunkbank[qI].id+"&interaction=7&v="+timeStamp, function() { });
+        }
     } else{
       //remove hide
       $("#hideIcon img").removeClass("colourOn").addClass("colourOff");
@@ -561,7 +570,10 @@ function toggleStar(x){
         //chunkbank[n].star=1;
         if ($.inArray(x,favourites)===-1){favourites.push(x);}
         $("#entryOption1 img").removeClass("colourOff").addClass("colourOn");
-        if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=2", function() { });}
+        if (recordLog){
+            var timeStamp = new Date().getTime();
+            $.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=2&v="+timeStamp, function() { });
+        }
     } else{
         //remove starred entry
         for (var f=0; f<favourites.length; f++){if (favourites[f]===x){favourites.splice(f, 1); f--;}}
@@ -634,7 +646,10 @@ function toggleInfo(){
         //hide convo if showing
          //if($("#entryOption5 img").hasClass("colourOn")){ $(".conventry").css("display","none");  $("#entryOption5 img").removeClass("colourOn").addClass("colourOff");}
         $("#entryOption4 img").removeClass("colourOff").addClass("colourOn");
-        if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=4", function() { });}
+        if (recordLog){
+            var timeStamp = new Date().getTime();
+            $.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=4&v="+timeStamp, function() { });
+        }
     } else{
         //hide glossing
         $(".entryGlossing, #infoentry, #creditsentry").css("display", "none"); $(".entryNormal").fadeIn();
@@ -650,7 +665,10 @@ function toggleConversation(){
         //hide mike if showing
         if($("#entryOption6 img").hasClass("colourOn")){ $("#entry .mikeentry").css("display","none");  $("#entryOption6 img").removeClass("colourOn").addClass("colourOff");}
         $("#entryOption5 img").removeClass("colourOff").addClass("colourOn");
-       if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=5", function() { });}
+        if (recordLog){
+            var timeStamp = new Date().getTime();
+            $.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=5&v="+timeStamp, function() { });
+        }
     } else{
         //hide conversation
         $(".conventry").css("display","none");
@@ -664,7 +682,6 @@ function checkToken(){
     token=cleanUp($("#token input").val());
     if( token==="test" ){
         showPage("dashboard");
-        if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=0&interaction=11", function() { });}
         return false;
     }
     $.get(apiPath+"check-token.php?table="+language+"&token="+token, function() {})
@@ -674,7 +691,10 @@ function checkToken(){
                 var tokenName = (language==="mangarrayi") ? "mang-token" : language+"-token";
                 localStorage.setItem(tokenName, token);
                 showPage("dashboard");
-                if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=0&interaction=11", function() { });}
+                if (recordLog){
+                    var timeStamp = new Date().getTime();
+                    $.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=1&interaction=11&v="+timeStamp, function() { });
+                }
             } else {
                 alert("Token is not right or has already been used");
                 return false;
@@ -1083,7 +1103,8 @@ function previousLevel(){
 function setUpQuestionSet(){
     //console.log("=======SET UP QUESTION SET");
     //get question set from Storage
-    var qnStorage=language+"-set"; if (localStorage.getItem(qnStorage)!==null){ questionSet=JSON.parse(localStorage.getItem(qnStorage));}
+    var qnStorage=language+"-set"; 
+    if (localStorage.getItem(qnStorage)!==null){ questionSet=JSON.parse(localStorage.getItem(qnStorage));}
     var initialSetUp=false; if (questionSet.length===0){initialSetUp=true;}
     if(initialSetUp){$(".activityReset").css("display","none");}//hide reset button if this is their first time
     //questionSetLength is the number of phrases to be added to the question set.
@@ -1098,9 +1119,9 @@ function setUpQuestionSet(){
     var possiblePhraseCount=0; var possibleShortPhraseCount=0;
     // if (chunkbank[a][translationCol]===null){chunkbank[a][translationCol]="";}
     chunkbankFlags.forEach((item, i) => {
-        if(item.flag!=="green"&&item.flag!=="red"&&item.id!=="0"&&item.id!=="1"&&chunkbank[item.index]){
+        if(item.flag!=="green" && item.flag!=="red" && item.id!=="0" &&item.id!=="1" && chunkbank[item.index] ){
             if (chunkbank[item.index][languageCol]) {
-                if (chunkbank[item.index][languageCol]!==""&&chunkbank[item.index][translationCol]!=="") { possiblePhraseCount++; }
+                if (chunkbank[item.index][languageCol]!=="" && chunkbank[item.index][translationCol]!=="" && !topicsToHide.includes(chunkbank[item.index].topic)) { possiblePhraseCount++; }
             }
         }
     });
@@ -1138,7 +1159,7 @@ function setUpQuestionSet(){
                 if(chunkbank[f][languageCol] && chunkbank[f][translationCol]) {
                     if( !questionSet.some(el => el.id === chunkbankFlags[f].id) && chunkbankFlags[f].id!=="0"&&chunkbank[f][languageCol]!==""&&chunkbank[f][translationCol]!==""){
                         //check for favourite phrases that haven't already been mastered or hidden
-                        if (chunkbankFlags[f].fave===1 &&(chunkbankFlags[f].flag!=="green"&&chunkbankFlags[f].flag!=="red")){
+                        if ( chunkbankFlags[f].fave===1 && (chunkbankFlags[f].flag!=="green" && chunkbankFlags[f].flag!=="red")  && !topicsToHide.includes(chunkbank[f].topic)) {
                             //add all these to set - fill up set but don't go over the number of questions needed
                             if(numQuestionsNeeded>0){
                                 questionSet.push({id:chunkbankFlags[f].id,index:chunkbankFlags[f].index}); //add to set
@@ -1158,10 +1179,10 @@ function setUpQuestionSet(){
         var numberRandomsNeeded=Math.round(numQuestionsNeeded/3);
         var i=0; while (i < numberRandomsNeeded) {
             var randomNo=Math.floor((Math.random() * (chunkbankFlags.length-1)));//randomly choose from chunkbank array
-            //check phrase not already in the question set array, has not already been mastered (green) or hidden (red) and has language and translation content
+            //check phrase not already in the question set array, has not already been mastered (green) or hidden (red) and has language and translation content and is not in a hidden topic
             if (chunkbank[randomNo]) {
                 if (chunkbank[randomNo][languageCol] && chunkbank[randomNo][translationCol]) {
-                    if(!questionSet.some(el => el.id === chunkbankFlags[randomNo].id)&&chunkbankFlags[randomNo].id!=="0" &&(chunkbankFlags[randomNo].flag!=="green"||chunkbankFlags[randomNo].flag!=="red") &&chunkbank[randomNo][languageCol]!==""&&chunkbank[randomNo][translationCol]!==""){
+                    if(!questionSet.some(el => el.id === chunkbankFlags[randomNo].id)&&chunkbankFlags[randomNo].id!=="0" &&(chunkbankFlags[randomNo].flag!=="green"||chunkbankFlags[randomNo].flag!=="red") && chunkbank[randomNo][languageCol]!=="" && chunkbank[randomNo][translationCol]!=="" && !topicsToHide.includes(chunkbank[randomNo].topic)){
                         if(!initialSetUp||chunkbank[chunkbankFlags[randomNo].index][languageCol].length<initialActivityWordLength){//choose short words the first time round
                             questionSet.push({id:chunkbankFlags[randomNo].id,index:chunkbankFlags[randomNo].index}); //add to set
                             chunkbankFlags[randomNo].flag="blue";//set flag in main flag array to blue
@@ -1223,8 +1244,10 @@ function setUpQuestionSet(){
                         if (chunkbank[c]) {
                             if(chunkbank[c][topicCol]===topic){//find similar topics
                                 if (chunkbank[c][languageCol] && chunkbank[c][translationCol]) {
-                                    if(!questionSet.some(el => el.id === chunkbank[c].id) && numQuestionsNeeded>0 &&chunkbank[c].id!=="0" &&(chunkbankFlags[c].flag!=="green"||chunkbankFlags[c].flag!=="red")&&chunkbank[c][languageCol]!==""&&chunkbank[c][translationCol]!==""){ //check phrase not already in the question set array, mastered or hidden and has language and translation content
-                                        if(!initialSetUp||chunkbank[c][languageCol].length<initialActivityWordLength){//choose short words the first time round
+                                    //check phrase not already in the question set array, mastered or hidden and has language and translation content
+                                    if(!questionSet.some(el => el.id === chunkbank[c].id) && numQuestionsNeeded>0 &&chunkbank[c].id!=="0" && (chunkbankFlags[c].flag!=="green"||chunkbankFlags[c].flag!=="red") && chunkbank[c][languageCol]!=="" && chunkbank[c][translationCol]!=="" && !topicsToHide.includes(chunkbank[c].topic)){ 
+                                        //choose short words the first time round
+                                        if(!initialSetUp||chunkbank[c][languageCol].length<initialActivityWordLength){
                                             questionSet.push({id:chunkbank[c].id,index:c}); //add to set
                                             chunkbankFlags[c].flag="blue";//set flag in main flag array to blue
                                             chunkbankFlags[c].count=0;//set count in main flag array to 0
@@ -1253,7 +1276,7 @@ function setUpQuestionSet(){
                 //check phrase not already in the question set array, mastered or hidden and has language and translation content
                 if (chunkbank[randomNo]) {
                     if (chunkbank[randomNo][languageCol] && chunkbank[randomNo][translationCol]) {
-                        if(!questionSet.some(el => el.id === chunkbankFlags[randomNo].id)&&chunkbankFlags[randomNo].id!=="0" &&(chunkbankFlags[randomNo].flag!=="green"||chunkbankFlags[randomNo].flag!=="red")&&chunkbank[randomNo][languageCol]!==""&&chunkbank[randomNo][translationCol]!==""){
+                        if(!questionSet.some(el => el.id === chunkbankFlags[randomNo].id) && chunkbankFlags[randomNo].id!=="0" &&(chunkbankFlags[randomNo].flag!=="green"||chunkbankFlags[randomNo].flag!=="red") && chunkbank[randomNo][languageCol]!=="" && chunkbank[randomNo][translationCol]!=="" && !topicsToHide.includes(chunkbank[randomNo].topic)){
                             questionSet.push({id:chunkbankFlags[randomNo].id,index:chunkbankFlags[randomNo].index}); //add to set
                                 chunkbankFlags[randomNo].flag="blue";//set flag in main flag array to blue
                                 chunkbankFlags[randomNo].count=0;//set count in main flag array to 0
@@ -1276,10 +1299,11 @@ function setUpQuestionSet(){
             //check if there are any new faves that haven't been added to set yet, and that haven't already been mastered or hidden
             if (chunkbankFlags[f]) {
                 if (chunkbankFlags[f][languageCol]) {
-                    if(!questionSet.some(el => el.id === chunkbankFlags[f].id) && chunkbankFlags[f].fave===1 &&(chunkbankFlags[f].flag!=="green"||chunkbankFlags[f].flag!=="red")){
+                    if(!questionSet.some(el => el.id === chunkbankFlags[f].id) && chunkbankFlags[f].fave===1 && (chunkbankFlags[f].flag!=="green"||chunkbankFlags[f].flag!=="red") && !topicsToHide.includes(chunkbank[f].topic)){
                         //console.log("There's a new favourite: "+chunkbankFlags[f].id);
                         //remove the last non-favourite from the set
-                        var forRemoval; for (var qs=0; qs<questionSet.length; qs++){if(chunkbankFlags[questionSet[qs].index].fave===0){    forRemoval=qs;    }}
+                        var forRemoval; 
+                        for (var qs=0; qs<questionSet.length; qs++){if(chunkbankFlags[questionSet[qs].index].fave===0){    forRemoval=qs;    }}
                         //if there's any non favourites we can remove...
                         if (forRemoval){
                             //console.log("Replacing item "+questionSet[forRemoval].id+" with "+chunkbankFlags[f].id);
@@ -1331,9 +1355,9 @@ function setUpMemorySet(){
             var randomNo=Math.floor((Math.random() * (chunkbankFlags.length-1)));//randomly choose from chunkbank array
             //check phrase id not already in the memory set array and is long enough
             if(!memorySet.some(el => el.id === chunkbankFlags[randomNo].id) && chunkbankFlags[randomNo].id!=="0"){
-                //choose phrases with images and audio and check image is not a duplicate
+                //choose phrases with images and audio and check image is not a duplicate or in a hidden topic
                 if(chunkbank[chunkbankFlags[randomNo].index]){
-                    if(chunkbank[chunkbankFlags[randomNo].index].soundfilename!=="" && chunkbank[chunkbankFlags[randomNo].index].image!=="" && !memorySet.some(el => el.image === chunkbank[chunkbankFlags[randomNo].index].image)){
+                    if(chunkbank[chunkbankFlags[randomNo].index].soundfilename!=="" && chunkbank[chunkbankFlags[randomNo].index].image!=="" && !memorySet.some(el => el.image === chunkbank[chunkbankFlags[randomNo].index].image) && !topicsToHide.includes(chunkbank[randomNo].topic)){
                         if(chunkbank[chunkbankFlags[randomNo].index][languageCol].length<maxMemoryWordLength){//choose short phrases
                           memorySet.push({
                             id:chunkbankFlags[randomNo].id,
@@ -1394,6 +1418,10 @@ async function setUpMemory(){
   mstr+='<div class="memoryReset" onclick="audioOff(); setUpMemory();">Play again</div>';
   mstr+="<div class='after'></div>";
   $("#memoryBody").html(mstr);
+  if (recordLog){
+        var timeStamp = new Date().getTime();
+        $.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=1&interaction=13&v="+timeStamp, function() { });
+    }
 }
 
 function hideMemoryCard(i){
@@ -1485,7 +1513,7 @@ async function setUpActivity(mode){
     chunkbankFlags.forEach((item, i) => {
         if (chunkbank[item.index]) {
             if (chunkbank[item.index].language) {
-                if(item.flag!=="green"&&item.flag!=="red"&&item.id!=="0" &&chunkbank[item.index].language!==""){
+                if( item.flag!=="green" && item.flag!=="red" && item.id!=="0" && chunkbank[item.index].language!=="" && !topicsToHide.includes(chunkbank[item.index].topic)){
                     possiblePhraseCount++;
                   }
             }
@@ -1591,7 +1619,7 @@ async function setUpActivity(mode){
     //$(".activityFeedback").html(progressText);
     $(".activityEntryGlossingTextContent, .mikePrompt").html("");
     $("#hideIcon img").removeClass("colourOn").addClass("colourOff");
-
+   
 
 
     switch (currentActivityType){
@@ -1606,7 +1634,10 @@ async function setUpActivity(mode){
             if(chunkbank[qI].soundfilename){
                 $("#activityEntryPlayOption2, #activityEntryPlayOption1").removeClass("disabled").css("display","block");
             }
-            $(".activityEntryGlossingTextContent").html(chunkbank[qI].glossing+"<br><br>"+chunkbank[qI].explanation);
+            let glossingContent = chunkbank[qI].glossing;
+            if (chunkbank[qI].explanation) { glossingContent+="<br><br>"+chunkbank[qI].explanation; }
+            $(".activityEntryGlossingTextContent").html(glossingContent);
+            //console.log(chunkbank[qI].glossing,chunkbank[qI].explanation)
             //set Answers
             answerSet.forEach(function callback(value, index) {
               var a=parseInt(value.index);
@@ -1623,7 +1654,10 @@ async function setUpActivity(mode){
             });
             //show activity-related content
             $(".activity1, .activity1or2").css("display","flex");
-            if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+chunkbank[qI].id+"&interaction=8", function() { });}
+            if (recordLog){
+                var timeStamp = new Date().getTime();
+                $.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+chunkbank[qI].id+"&interaction=8&v="+timeStamp, function() { });
+            }
             toggleActivityAudio(); //auto play
             break;
 
@@ -1651,7 +1685,10 @@ async function setUpActivity(mode){
             });
             //show activity-related content
             $(".activity1or2, .reloadIconDiv").css("display","flex");
-            if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+chunkbank[qI].id+"&interaction=9", function() { });}
+            if (recordLog){
+                var timeStamp = new Date().getTime();
+                $.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+chunkbank[qI].id+"&interaction=9&v="+timeStamp, function() { });
+            }
             break;
 
         case 3: //english/kriol/image to audio
@@ -1678,7 +1715,10 @@ async function setUpActivity(mode){
             //show activity-related content
             $(".reloadIconDiv").css("display","flex");
             $(".activity3").css("display","block");
-            if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+chunkbank[qI].id+"&interaction=10", function() { });}
+            if (recordLog){
+                var timeStamp = new Date().getTime();
+                $.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+chunkbank[qI].id+"&interaction=10&v="+timeStamp, function() { });
+            }
             break;
 
         default:
@@ -1827,7 +1867,12 @@ function toggleActivityAnswer(id){
             $(".activityFeedback").html("Try again");
             if (language==="mangarrayi" &&effect){playAudio("activity_dayi.mp3", 0);}
         }
-        if (type==1){$("#infoIcon").css("display", "block");}//show info button
+        if (type==1){
+            //only show info icon if there is an explanation or the glossing is different to the language phrase
+            if (chunkbank[qI].explanation || chunkbank[qI].glossing!==chunkbank[qI][languageCol]) {
+               $("#infoIcon").css("display", "block");
+            }   
+        }
 
     }
 }
@@ -2052,7 +2097,7 @@ function loadFilterEntries(){
     //now sort filter item list into alphabetical order, ignoring any * sign at the start
     allFilterArray.sort(function (a, b) {
         function getRaw(s) {
-            return s.replace(/\*/g, '+').trim();
+            return s.replace('*','').trim();
         }
         return getRaw(a).localeCompare(getRaw(b));
     });
@@ -2239,7 +2284,10 @@ function checkLoadedAudio(){
         audio.playbackRate=playbackspeed;
         if (chunkbank[selectedN].speaker==="Amy Dirn.gayg" && playbackspeed!==1){audio.playbackRate=0.6;} //if set to slow then slow down Amy a lot more
         if(playbackspeed!==1){//write to log if they are playing it slowly
-            if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=3", function() { });}
+            if (recordLog){
+                var timeStamp = new Date().getTime();
+                $.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedEntry+"&interaction=3&v="+timeStamp, function() { });
+            }
         }
     } else {
         audio.playbackRate=1;
@@ -2258,9 +2306,10 @@ function playAudio(filename, x) {
     var audio = document.getElementById('audioPlayer');
     audio.setAttribute("src", filename+'?'+cacheBuster);
     audio.load();
-    if (recordLog && selectedAudio!==0 ){
+    if (recordLog && selectedAudio!==0 && x!==0){
         //console.log('log audio play',selectedAudio);
-        $.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedAudio+"&interaction=1", function() { });
+        var timeStamp = new Date().getTime();
+        $.get(apiPath+"log.php?table="+language+"&token="+token+"&entry="+selectedAudio+"&interaction=1&v="+timeStamp, function() { });
     }
  }
 
@@ -2436,7 +2485,10 @@ $(document).ready(function(){
             gotoPage="token"; //need to get token
         } else {
             token=localStorage.getItem(tokenName);
-            if (recordLog){$.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=0&interaction=12", function() { });}
+            if (recordLog){
+                var timeStamp = new Date().getTime();
+                $.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=1&interaction=12&v="+timeStamp, function() { });
+            }
         }
         setTimeout(function(){audioOff();showPage(gotoPage);},500);
 
@@ -2674,7 +2726,8 @@ $(document).ready(function(){
     }
 
     //get customised glossing colours from the DB
-    $.getJSON(apiPath+"get-glossing.php?table="+language)
+    var timeStamp = new Date().getTime();
+    $.getJSON(apiPath+"get-glossing.php?table="+language+"&v="+timeStamp)
     .done(function(data){
         if (data!==0) {
             data.forEach((item, i) => {
