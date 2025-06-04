@@ -146,13 +146,13 @@ hr{ display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:0
 #subtopicsContainer, #subtopicsExpandedContainer, .subtopics{display: none; margin-top: 50px;}
 #subtopicsExpandedContainer{margin-top: 60px;}
 .topicHeader, .subtopicHeader{background-color: #ff4b00; color: #FFF; padding: 10px 0 10px 5vw; text-align: left; position: absolute; top: 120px; width: 95%;     height: 30px;     display: flex;     justify-content: space-between;}
-.topicHeaderTitle, .subtopicHeaderTitle{ display: inline;   text-align: left; }
-.topicHeaderImage, .subtopicHeaderImage{display: inline;     margin-left: 10px; margin-right:10px; min-height: 2em; }
+.topicHeaderTitle, .subtopicHeaderTitle{ text-align: left; }
+.topicHeaderImage, .subtopicHeaderImage{ }
 .topicHeaderImage img, .subtopicHeaderImage img{  width: 20px;}
 .topicHeaderIcon, .subtopicHeaderIcon{ margin-right: 20px; margin-left:10px; background-color: #FFF;}
 .topicHeaderIcon img, .subtopicHeaderIcon img{ width: 30px; }
 .topicHeaderRight{display:flex;}
-.topicHeaderLeft{display:flex;}
+.topicHeaderLeft{display:flex; flex-direction: row; align-items: center; column-gap: 10px;}
 .iconWhite{/*filter: invert(97%) sepia(50%) saturate(13%) hue-rotate(21deg) brightness(104%) contrast(102%);*/}/*white*/
 .subtopicDivContainer{width:25%;   background-color: #FFF; box-shadow: 0px 2px 2px #0000003D;     margin: 10px; padding: 10px 5px; }
 .subtopicDivHolder{padding:1vw; cursor: pointer;}
@@ -308,7 +308,7 @@ hr{ display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:0
 /*PLAY ALL*/
 .playAllHolder { padding: .5em; display: flex; justify-content: flex-end; align-content: center; align-items: center;}
 .playAllButtonHolder {    cursor: pointer; border: 1px solid #FFF; color: #FFF;    padding: .5em;   border-radius: 20px;   background-color: #000;     display: flex; justify-content: center; align-items: center;}
-.playAllAudioIcon {height:1.2em; width:auto; margin-right:0.3em; max-width:20%; }
+.playAllAudioIcon {height:1.2em; width:auto; margin-right:0.3em; max-width:20%;min-width: 20px; }
 
 /*Conversation*/
 #conversationentry entry{}

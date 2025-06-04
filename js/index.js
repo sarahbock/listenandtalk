@@ -121,8 +121,11 @@ if (language==="mangarrayi"){
 
 //show token / warning system
 if (language==="umpila" || language==="mangarrayi"){
-    if (web===false) audiopath="mp3/"; //mp3 and image folder is inside app folder
     startpage="warning";//go to warning and token screens on startup
+}
+
+if (language==="umpila" || language==="mangarrayi" || language==="dharug"){
+    if (web===false) audiopath="mp3/"; //mp3 and image folder is inside app folder
 }
 
 
@@ -2621,7 +2624,7 @@ $(document).ready(function(){
           } else {
             $("#entry .playAllAudioIcon").attr("src","images/icon_play_white.png");
           }
-        } else if (currentpage==="dashboard" && $("#subtopicsExpandedContainer .playAllAudioIcon").attr("src")==="images/icon_pause_white.png") {
+        } else if ((currentpage==="dashboard"||currentpage==="launch") && $("#subtopicsExpandedContainer .playAllAudioIcon").attr("src")==="images/icon_pause_white.png") {
             playAllTCounter++;
             if (playAllTCounter<topicEntries.length){
               var t = chunkbank.findIndex(chunk=>chunk.id===topicEntries[playAllTCounter]);
@@ -2670,18 +2673,26 @@ $(document).ready(function(){
         const missingAudioFilename = (missingaudioIndex === -1) ? missingaudio : missingaudio.substring(0, missingaudioIndex);
         //console.log("Missing audio "+missingAudioFilename+' online?',window.navigator.onLine);
         if (missingAudioFilename === '') return false;
-        
-        //try looking for the file online
-        if (audioError===0 && window.navigator.onLine){
+        if (audioError===0){
+             //try capitalising the first letter of the filename
+            var filename=audiopathServer+missingAudioFilename.charAt(0).toUpperCase()+ missingAudioFilename.slice(1);
+            console.log("looking for "+filename);
+            var audio = document.getElementById('audioPlayer');
+            audio.setAttribute("src", filename);
+            audioError++;
+            audio.load();
+        } else if (audioError===1 && window.navigator.onLine){
+            //try looking for the file online
             var filename=audiopathServer+missingaudio;
             //console.log("looking for "+filename);
             var audio = document.getElementById('audioPlayer');
             audio.setAttribute("src", filename);
             audioError++;
             audio.load();
-        } else if (audioError===1 || !window.navigator.onLine){
+        } else if (audioError===2 || !window.navigator.onLine){
+            //var filename=audiopathServer+missingaudio; console.log("looking for "+filename);
             if (!window.navigator.onLine) {
-                showAlert("<p>Sorry, that file isn't available offline yet. If your Internet connection is dropping out then try playing it again.</p> ");
+                showAlert("<p>Sorry, that file isn't available offline yet. If your internet connection is dropping out then try playing it again.</p> ");
             } else {
                 showAlert("<p>Sorry, but there's a problem playing the sound file. Let us know so that we can improve the app. Tell us which entry you are playing and which type of phone you have.</p> ");
             }
