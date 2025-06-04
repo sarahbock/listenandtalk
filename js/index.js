@@ -2419,7 +2419,7 @@ var captureError = function(error) {
 
 var app = {
     initialize: function() {
-        "use strict";
+        
         document.addEventListener('deviceready', this.onDeviceReady.bind(this), false);
     },
 
@@ -2455,8 +2455,7 @@ function getQueryVariable(variable){
 
 
 $(document).ready(function(){
-    "use strict";
-
+    
     //populate language titles
   $(".languageText").html(languageCap);
   $(".translationText").html(translationCap);
@@ -2485,10 +2484,6 @@ $(document).ready(function(){
             gotoPage="token"; //need to get token
         } else {
             token=localStorage.getItem(tokenName);
-            if (recordLog){
-                var timeStamp = new Date().getTime();
-                $.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=1&interaction=12&v="+timeStamp, function() { });
-            }
         }
         setTimeout(function(){audioOff();showPage(gotoPage);},500);
 
@@ -2754,6 +2749,10 @@ $(document).ready(function(){
     getConversations();
     setupTopics();
     //getSpeakers();
+    if (recordLog){
+        var timeStamp = new Date().getTime();
+        $.get(apiPath+"log.php?table="+language+"&token="+token+"&entry=1&interaction=12&v="+timeStamp, function() { });
+    }
 });
 
 //ANDROID listener when app moves to foreground - when picking contact
