@@ -110,12 +110,12 @@ if (language==="mangarrayi"){
     
     translateNoText="dayi"; //text for yes and no buttons in language
     translateYesText="yowo";
-    versionNo="2.4.13";
+    versionNo="2.4.11";
     appTitleShort="Warrma Mangarrayi";
     appTitleLong="Warrma Mangarrayi (Listen to Mangarrayi)";
     projectInfo='<p class="leftText">Are you interested in learning Mangarrayi? This app is to help community members learn some phrases in your own language.</p><p class="leftText">We acknowledge the Mangarrayi speakers whose voices appear in this app: <strong>Sheila Yanybarrak Conway, Jesse Garalnganyjak Roberts, Amy Dirn.gayg.</strong></p><p class="leftText">This app has been co-designed by the Jilkminggan Community with Western Sydney University and Elearn Australia.</p><a href="http://www.jcac.com.au/" target="_blank"><img src="images/logo_jcac.png" alt="Jilkminggan Community Aboriginal Corporation logo" class="aboutLogo"></a><p class="leftText">Funding from: Australian Research Council Centre of Excellence for the Dynamics of Language</p><a href="https://www.westernsydney.edu.au/" target="_blank"><img src="images/logo_wsu.png" alt="Western Sydney University logo" class="aboutLogo rectLogo"></a><a href="https://www.dynamicsoflanguage.edu.au/" target="_blank"><img src="images/logo_arc.png" alt="ARC Centre of Excellence for the Dynamics of Language" class="aboutLogo rectLogo"></a><a href="https://www.elearnaustralia.com.au" target="_blank"><img src="images/logo_ela.png" alt="Elearn Australia" class="aboutLogo rectLogo"></a><p>&nbsp;</p>';
     maxMemoryWordLength=50;
-    tokenRequest='<a href="https://forms.gle/Mp36U4kGuf3MEv7P7" target="_blank">Ask JCAC</a>';
+    tokenRequest='<a href="https://docs.google.com/forms/d/e/1FAIpQLSelSV0BzeMsXXgJz_sZ78AdmBbKLWey5W4PwdhqPaHI0x3aHA/viewform" target="_blank">Ask JCAC</a>';
     speakers=[{"title":"Sheila Conway","id":"2"},{"title":"Phyllis Conway","id":"8"},{"title":"Amy Dirn.gayg","id":"1"},{"title":"Jennifer Doctor","id":"6"},{"title":"Gina Farrar","id":"7"},{"title":"Josie Lardy","id":"3"},{"title":"Jessie Roberts","id":"4"},{"title":"Syrita Conway","id":"5"}];
 }
 
