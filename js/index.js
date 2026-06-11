@@ -68,7 +68,7 @@ if (language==="dharug"){
   appTitleLong="Bayala Dharug"; 
   $("#launch .launchlogo").attr("src", "images/logo_bayala.png");
   projectInfo=`<p class="leftText"><a href="https://bayala.net.au/" target="_blank">Bayala Aboriginal Corporation</a> has designed this app to assist with the important cultural obligation of Dharug language revival. The Bayala Dharug app is shared in spirit with other Dharug community members and their much wider circle of allies. </p><p class="leftText">The development of this Bayala Dharug app has been supported by the Australian Institute for Aboriginal and Torres Strait Islander Studies (AIATSIS), ElearnAustralia and Western Sydney University. </p><p class="leftText">Dharug Dhalang 'Dharug language', sometimes spelled Darug and Dharruk, is also known as the Sydney Language. Dharug was spoken across much of the Sydney basin, from the Hawkesbury to the Georges River and from the Blue Mountains to the sea. As Dharug Country was the site of the first English colony intergenerational language transmission of Dharug was disrupted early and severely. Consequently, the Dharug community has been on a journey of language revitalisation. </p><p class="leftText">Language revival is a long road. Bayala Aboriginal Corporation shares in a cultural responsibility for nurturing our shared Dharug language and informing Sydneysiders about the traditional language of Sydney and the protocols for using it. This responsibility is equally important as looking after Country and Community. The Bayala Aboriginal Corporation is championing Dharug language learning and teaching, researching and publishing activities. This care for our language has been inspired by Dharug people who led Dharug language work including Aunty Edna Watson and Richard Green.</p><p class="leftText">The Bayala Dharug app has been developed as an accessible language learning resource which adds to an ever-growing suite of Dharug language revival materials. The Bayala Dharug app is intended for individual and personal use to enable Dharug language learning. The app should be used in contexts such as family language learning, shared language learning between community members, private language learning by students and so forth. The Bayala Dharug app does not replace Dharug language programs for the community, in preschool, school, TAFE or university. Permission must be sought from copyright holders Bayala Aboriginal Corporation for public use of any and all elements contained in the app, including images and sound files (see Terms of Use). </p><p class="leftText">The Bayala Dharug app is a rich and living Dharug language learning resource and a reliable source of Dharug language information. It currently provides over 500 individual entries for Dharug words and sentences, with explanations, recordings and images. This initial language offering will be regularly updated and expanded by the Bayala Aboriginal Corporation to facilitate access to Dharug Dhalang and the language resources it develops ongoingly through its teaching and research activities.</p><p class="leftText">The app shares Dharug language knowledge that has been built up through contemporary Dharug teaching and researching endeavours. The focus on Dharug sentences enables Dharug language learners to move beyond single words and into becoming conversational and using the language more communicatively. Each item in the app provides a model of how Dharug language is said and written, and how Dharug sentences are assembled. The app enables all Dharug language learners to sing from the same language song sheet, respecting the language and fostering communication and mutual comprehension. </p><p class="leftText">Acknowledgements (in alphabetical order):<br>Illustrations: Corina Norman, Jasmine Seymour, Leanne Watson, Rhiannon Wright. <br>Sound recordings: Corina Norman, Debbie Smith, Jasmine Seymour, Lani Barnes, Leanne King, Leanne Watson, Libby Coplin, Rhiannon Wright and Richard Torning. </p>`;
-  versionNo="1.0.1";
+  versionNo="1.0.3";
 }
 
 //umpila app
@@ -2666,39 +2666,38 @@ $(document).ready(function(){
 
     //catch missing audio files
     audioError=0;
+    var audioErrorFilename='';
     $("#audioPlayer").on("error", function () {
-        var missingaudio=$("#audioPlayer").attr("src").substr(audiopath.length);
-        const missingaudioIndex = missingaudio.indexOf('?');
-        const missingAudioFilename = (missingaudioIndex === -1) ? missingaudio : missingaudio.substring(0, missingaudioIndex);
-        //console.log("Missing audio "+missingAudioFilename+' online?',window.navigator.onLine);
-        if (missingAudioFilename === '') return false;
+        var audio = document.getElementById('audioPlayer');
         if (audioError===0){
-             //try capitalising the first letter of the filename
-            var filename=audiopathServer+missingAudioFilename.charAt(0).toUpperCase()+ missingAudioFilename.slice(1);
+            //capture the original filename from the initial (local) src before retrying
+            var missingaudio=$("#audioPlayer").attr("src").substr(audiopath.length);
+            var missingaudioIndex = missingaudio.indexOf('?');
+            audioErrorFilename = (missingaudioIndex === -1) ? missingaudio : missingaudio.substring(0, missingaudioIndex);
+            if (audioErrorFilename === '') return false;
+            //try capitalising the first letter of the filename locally
+            var filename=audiopath+audioErrorFilename.charAt(0).toUpperCase()+audioErrorFilename.slice(1);
             console.log("looking for "+filename);
-            var audio = document.getElementById('audioPlayer');
             audio.setAttribute("src", filename);
             audioError++;
             audio.load();
         } else if (audioError===1 && window.navigator.onLine){
             //try looking for the file online
-            var filename=audiopathServer+missingaudio;
-            //console.log("looking for "+filename);
-            var audio = document.getElementById('audioPlayer');
+            var filename=audiopathServer+audioErrorFilename;
+            console.log("looking for "+filename);
             audio.setAttribute("src", filename);
             audioError++;
             audio.load();
-        } else if (audioError===2 || !window.navigator.onLine){
-            //var filename=audiopathServer+missingaudio; console.log("looking for "+filename);
+        } else {
             if (!window.navigator.onLine) {
                 showAlert("<p>Sorry, that file isn't available offline yet. If your internet connection is dropping out then try playing it again.</p> ");
             } else {
                 showAlert("<p>Sorry, but there's a problem playing the sound file. Let us know so that we can improve the app. Tell us which entry you are playing and which type of phone you have.</p> ");
             }
-             //$("#audioPlayer").attr("src").substr(audiopathServer.length));
             $(".audioIcon").attr("src","images/audio_on.png");
             hideAudioPlayButtons();
             audioError=0;
+            audioErrorFilename='';
         }
     });
 
