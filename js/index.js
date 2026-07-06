@@ -53,7 +53,7 @@ var audioError=0;
 var playbackspeed=1;
 //get local images if offline
 var imagepath= (window.navigator.onLine) ? web_dir+language+"/img/" : "img/";
-var speakers=[]; var topics=[]; var conversations=[]; var favourites=[]; var chunkbank=[]; var chunkbankSorted=[]; var chunkbankAlphabetical=[]; var chunkbankSortedLength=[]; var chunkbankFlags=[]; var entryConversation=[];
+var speakers=[]; var topics=[]; var conversations=[]; var favourites=[]; var chunkbank=[]; var chunkbankSorted=[]; var chunkbankAlphabetical=[]; var chunkbankSortedLength=[]; var chunkbankFlags=[]; var entryConversation=[]; var chunkbankSortedLang=[];
 var topicsToHide = 
 (language === 'dharug') ? ['27','28','38','50','37','42','48','39','43','49','47','52','53','54','55'] : 
 [];
@@ -68,7 +68,7 @@ if (language==="dharug"){
   appTitleLong="Bayala Dharug"; 
   $("#launch .launchlogo").attr("src", "images/logo_bayala.png");
   projectInfo=`<p class="leftText"><a href="https://bayala.net.au/" target="_blank">Bayala Aboriginal Corporation</a> has designed this app to assist with the important cultural obligation of Dharug language revival. The Bayala Dharug app is shared in spirit with other Dharug community members and their much wider circle of allies. </p><p class="leftText">The development of this Bayala Dharug app has been supported by the Australian Institute for Aboriginal and Torres Strait Islander Studies (AIATSIS), ElearnAustralia and Western Sydney University. </p><p class="leftText">Dharug Dhalang 'Dharug language', sometimes spelled Darug and Dharruk, is also known as the Sydney Language. Dharug was spoken across much of the Sydney basin, from the Hawkesbury to the Georges River and from the Blue Mountains to the sea. As Dharug Country was the site of the first English colony intergenerational language transmission of Dharug was disrupted early and severely. Consequently, the Dharug community has been on a journey of language revitalisation. </p><p class="leftText">Language revival is a long road. Bayala Aboriginal Corporation shares in a cultural responsibility for nurturing our shared Dharug language and informing Sydneysiders about the traditional language of Sydney and the protocols for using it. This responsibility is equally important as looking after Country and Community. The Bayala Aboriginal Corporation is championing Dharug language learning and teaching, researching and publishing activities. This care for our language has been inspired by Dharug people who led Dharug language work including Aunty Edna Watson and Richard Green.</p><p class="leftText">The Bayala Dharug app has been developed as an accessible language learning resource which adds to an ever-growing suite of Dharug language revival materials. The Bayala Dharug app is intended for individual and personal use to enable Dharug language learning. The app should be used in contexts such as family language learning, shared language learning between community members, private language learning by students and so forth. The Bayala Dharug app does not replace Dharug language programs for the community, in preschool, school, TAFE or university. Permission must be sought from copyright holders Bayala Aboriginal Corporation for public use of any and all elements contained in the app, including images and sound files (see Terms of Use). </p><p class="leftText">The Bayala Dharug app is a rich and living Dharug language learning resource and a reliable source of Dharug language information. It currently provides over 500 individual entries for Dharug words and sentences, with explanations, recordings and images. This initial language offering will be regularly updated and expanded by the Bayala Aboriginal Corporation to facilitate access to Dharug Dhalang and the language resources it develops ongoingly through its teaching and research activities.</p><p class="leftText">The app shares Dharug language knowledge that has been built up through contemporary Dharug teaching and researching endeavours. The focus on Dharug sentences enables Dharug language learners to move beyond single words and into becoming conversational and using the language more communicatively. Each item in the app provides a model of how Dharug language is said and written, and how Dharug sentences are assembled. The app enables all Dharug language learners to sing from the same language song sheet, respecting the language and fostering communication and mutual comprehension. </p><p class="leftText">Acknowledgements (in alphabetical order):<br>Illustrations: Corina Norman, Jasmine Seymour, Leanne Watson, Rhiannon Wright. <br>Sound recordings: Corina Norman, Debbie Smith, Jasmine Seymour, Lani Barnes, Leanne King, Leanne Watson, Libby Coplin, Rhiannon Wright and Richard Torning. </p>`;
-  versionNo="1.0.3";
+  versionNo="1.0.4";
 }
 
 //umpila app
@@ -243,7 +243,11 @@ function initialiseDictionary(){
         chunkbankSorted = [...chunkbank].sort((a,b) => (a[translationCol] > b[translationCol]) ? 1 : ((b[translationCol] > a[translationCol]) ? -1 : 0));//sort in A-Z order of english
     }
     var keyArray = chunkbankSorted.map(function(item) { return {'display':item.displayorder,'english':item[translationCol]}; });
-    chunkbankSortedLength=[...chunkbank].sort((a,b) => (a[translationCol].length > b[translationCol].length) ? 1 : ((b[translationCol].length > a[translationCol].length) ? -1 : 0));//sort by length of english
+    //sort by length of english
+    chunkbankSortedLength=[...chunkbank].sort((a,b) => (a[translationCol].length > b[translationCol].length) ? 1 : ((b[translationCol].length > a[translationCol].length) ? -1 : 0));
+    //sort alphabetically of language, regardless of case
+    chunkbankSortedLang = [...chunkbank].sort((a,b) => a[languageCol].localeCompare(b[languageCol], undefined, {sensitivity: 'base'}));
+    
     getData();
     $(".preloadContainer").html(preloadHTML);
     //if(localStorage.getItem("mang-lang")===null){  showPage(startscreen);  } else {showPage("dashboard");}
@@ -2081,7 +2085,8 @@ function loadFilterEntries(){
             if (chunkbank[b][selectedFilter]==null){chunkbank[b][selectedFilter]="";}
             var tempFilterArray = chunkbank[b][selectedFilter].split(",");
             for (var c=0; c<tempFilterArray.length; c++){
-                var newItem = tempFilterArray[c].replace(/-/g, '').trim();//replace dashes and extra space from filter item
+                //remove dashes unless filter is Dharug keywords, then trim filter
+                var newItem = (language === "dharug" && selectedFilter === "keyword") ? tempFilterArray[c].trim() : tempFilterArray[c].replace(/-/g, '').trim();
                 //fix spelling mistakes and duplicates
             if (newItem==="I am"){newItem="I'm";}
             // if (selectedFilter==="keywordenglish"){newItem=newItem.toLowerCase();}//change english items to lower case so they appear in alphabetical order
@@ -2136,31 +2141,31 @@ function loadFilterEntries(){
         //create an empty array to store entry ids for each filter (used in play all functionality)
         var filteredEntriesId = [];
 
+        //chunkbankSortedLength is sorted by length of english phrase so that the shorter phrases appear first in the filtered list. However for class (word and phrase) filters, we will sort alphabetically by the language column instead of by length of english phrase
+        var chunkbankSortedForFilter = (selectedFilter==="class") ? chunkbankSortedLang : chunkbankSortedLength;
+        
+
         //loop through the dictionary and find entries with that filter item (list in order of length of english)
-        for (var e=0; e<chunkbankSortedLength.length; e++){
+        for (var e=0; e<chunkbankSortedForFilter.length; e++){
             var isMatch=false;
             //there may be more than one filter item for each entry so split the filter items ito array
-             var entryFilterArray = chunkbankSortedLength[e][selectedFilter]?.split(","); //e.g. hungry
+             var entryFilterArray = chunkbankSortedForFilter[e][selectedFilter]?.split(","); //e.g. hungry
             for (var f=0; f<entryFilterArray?.length; f++){
-                var entryFilter=entryFilterArray[f].replace(/-/g, '').trim(); //trim filter item and remove dashes
+                //remove dashes unless filter is Dharug keyword, then trim filter
+                var entryFilter = (language === "dharug" && selectedFilter === "keyword") ? entryFilterArray[f].trim() : entryFilterArray[f].replace(/-/g, '').trim();
                  //change filter item to lower case, unless the filter word is all caps
                 entryFilter = (entryFilter === entryFilter?.toUpperCase()) ? entryFilter : entryFilter=entryFilter?.toLowerCase();
                 //if (selectedFilter!=="keyword"){entryFilter=entryFilter.toLowerCase();}
                 if (entryFilter===filterArray[d]){isMatch=true;}
-                // if (filterArray[d]==="talking about your body state."){  if(chunkbankSortedLength[e].english==="I'm hungry"){//console.log("filterArray[d] "+filterArray[d]+" entryFilter: "+entryFilter+" isMatch "+isMatch);}}
             }
-            /*const hideFromResults = 
-            topicsToHide.includes(chunkbankSortedLength[e].topic) ||
-            (chunkbank[b].related &&
-            chunkbank[b].related.split(',').some(item => topicsToHide.includes(item.trim())));*/
             //if (chunkbank[b].id==='499') console.log(hideFromResults);
-            if (isMatch && !topicsToHide.includes(chunkbankSortedLength[e].topic)){
+            if (isMatch && !topicsToHide.includes(chunkbankSortedForFilter[e].topic)){
                 //add entry id to array for this filter item (used in play all functionality)
-                filteredEntriesId.push(chunkbankSortedLength[e].id);
+                filteredEntriesId.push(chunkbankSortedForFilter[e].id);
                 var startFilterHTML = '<div class="entry">';
-                var languageFilterHTML = '<div class="entryMangarrayi audioButtonDiv active" id="categoryaudio_'+chunkbankSortedLength[e].id+'" onclick="toggleAudio(\'categoryaudio_'+chunkbankSortedLength[e].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon">'+chunkbankSortedLength[e][languageCol]+'</div>';
-                var translationFilterHTML = '<div class="entryEnglish" onclick="referrer=\'categorylist\'; setEntry(\''+chunkbankSortedLength[e].id+'\'); showPage(\'entry\');">'+chunkbankSortedLength[e][translationCol]+'</div>';
-                var endFilterHTML = '<div class="entryGo active" onclick="referrer=\'categorylist\'; setEntry(\''+chunkbankSortedLength[e].id+'\'); showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"></div></div>';
+                var languageFilterHTML = '<div class="entryMangarrayi audioButtonDiv active" id="categoryaudio_'+chunkbankSortedForFilter[e].id+'" onclick="toggleAudio(\'categoryaudio_'+chunkbankSortedForFilter[e].id+'\');"><img src="images/audio_on.png" alt="play" title="Play" class="audioIcon">'+chunkbankSortedForFilter[e][languageCol]+'</div>';
+                var translationFilterHTML = '<div class="entryEnglish" onclick="referrer=\'categorylist\'; setEntry(\''+chunkbankSortedForFilter[e].id+'\'); showPage(\'entry\');">'+chunkbankSortedForFilter[e][translationCol]+'</div>';
+                var endFilterHTML = '<div class="entryGo active" onclick="referrer=\'categorylist\'; setEntry(\''+chunkbankSortedForFilter[e].id+'\'); showPage(\'entry\');"><img src="images/icon_right.png" alt="arrow right"></div><div class="clearBoth"></div></div>';
                 filterListHTML+='';
                 //set column 1 to be language column if this display is prefered
                 if (languageFirst){
