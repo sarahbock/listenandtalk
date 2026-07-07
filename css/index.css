@@ -365,7 +365,7 @@ h2.coventryHeader{}
 #activityEntryPlayOption1{width:10vw; margin-right: 1em;}
 #activityEntryPlayOption2{width:10vw; }
 
-.activityAnswers{ }
+.activityAnswers{ overflow-y: auto;}
 .activityAnswerHolder{    display: flex;
     flex-direction: row;
     justify-content: center;
