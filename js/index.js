@@ -1004,7 +1004,7 @@ async function showActivity(){
 
 function showActivityHome(){
   $("#memoryBody, #activityBody").css("display", "none");
-  $(".activityReset").css("display", "block");
+  $("#activity .activityReset").css("display", "block");
   $("#activityStart").css("display", "flex");
   $(".menuButton img").attr("src","images/icon_menu.png");
   referrer="activity";
@@ -1096,10 +1096,23 @@ function resetActivity(){
     questionSet=[]; var qnStorage=language+"-set"; localStorage.setItem(qnStorage, JSON.stringify(questionSet));
     chunkbankFlags.forEach((item, i) => {item.flag="none";}); setFlags();//update local storage
     //hide reset button
-    $(".activityReset").css("display","none");
+    $("#activity .activityReset").css("display","none");
     //set up new question set
     setUpQuestionSet();
     showAlert("Your progress has been reset.");
+}
+
+function resetFavourites(){
+    //console.log("=======RESET FAVOURITES");
+    //stop any audio that is playing
+    audioOff();
+    //empty the favourites array and update local storage
+    favourites=[]; localStorage.setItem(language+"-favourites", JSON.stringify(favourites));
+    //clear the fave marker on the flags array so removed faves aren't added to the activity
+    chunkbankFlags.forEach((item, i) => {item.fave=0;}); setFlags();
+    //redraw the favourites screen
+    loadFavourites();
+    showAlert("Your favourites have been cleared.");
 }
 
 function previousLevel(){
@@ -1113,7 +1126,7 @@ function setUpQuestionSet(){
     var qnStorage=language+"-set"; 
     if (localStorage.getItem(qnStorage)!==null){ questionSet=JSON.parse(localStorage.getItem(qnStorage));}
     var initialSetUp=false; if (questionSet.length===0){initialSetUp=true;}
-    if(initialSetUp){$(".activityReset").css("display","none");}//hide reset button if this is their first time
+    if(initialSetUp){$("#activity .activityReset").css("display","none");}//hide reset button if this is their first time
     //questionSetLength is the number of phrases to be added to the question set.
     //Check questionSetLength does not exceed the number of possible phrases (i.e. phrases that are not green or red)
     //questionSetLength=2;//testing
@@ -1404,7 +1417,7 @@ function setUpMemorySet(){
 var selectedMemoryItemA=null;
 var selectedMemoryItemB=null;
 async function setUpMemory(){
-  $("#activityStart, .activityReset, #activityBody").css("display", "none");
+  $("#activityStart, #activity .activityReset, #activityBody").css("display", "none");
   $("#memoryBody").removeClass("pyro").css("display", "flex");
   $(".menuButton img").attr("src","images/icon_left.png");
   referrer="memory";
@@ -1732,7 +1745,7 @@ async function setUpActivity(mode){
     }
 
     if (qI!==0){ //initialise activity page
-        $("#activityStart, .activityReset").css("display", "none");
+        $("#activityStart, #activity .activityReset").css("display", "none");
         $("#activityBody").css("display", "flex");
         $(".menuButton img").attr("src","images/icon_left.png");
         referrer="quiz";
@@ -2053,6 +2066,8 @@ function loadFavourites(){
     }
     if (str===""){str='<p class="paddedContent note">Tap the star on any words you want to learn and they will show up here. </p><p class="paddedContent note">You will also be able to practice them in the "Have a go" part.</p>';} //default text if empty
     $("#favouritesresults").html(str);
+    //only show the reset link if there is something to reset
+    if (favourites.length>0){$("#favouritesReset").css("display","block");} else {$("#favouritesReset").css("display","none");}
 }
 //=========================================================================================================================== FILTERS
 function showCategory(){
@@ -2076,6 +2091,8 @@ function loadFilterEntries(){
     selectedFilterResult=null;
     $("#filterEntries").val(selectedFilter);
     var allFilterArray=[];
+    //translation keywords keep the case they were written in, so they are compared case-insensitively instead
+    var keepCase = (selectedFilter==="keywordtranslation");
     for (var b=0; b<chunkbank.length; b++){
         //don't include any entries from the topics that are hidden from the filtered list
         //const hideFromResults =  topicsToHide.includes(chunkbank[b].topic) || (chunkbank[b].related && chunkbank[b].related.split(',').some(item => topicsToHide.includes(item.trim())));
@@ -2091,12 +2108,13 @@ function loadFilterEntries(){
             if (newItem==="I am"){newItem="I'm";}
             // if (selectedFilter==="keywordenglish"){newItem=newItem.toLowerCase();}//change english items to lower case so they appear in alphabetical order
             // if (selectedFilter==="keyword"){newItem=newItem.toLowerCase();}//change mangarrayi  items to lower case
-                //change all filter items to lower case, unless the filter word is all caps
-                newItem = (newItem === newItem?.toUpperCase()) ? newItem : newItem=newItem?.toLowerCase();
+                //change all filter items to lower case, unless the filter word is all caps or these are translation keywords
+                if (!keepCase){newItem = (newItem === newItem?.toUpperCase()) ? newItem : newItem=newItem?.toLowerCase();}
                 //push filter items into an array and avoid duplicates
-                if (allFilterArray.indexOf(newItem) === -1 && newItem!==""){
+                var isDuplicate = keepCase ? allFilterArray.some(item => item.toLowerCase()===newItem?.toLowerCase()) : allFilterArray.indexOf(newItem) !== -1;
+                if (!isDuplicate && newItem!==""){
                     allFilterArray.push(newItem);
-                } 
+                }
             }
         }
     }
@@ -2156,7 +2174,7 @@ function loadFilterEntries(){
                  //change filter item to lower case, unless the filter word is all caps
                 entryFilter = (entryFilter === entryFilter?.toUpperCase()) ? entryFilter : entryFilter=entryFilter?.toLowerCase();
                 //if (selectedFilter!=="keyword"){entryFilter=entryFilter.toLowerCase();}
-                if (entryFilter===filterArray[d]){isMatch=true;}
+                if (keepCase ? entryFilter?.toLowerCase()===filterArray[d].toLowerCase() : entryFilter===filterArray[d]){isMatch=true;}
             }
             //if (chunkbank[b].id==='499') console.log(hideFromResults);
             if (isMatch && !topicsToHide.includes(chunkbankSortedForFilter[e].topic)){
