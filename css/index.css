@@ -25,6 +25,25 @@
        url('../webfonts/patua-one-v10-latin-regular.svg#PatuaOne') format('svg'); /* Legacy iOS */
 }
 
+/* Safe-area insets. Android 16 (API 36) forces edge-to-edge and iOS uses these
+   for the notch/home indicator; every other browser gets the 0px defaults below,
+   so calc()s using them resolve to the original values. */
+:root{
+	--safe-top: 0px;
+	--safe-bottom: 0px;
+	--safe-left: 0px;
+	--safe-right: 0px;
+	--header-height: 120px;
+}
+@supports (padding: env(safe-area-inset-top)){
+	:root{
+		--safe-top: env(safe-area-inset-top);
+		--safe-bottom: env(safe-area-inset-bottom);
+		--safe-left: env(safe-area-inset-left);
+		--safe-right: env(safe-area-inset-right);
+	}
+}
+
 html {height:100%;}
 body {
     -webkit-text-size-adjust: none;
@@ -148,7 +167,7 @@ hr{ display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:0
 
 #subtopicsContainer, #subtopicsExpandedContainer, .subtopics{display: none; margin-top: 50px;}
 #subtopicsExpandedContainer{margin-top: 60px;}
-.topicHeader, .subtopicHeader{background-color: #ff4b00; color: #FFF; padding: 10px 0 10px 5vw; text-align: left; position: absolute; top: 120px; width: 95%;     height: 30px;     display: flex;     justify-content: space-between;}
+.topicHeader, .subtopicHeader{background-color: #ff4b00; color: #FFF; padding: 10px 0 10px 5vw; text-align: left; position: absolute; top: calc(var(--header-height) + var(--safe-top)); width: 95%;     height: 30px;     display: flex;     justify-content: space-between;}
 .topicHeaderTitle, .subtopicHeaderTitle{ text-align: left; }
 .topicHeaderImage, .subtopicHeaderImage{ }
 .topicHeaderImage img, .subtopicHeaderImage img{  width: 20px;}
@@ -195,11 +214,12 @@ hr{ display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:0
 #image {background-color: #FFFFFF;}
 #image .popupBody{background: none; width: 100vw;}
 #image img{max-width: 100%; max-height: 100%;}
-#imageClose{background-color: #ffb91a; position: absolute; top: 0; right: 0; cursor: pointer; padding: 10px 20px; width: 10vw; height: auto; max-width: 40px;}
+#imageClose{background-color: #ffb91a; position: absolute; top: var(--safe-top); right: var(--safe-right); cursor: pointer; padding: 10px 20px; width: 10vw; height: auto; max-width: 40px;}
 
 /*GENERAL SCREENS min-height: 145px; */
-.screenHeader{  text-align: center;   height: 120px;  }
-.screenHeaderBack{position: absolute; top: 0; left: 0; cursor: pointer; padding: 3vh 20px; }
+/* content box stays --header-height tall; the inset padding pushes it clear of the status bar */
+.screenHeader{  text-align: center;   height: var(--header-height);  padding-top: var(--safe-top);  }
+.screenHeaderBack{position: absolute; top: 0; left: 0; cursor: pointer; padding: calc(3vh + var(--safe-top)) 20px 3vh calc(20px + var(--safe-left)); }
 .screenHeaderBackIcon{color: #FFF; font-size: 2em; }
 .screenHeader h2{text-align: center;}
 
@@ -219,13 +239,14 @@ hr{ display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin:0
 .headerSearchBox input{border-radius:.3em; padding: 5px 2%; border: 0;}
 .headerBottom{ background-color:#E9E9E9;  }
 
-.screenBody{    height: calc(100% - 120px);  text-align: center; overflow:auto; overflow-y: auto;  -webkit-overflow-scrolling: touch;}
+.screenBody{    height: calc(100% - var(--header-height) - var(--safe-top));  text-align: center; overflow:auto; overflow-y: auto;  -webkit-overflow-scrolling: touch;}
 .screenBody::-webkit-scrollbar { /*width: 0 !important;     display: none;*/ } /*uncomment these two styles for app version*/
 .screenBody::-webkit-scrollbar-thumb { /*background: #FF0000;*/}
 .screenFooter{height: 5%;
     position: fixed;
     left: 0;
     bottom: 0;
+    padding-bottom: var(--safe-bottom);
     width: 100vw;}
 .nextButton{height: 7%; text-transform: uppercase; font-size: 1.3em;     padding: 2vh 0 0 0;}
 .helpIcon {cursor: pointer; float: right;}
@@ -435,6 +456,7 @@ margin: .5vw;
     justify-content: space-between;
     bottom: 0;
     left: 0;
+    padding-bottom: var(--safe-bottom);
     width: 100%; background-color: #000;}
 .activityNavOption{flex: 0;  text-align: left;    margin: 10px;}
 .activityNavOption img{border-radius:50%; width: 30px;padding: 5px; cursor: pointer;}
@@ -471,7 +493,7 @@ margin: .5vw;
 #categoryentries select{width:50vw; height: auto; background-color: #FFF; background-image: url("../images/icon_down.png");     background-position: 97% 50%; background-repeat: no-repeat;    background-size: auto 40%; margin-left: 5vw; padding-right: 5vw;}
 
 /*SEARCH*/
-#headerSearchResult{    position: absolute; top: 50px; height: auto; width: 100vw; background-color: #FFF; }
+#headerSearchResult{    position: absolute; top: calc(50px + var(--safe-top)); height: auto; width: 100vw; background-color: #FFF; }
 #headerSearchResult .searchresult{cursor: pointer; margin-bottom:0;  border-bottom:1px solid #021C40;     padding: 0.5em;}
 #headerSearchResult h2{color: #4e86c1; margin: 0 0 0 2%; padding: 5px 0 0 0; width: 96%;}
 #headerSearchResult p{padding: 1em;}
