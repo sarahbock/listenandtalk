@@ -493,7 +493,7 @@ margin: .5vw;
 #categoryentries select{width:50vw; height: auto; background-color: #FFF; background-image: url("../images/icon_down.png");     background-position: 97% 50%; background-repeat: no-repeat;    background-size: auto 40%; margin-left: 5vw; padding-right: 5vw;}
 
 /*SEARCH*/
-#headerSearchResult{    position: absolute; top: calc(50px + var(--safe-top)); height: auto; width: 100vw; background-color: #FFF; }
+#headerSearchResult{    position: absolute; top: 50px; height: auto; width: 100vw; background-color: #FFF; }
 #headerSearchResult .searchresult{cursor: pointer; margin-bottom:0;  border-bottom:1px solid #021C40;     padding: 0.5em;}
 #headerSearchResult h2{color: #4e86c1; margin: 0 0 0 2%; padding: 5px 0 0 0; width: 96%;}
 #headerSearchResult p{padding: 1em;}
@@ -514,7 +514,9 @@ margin: .5vw;
 /*MENU*/
 #menu, #langmenu{align-items: flex-start; justify-content: flex-start;} #langmenu{justify-content: flex-end;}
 #menu .popupBodyText, #langmenu .popupBodyText{padding:0; margin:0;}
-.menuHeader{background-color: #131114; background-image: url(../images/icon_close.png);     background-position: 73vw 1vh; background-size: 3vh;     background-repeat: no-repeat; min-height: 5%; }
+/* the menu popup is pinned to the top of #appHolder, so the dark bar has to
+   absorb the status bar inset itself - the close icon shifts down with it */
+.menuHeader{background-color: #131114; background-image: url(../images/icon_close.png);     background-position: 73vw calc(1vh + var(--safe-top)); background-size: 3vh;     background-repeat: no-repeat; min-height: 5%; padding-top: var(--safe-top); }
 .menuHeaderName{ font-family: "Patua One","Helvetica","Arial",Sans-Serif;color:#FFF; font-size: 1.3em; font-weight:500;     padding-top: 1vh; padding-left: 5%; padding-bottom: 1vh;}
 .menuBody{min-height:93%; overflow:auto; overflow-y: scroll;  -webkit-overflow-scrolling: touch; } .menuBody::-webkit-scrollbar { width: 0; }
 .menuBodyItem{border-bottom:1px solid #D7D7D7; cursor: pointer; padding: 3% 0; display: flex; flex-direction: row; justify-content: flex-start; align-items: center; }
